@@ -20,6 +20,9 @@
   "useTabs": false,
   "embeddedLanguageFormatting": "auto",
   "printWidth": 80,
-  "plugins": ["prettier-plugin-tailwindcss", "prettier-plugin-organize-imports"],
-  "tailwindConfig": "./apps/dating-app/tailwind.config.js"
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-organize-imports"
+  ],
+  "tailwindConfig": "./tailwind.config.js"
 }

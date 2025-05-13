@@ -11,7 +11,7 @@ const NumberStep: React.FunctionComponent<INumberStepProps> = ({
 }) => {
   return (
     <div className='w-[50px] h-[50px] rounded-full bg-white text-primary flex items-center justify-center text-2xl'>
-      NumberStep
+      1
     </div>
   )
 }

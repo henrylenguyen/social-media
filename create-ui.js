@@ -97,8 +97,8 @@ function ensureComponentsJson(libPath) {
       rsc: false,
       tsx: true,
       tailwind: {
-        config: 'tailwind.config.js',
-        css: 'src/styles/globals.css',
+        config: '../../tailwind.config.js',
+        css: '../../styles/globals.css',
         baseColor: 'slate',
         cssVariables: true,
       },
@@ -142,82 +142,10 @@ export function cn(...inputs: ClassValue[]): string {
   }
 }
 
-// Ensure styles directory and globals.css exists
+// Ensure styles directory and globals.css exists (Deprecated - no longer needed)
 function ensureStyles(libPath) {
-  const stylesDir = path.join(libPath, 'src', 'styles')
-  const globalsFilePath = path.join(stylesDir, 'globals.css')
-
-  // Create styles directory if it doesn't exist
-  if (!fs.existsSync(stylesDir)) {
-    fs.mkdirSync(stylesDir, { recursive: true })
-  }
-
-  // Create globals.css if it doesn't exist
-  if (!fs.existsSync(globalsFilePath)) {
-    const globalsFileContent = `@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}`
-    fs.writeFileSync(globalsFilePath, globalsFileContent)
-    console.log(
-      `✅ Đã tạo file styles/globals.css trong ${path.basename(libPath)}`,
-    )
-  }
+  // No longer creating styles directory in libs since we use global styles
+  console.log(`ℹ️ Bỏ qua tạo thư mục styles trong ${path.basename(libPath)} - sử dụng '@social-media/styles' thay thế`)
 }
 
 // Ensure tailwind.config.js exists
@@ -226,86 +154,23 @@ function ensureTailwindConfig(libPath) {
 
   // Create tailwind.config.js if it doesn't exist
   if (!fs.existsSync(tailwindConfigPath)) {
-    const tailwindConfigContent = `const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
-const { join } = require('path');
+    const tailwindConfigContent = `// Sử dụng cấu hình Tailwind từ thư mục root
+const rootTailwindConfig = require('../../tailwind.config.js');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
+  // Kế thừa tất cả từ cấu hình root
+  ...rootTailwindConfig,
+  // Tùy chỉnh nội dung cho thư viện này nếu cần
   content: [
-    join(__dirname, 'src/**/*.{js,ts,jsx,tsx}'),
-    ...createGlobPatternsForDependencies(__dirname),
+    './src/**/*.{ts,tsx,js,jsx,html}',
+    '!./src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
+    ...rootTailwindConfig.content,
   ],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-}`
+};`
     fs.writeFileSync(tailwindConfigPath, tailwindConfigContent)
     console.log(
-      `✅ Đã tạo file tailwind.config.js trong ${path.basename(libPath)}`,
+      `✅ Đã tạo file tailwind.config.js trong ${path.basename(libPath)} tham chiếu đến cấu hình root`,
     )
   }
 }
@@ -316,15 +181,11 @@ function ensurePostcssConfig(libPath) {
 
   // Create postcss.config.js if it doesn't exist
   if (!fs.existsSync(postcssConfigPath)) {
-    const postcssConfigContent = `module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  }
-}`
+    const postcssConfigContent = `// Sử dụng cấu hình PostCSS từ thư mục root
+module.exports = require('../../postcss.config.js');`
     fs.writeFileSync(postcssConfigPath, postcssConfigContent)
     console.log(
-      `✅ Đã tạo file postcss.config.js trong ${path.basename(libPath)}`,
+      `✅ Đã tạo file postcss.config.js trong ${path.basename(libPath)} tham chiếu đến cấu hình root`,
     )
   }
 }
@@ -374,8 +235,8 @@ function createStorybookFile(componentName, componentType, componentFilePath) {
   let mainComponentName = exportNames.find(
     (name) =>
       name.toLowerCase() ===
-        componentName.charAt(0).toUpperCase() +
-          componentName.slice(1).toLowerCase() ||
+      componentName.charAt(0).toUpperCase() +
+      componentName.slice(1).toLowerCase() ||
       name === componentName.charAt(0).toUpperCase() + componentName.slice(1),
   )
 
@@ -641,8 +502,7 @@ function createComponent(componentName, componentType = null) {
                 atomsIndex.includes(`from './${dep}`)
               ) {
                 atomImports.push(
-                  `import { ${
-                    dep.charAt(0).toUpperCase() + dep.slice(1)
+                  `import { ${dep.charAt(0).toUpperCase() + dep.slice(1)
                   } } from '@social-media/atoms';`,
                 )
                 // Replace local imports with package imports

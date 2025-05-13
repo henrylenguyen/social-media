@@ -1,4 +1,4 @@
-import './global.css'
+import '@social-media/styles'
 
 export const metadata = {
   title: 'Welcome to dating-app',
