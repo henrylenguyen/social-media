@@ -17,7 +17,54 @@ module.exports = {
     //     ...createGlobPatternsForDependencies(__dirname)
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#FF6B6B', // Start of gradient
+          light: '#FF9E80',   // End of gradient
+          gradient: 'linear-gradient(to right, #FF6B6B, #FF9E80)',
+        },
+        secondary: {
+          blue: {
+            DEFAULT: '#2E86DE',
+            light: '#54A0FF',
+            gradient: 'linear-gradient(to right, #2E86DE, #54A0FF)',
+          },
+          green: {
+            DEFAULT: '#20bf6b',
+            light: '#26de81',
+            gradient: 'linear-gradient(to right, #20bf6b, #26de81)',
+          },
+          gold: {
+            DEFAULT: '#FED330',
+            light: '#F7B731',
+            gradient: 'linear-gradient(to right, #FED330, #F7B731)',
+          },
+          purple: {
+            DEFAULT: '#9C27B0',
+            light: '#D500F9',
+            gradient: 'linear-gradient(to right, #9C27B0, #D500F9)',
+          },
+        },
+        text: {
+          primary: '#333333',
+          secondary: '#666666',
+          tertiary: '#999999',
+        },
+        background: '#f8f8f8',
+        surface: '#FFFFFF',
+        error: '#FF3B5C',
+        success: '#1BE4A1',
+        warning: '#FED330',
+      },
+      backgroundImage: {
+        'primary-gradient': 'linear-gradient(to right, #FF6B6B, #FF9E80)',
+        'secondary-blue-gradient': 'linear-gradient(to right, #2E86DE, #54A0FF)',
+        'secondary-green-gradient': 'linear-gradient(to right, #20bf6b, #26de81)',
+        'secondary-gold-gradient': 'linear-gradient(to right, #FED330, #F7B731)',
+        'secondary-purple-gradient': 'linear-gradient(to right, #9C27B0, #D500F9)',
+      },
+    },
   },
   plugins: [],
 };

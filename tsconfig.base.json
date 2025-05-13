@@ -16,6 +16,17 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["development"]
+    "customConditions": ["development"],
+    "paths": {
+      "@social-media/atoms": ["libs/atoms/src/index.ts"],
+      "@social-media/atoms/*": ["libs/atoms/src/*"],
+      "@social-media/molecules": ["libs/molecules/src/index.ts"],
+      "@social-media/molecules/*": ["libs/molecules/src/*"],
+      "@social-media/organisms": ["libs/organisms/src/index.ts"],
+      "@social-media/organisms/*": ["libs/organisms/src/*"],
+      "@social-media/templates": ["libs/templates/src/index.ts"],
+      "@social-media/templates/*": ["libs/templates/src/*"],
+      "@utils/*": ["libs/atoms/src/utils/*"]
+    }
   }
 }
