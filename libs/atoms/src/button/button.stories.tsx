@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
+import type { Meta, StoryObj } from '@storybook/react'
+import { Button } from './button'
 
 /**
  * Button component from shadcn UI
@@ -11,10 +11,10 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     // Define controls for the component props here
   },
-};
+}
 
-export default meta;
-type Story = StoryObj<typeof Button>;
+export default meta
+type Story = StoryObj<typeof Button>
 
 /**
  * Default Button component
@@ -23,4 +23,4 @@ export const Default: Story = {
   args: {
     // Define default props here
   },
-};
+}

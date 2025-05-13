@@ -2,4 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+input,
+select,
+textarea {
+  background-color: transparent;
+  outline: none;
+}
+button {
+  cursor: pointer;
+  background-color: transparent;
+  outline: none;
+  border: 0;
+}
+body {
+  min-height: 100vh;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Gradient Background Classes */
+.bg-primary-gradient-to-right {
+  background-image: linear-gradient(to right, #FF6B6B, #FF9E80);
+}
+.bg-primary-gradient-to-left {
+  background-image: linear-gradient(to left, #FF6B6B, #FF9E80);
+}
+.bg-primary-gradient-to-top {
+  background-image: linear-gradient(to top, #FF6B6B, #FF9E80);
+}
+.bg-primary-gradient-to-bottom {
+  background-image: linear-gradient(to bottom, #FF6B6B, #FF9E80);
+}
+
+.bg-secondary-blue-gradient {
+  background-image: linear-gradient(to right, #2E86DE, #54A0FF);
+}
+
+.bg-secondary-green-gradient {
+  background-image: linear-gradient(to right, #20bf6b, #26de81);
+}
+
+.bg-secondary-gold-gradient {
+  background-image: linear-gradient(to right, #FED330, #F7B731);
+}
+
+.bg-secondary-purple-gradient {
+  background-image: linear-gradient(to right, #9C27B0, #D500F9);
+}
+
+/* Text Gradient Classes */
+.text-primary-gradient {
+  background-image: linear-gradient(to right, #FF6B6B, #FF9E80);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-secondary-blue-gradient {
+  background-image: linear-gradient(to right, #2E86DE, #54A0FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-secondary-green-gradient {
+  background-image: linear-gradient(to right, #20bf6b, #26de81);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-secondary-gold-gradient {
+  background-image: linear-gradient(to right, #FED330, #F7B731);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-secondary-purple-gradient {
+  background-image: linear-gradient(to right, #9C27B0, #D500F9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Border Gradient Classes */
+.border-primary-gradient {
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white),
+                   linear-gradient(to right, #FF6B6B, #FF9E80);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.border-secondary-blue-gradient {
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white),
+                   linear-gradient(to right, #2E86DE, #54A0FF);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.border-secondary-green-gradient {
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white),
+                   linear-gradient(to right, #20bf6b, #26de81);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.border-secondary-gold-gradient {
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white),
+                   linear-gradient(to right, #FED330, #F7B731);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.border-secondary-purple-gradient {
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white),
+                   linear-gradient(to right, #9C27B0, #D500F9);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
 

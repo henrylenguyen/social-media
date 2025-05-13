@@ -6,7 +6,6 @@
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
@@ -25,13 +24,14 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
     "../../apps/dating-app/.next/types/**/*.ts",
     "../../dist/apps/dating-app/.next/types/**/*.ts",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "out-tsc",
