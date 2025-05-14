@@ -1,6 +1,6 @@
-
+export * from './avatar/avatar'
 export * from './button/button'
 export * from './input/input'
+export * from './label/label'
 export { default as NumberStep } from './numberStep/numberStep'
-
-export * from './avatar/avatar';
+export * from './utils'

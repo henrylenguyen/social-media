@@ -15,8 +15,12 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       src: path.resolve(__dirname, '../../libs/atoms/src'),
-      '@social-media/styles': path.resolve(__dirname, '../../styles/globals.css'),
+      '@social-media/styles': path.resolve(
+        __dirname,
+        '../../styles/globals.css',
+      ),
       '@styles': path.resolve(__dirname, '../../styles'),
+      '@': path.resolve(__dirname, './src'),
     }
     return config
   },

@@ -123,6 +123,7 @@ function ensureComponentsJson(libPath) {
 function ensureUtils(libPath) {
   const utilsDir = path.join(libPath, 'src', 'utils')
   const cnFilePath = path.join(utilsDir, 'cn.ts')
+  const indexFilePath = path.join(utilsDir, 'index.ts')
 
   // Create utils directory if it doesn't exist
   if (!fs.existsSync(utilsDir)) {
@@ -131,21 +132,37 @@ function ensureUtils(libPath) {
 
   // Create cn.ts if it doesn't exist
   if (!fs.existsSync(cnFilePath)) {
-    const cnFileContent = `import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+    const cnFileContent = `import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }`
     fs.writeFileSync(cnFilePath, cnFileContent)
     console.log(`✅ Đã tạo file utils/cn.ts trong ${path.basename(libPath)}`)
+  }
+
+  // Create index.ts to export cn
+  if (!fs.existsSync(indexFilePath)) {
+    const indexFileContent = `export { cn } from './cn'
+`
+    fs.writeFileSync(indexFilePath, indexFileContent)
+    console.log(
+      `✅ Đã tạo file utils/index.ts để export cn trong ${path.basename(
+        libPath,
+      )}`,
+    )
   }
 }
 
 // Ensure styles directory and globals.css exists (Deprecated - no longer needed)
 function ensureStyles(libPath) {
   // No longer creating styles directory in libs since we use global styles
-  console.log(`ℹ️ Bỏ qua tạo thư mục styles trong ${path.basename(libPath)} - sử dụng '@social-media/styles' thay thế`)
+  console.log(
+    `ℹ️ Bỏ qua tạo thư mục styles trong ${path.basename(
+      libPath,
+    )} - sử dụng '@social-media/styles' thay thế`,
+  )
 }
 
 // Ensure tailwind.config.js exists
@@ -170,7 +187,9 @@ module.exports = {
 };`
     fs.writeFileSync(tailwindConfigPath, tailwindConfigContent)
     console.log(
-      `✅ Đã tạo file tailwind.config.js trong ${path.basename(libPath)} tham chiếu đến cấu hình root`,
+      `✅ Đã tạo file tailwind.config.js trong ${path.basename(
+        libPath,
+      )} tham chiếu đến cấu hình root`,
     )
   }
 }
@@ -185,7 +204,9 @@ function ensurePostcssConfig(libPath) {
 module.exports = require('../../postcss.config.js');`
     fs.writeFileSync(postcssConfigPath, postcssConfigContent)
     console.log(
-      `✅ Đã tạo file postcss.config.js trong ${path.basename(libPath)} tham chiếu đến cấu hình root`,
+      `✅ Đã tạo file postcss.config.js trong ${path.basename(
+        libPath,
+      )} tham chiếu đến cấu hình root`,
     )
   }
 }
@@ -236,8 +257,8 @@ function createStorybookFile(componentName, componentType, componentFilePath) {
   let mainComponentName = exportNames.find(
     (name) =>
       name.toLowerCase() ===
-      componentName.charAt(0).toUpperCase() +
-      componentName.slice(1).toLowerCase() ||
+        componentName.charAt(0).toUpperCase() +
+          componentName.slice(1).toLowerCase() ||
       name === componentName.charAt(0).toUpperCase() + componentName.slice(1),
   )
 
@@ -342,7 +363,219 @@ export const Default: Story = {
   fs.writeFileSync(storyFilePath, storyContent)
   console.log(`✅ Đã tạo file Storybook cho component ${componentName}`)
 
+  // Format story file
+  formatFile(storyFilePath)
+
   return storyFilePath
+}
+
+// Helper function to clean up empty directories
+function cleanupEmptyDirectories(basePath) {
+  const dirsToCheck = [
+    path.join(basePath, 'src', 'ui'),
+    path.join(basePath, 'src', '@', 'ui'),
+    path.join(basePath, 'src', '@'),
+    path.join(basePath, 'src', 'components'),
+    path.join(basePath, 'src', '@', 'components'),
+  ]
+
+  for (const dir of dirsToCheck) {
+    if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) {
+      fs.rmdirSync(dir)
+    }
+  }
+}
+
+// Function to forcefully remove UI directories and their contents
+function cleanupUIDirectories(basePath) {
+  const dirsToRemove = [
+    path.join(basePath, 'src', 'ui'),
+    path.join(basePath, 'src', '@', 'ui'),
+    path.join(basePath, 'src', 'components'),
+    path.join(basePath, 'src', '@', 'components'),
+  ]
+
+  for (const dir of dirsToRemove) {
+    if (fs.existsSync(dir)) {
+      console.log(`🧹 Đang xóa thư mục ${dir}...`)
+      try {
+        // Recursively delete directory and its contents
+        fs.rmSync(dir, { recursive: true, force: true })
+        console.log(`✅ Đã xóa thư mục ${dir} và các file bên trong`)
+      } catch (error) {
+        console.error(`❌ Không thể xóa thư mục ${dir}: ${error.message}`)
+      }
+    }
+  }
+}
+
+// Function to check for additional components created by shadcn
+function handleAdditionalComponents(libPath, componentType) {
+  // Path where shadcn might create additional components
+  const uiDirs = [
+    path.join(libPath, 'src', 'ui'),
+    path.join(libPath, 'src', '@', 'ui'),
+    path.join(libPath, 'src', 'components'),
+    path.join(libPath, 'src', '@', 'components'),
+  ]
+
+  // Atom components that should be moved if found
+  const atomComponentsList = atomComponents.map((c) => `${c}.tsx`)
+
+  // Check each potential UI directory
+  for (const uiDir of uiDirs) {
+    if (fs.existsSync(uiDir)) {
+      const files = fs.readdirSync(uiDir)
+
+      // Find any atom components that were created as secondary files
+      for (const file of files) {
+        if (atomComponentsList.includes(file)) {
+          const componentName = file.replace('.tsx', '')
+          console.log(
+            `⚠️ Phát hiện component phụ "${componentName}" được tạo ra`,
+          )
+
+          // Check if component already exists in atoms
+          const atomsDir = path.join(__dirname, 'libs', 'atoms')
+          const atomsComponentDir = path.join(atomsDir, 'src', componentName)
+          const atomsComponentPath = path.join(
+            atomsComponentDir,
+            `${componentName}.tsx`,
+          )
+
+          if (fs.existsSync(atomsComponentPath)) {
+            console.log(
+              `ℹ️ Component ${componentName} đã tồn tại trong atoms, bỏ qua`,
+            )
+            fs.unlinkSync(path.join(uiDir, file)) // Delete the duplicate
+          } else {
+            console.log(
+              `🔄 Di chuyển component ${componentName} vào thư viện atoms...`,
+            )
+
+            // Create directory in atoms
+            if (!fs.existsSync(atomsComponentDir)) {
+              fs.mkdirSync(atomsComponentDir, { recursive: true })
+            }
+
+            // Read file content
+            const fileContent = fs.readFileSync(path.join(uiDir, file), 'utf8')
+
+            // Update import paths based on component type
+            let updatedContent
+            if (componentType === 'atoms') {
+              updatedContent = fileContent
+                .replace(/from "..\/utils\/cn"/g, 'from "../utils"')
+                .replace(/from "..\/lib\/utils"/g, 'from "../utils"')
+                .replace(/from "@\/lib\/utils"/g, 'from "src/utils"')
+                .replace(/from "src\/utils\/cn"/g, 'from "src/utils"')
+                .replace(/from "src\/lib\/utils"/g, 'from "src/utils"')
+                .replace(/from "src\/ui\/(.+?)"/g, 'from "@social-media/atoms"')
+                .replace(
+                  /from "@social-media\/atoms\/utils"/g,
+                  'from "src/utils"',
+                )
+            } else {
+              updatedContent = fileContent
+                .replace(/from "..\/utils\/cn"/g, 'from "src/utils"')
+                .replace(/from "..\/lib\/utils"/g, 'from "src/utils"')
+                .replace(/from "@\/lib\/utils"/g, 'from "src/utils"')
+                .replace(/from "src\/utils\/cn"/g, 'from "src/utils"')
+                .replace(/from "src\/lib\/utils"/g, 'from "src/utils"')
+                .replace(/from "src\/ui\/(.+?)"/g, 'from "@social-media/atoms"')
+                .replace(
+                  /from "@social-media\/atoms\/utils"/g,
+                  'from "src/utils"',
+                )
+
+              // Add import for any atom dependencies if they exist in atoms lib
+              const atomsIndexPath = path.join(
+                __dirname,
+                'libs',
+                'atoms',
+                'src',
+                'index.ts',
+              )
+              if (fs.existsSync(atomsIndexPath)) {
+                const atomsIndex = fs.readFileSync(atomsIndexPath, 'utf8')
+                const atomImports = []
+
+                // Check for common atom dependencies
+                const potentialDependencies = [
+                  'button',
+                  'input',
+                  'label',
+                  'checkbox',
+                ]
+                for (const dep of potentialDependencies) {
+                  if (
+                    updatedContent.includes(`from "./${dep}`) &&
+                    atomsIndex.includes(`from './${dep}`)
+                  ) {
+                    atomImports.push(
+                      `import { ${
+                        dep.charAt(0).toUpperCase() + dep.slice(1)
+                      } } from '@social-media/atoms'`,
+                    )
+                    // Replace local imports with package imports
+                    updatedContent = updatedContent.replace(
+                      new RegExp('from "\\./' + dep, 'g'),
+                      `from '@social-media/atoms'`,
+                    )
+                  }
+                }
+
+                if (atomImports.length > 0) {
+                  // Add imports at the top of the file
+                  updatedContent =
+                    atomImports.join('\n') + '\n' + updatedContent
+                }
+              }
+            }
+
+            // Write to the new location
+            const targetPath = path.join(
+              atomsComponentDir,
+              `${componentName}.tsx`,
+            )
+            fs.writeFileSync(targetPath, updatedContent)
+
+            // Format the file
+            formatFile(targetPath)
+
+            // Create Storybook file
+            createStorybookFile(componentName, 'atoms', targetPath)
+
+            // Update atoms index.ts
+            const atomsIndexPath = path.join(atomsDir, 'src', 'index.ts')
+            const exportStatement = `export * from './${componentName}';\n`
+
+            if (fs.existsSync(atomsIndexPath)) {
+              const indexContent = fs.readFileSync(atomsIndexPath, 'utf8')
+              if (!indexContent.includes(exportStatement.trim())) {
+                fs.appendFileSync(atomsIndexPath, exportStatement)
+                console.log(
+                  `✅ Đã cập nhật index.ts atoms để export component ${componentName}`,
+                )
+
+                // Format file
+                formatFile(atomsIndexPath)
+              }
+            }
+
+            // Delete original file
+            fs.unlinkSync(path.join(uiDir, file))
+            console.log(
+              `✅ Đã di chuyển thành công component ${componentName} vào atoms`,
+            )
+          }
+        }
+      }
+    }
+  }
+
+  // Clean up UI directories after handling additional components
+  cleanupUIDirectories(libPath)
 }
 
 // Main function to create component
@@ -392,12 +625,7 @@ function createComponent(componentName, componentType = null) {
     ensureRequiredFiles(libPath)
 
     // Create component directory if it doesn't exist
-    let componentDir
-    if (componentType === 'atoms') {
-      componentDir = path.join(libPath, 'src', componentName)
-    } else {
-      componentDir = path.join(libPath, 'src', 'lib', componentName)
-    }
+    const componentDir = path.join(libPath, 'src', componentName)
 
     if (!fs.existsSync(componentDir)) {
       fs.mkdirSync(componentDir, { recursive: true })
@@ -409,12 +637,7 @@ function createComponent(componentName, componentType = null) {
     )
 
     // Path where shadcn should create the component
-    let shadcnPath
-    if (componentType === 'atoms') {
-      shadcnPath = `src/${componentName}`
-    } else {
-      shadcnPath = `src/lib/${componentName}`
-    }
+    const shadcnPath = `src/${componentName}`
 
     // Create component with shadcn
     execSync(
@@ -423,24 +646,13 @@ function createComponent(componentName, componentType = null) {
     )
 
     // Check if file was created successfully
-    let targetFilePath
-    let possiblePaths = []
-
-    if (componentType === 'atoms') {
-      targetFilePath = path.join(componentDir, `${componentName}.tsx`)
-      possiblePaths = [
-        path.join(libPath, 'src', '@', 'ui', `${componentName}.tsx`),
-        path.join(libPath, 'src', 'ui', `${componentName}.tsx`),
-      ]
-    } else {
-      targetFilePath = path.join(componentDir, `${componentName}.tsx`)
-      possiblePaths = [
-        path.join(libPath, 'src', 'lib', '@', 'ui', `${componentName}.tsx`),
-        path.join(libPath, 'src', 'lib', 'ui', `${componentName}.tsx`),
-        path.join(libPath, 'src', '@', 'ui', `${componentName}.tsx`),
-        path.join(libPath, 'src', 'ui', `${componentName}.tsx`),
-      ]
-    }
+    const targetFilePath = path.join(componentDir, `${componentName}.tsx`)
+    const possiblePaths = [
+      path.join(libPath, 'src', '@', 'ui', `${componentName}.tsx`),
+      path.join(libPath, 'src', 'ui', `${componentName}.tsx`),
+      path.join(libPath, 'src', '@', 'components', `${componentName}.tsx`),
+      path.join(libPath, 'src', 'components', `${componentName}.tsx`),
+    ]
 
     // Move file if it was created in a different location
     let fileFound = false
@@ -455,28 +667,22 @@ function createComponent(componentName, componentType = null) {
         let updatedContent
         if (componentType === 'atoms') {
           updatedContent = fileContent
-            .replace(/from "..\/utils\/cn"/g, 'from "../utils/cn"')
-            .replace(/from "..\/lib\/utils"/g, 'from "../utils/cn"')
-            .replace(/from "@\/lib\/utils"/g, 'from "../utils/cn"')
-            .replace(/from "src\/lib\/utils"/g, 'from "src/utils/cn"')
+            .replace(/from "..\/utils\/cn"/g, 'from "../utils"')
+            .replace(/from "..\/lib\/utils"/g, 'from "../utils"')
+            .replace(/from "@\/lib\/utils"/g, 'from "src/utils"')
+            .replace(/from "src\/utils\/cn"/g, 'from "src/utils"')
+            .replace(/from "src\/lib\/utils"/g, 'from "src/utils"')
+            .replace(/from "src\/ui\/(.+?)"/g, 'from "@social-media/atoms"')
+            .replace(/from "@social-media\/atoms\/utils"/g, 'from "src/utils"')
         } else {
           updatedContent = fileContent
-            .replace(
-              /from "..\/utils\/cn"/g,
-              'from "@social-media/atoms/utils/cn"',
-            )
-            .replace(
-              /from "..\/lib\/utils"/g,
-              'from "@social-media/atoms/utils/cn"',
-            )
-            .replace(
-              /from "@\/lib\/utils"/g,
-              'from "@social-media/atoms/utils/cn"',
-            )
-            .replace(
-              /from "src\/lib\/utils"/g,
-              'from "@social-media/atoms/utils/cn"',
-            )
+            .replace(/from "..\/utils\/cn"/g, 'from "src/utils"')
+            .replace(/from "..\/lib\/utils"/g, 'from "src/utils"')
+            .replace(/from "@\/lib\/utils"/g, 'from "src/utils"')
+            .replace(/from "src\/utils\/cn"/g, 'from "src/utils"')
+            .replace(/from "src\/lib\/utils"/g, 'from "src/utils"')
+            .replace(/from "src\/ui\/(.+?)"/g, 'from "@social-media/atoms"')
+            .replace(/from "@social-media\/atoms\/utils"/g, 'from "src/utils"')
 
           // Add import for any atom dependencies if they exist in atoms lib
           const atomsIndexPath = path.join(
@@ -503,12 +709,13 @@ function createComponent(componentName, componentType = null) {
                 atomsIndex.includes(`from './${dep}`)
               ) {
                 atomImports.push(
-                  `import { ${dep.charAt(0).toUpperCase() + dep.slice(1)
-                  } } from '@social-media/atoms';`,
+                  `import { ${
+                    dep.charAt(0).toUpperCase() + dep.slice(1)
+                  } } from '@social-media/atoms'`,
                 )
                 // Replace local imports with package imports
                 updatedContent = updatedContent.replace(
-                  new RegExp(`from "\\.\/${dep}`, 'g'),
+                  new RegExp('from "\\./' + dep, 'g'),
                   `from '@social-media/atoms'`,
                 )
               }
@@ -522,17 +729,24 @@ function createComponent(componentName, componentType = null) {
         }
 
         // Write to the new location
-        fs.writeFileSync(targetFilePath, updatedContent)
-        fs.unlinkSync(oldPath) // Delete old file
-        console.log(
-          `✅ Đã di chuyển component ${componentName} đến đúng thư mục`,
-        )
+        const targetPath = path.join(componentDir, `${componentName}.tsx`)
+        fs.writeFileSync(targetPath, updatedContent)
+
+        // Format the file
+        formatFile(targetPath)
+
+        // Create Storybook file
+        createStorybookFile(componentName, componentType, targetPath)
+
         break
       }
     }
 
     // Clean up any empty directories
     cleanupEmptyDirectories(libPath)
+
+    // Check for additional components created by shadcn
+    handleAdditionalComponents(libPath, componentType)
 
     // Check if component file was created successfully
     if (fs.existsSync(targetFilePath)) {
@@ -550,28 +764,45 @@ function createComponent(componentName, componentType = null) {
             `export * from './${componentName}';\n`,
           )
           console.log(`✅ Đã tạo file index.ts trong thư mục component`)
+
+          // Format index file
+          formatFile(indexComponentPath)
         }
       }
 
       // Update main index.ts to export new component
-      const indexFilePath =
-        componentType === 'atoms'
-          ? path.join(libPath, 'src', 'index.ts')
-          : path.join(libPath, 'src', 'index.ts')
+      const indexFilePath = path.join(libPath, 'src', 'index.ts')
 
       if (fs.existsSync(indexFilePath)) {
         const indexContent = fs.readFileSync(indexFilePath, 'utf8')
-        let exportStatement
+        // Use component directory to export correctly, avoid double export
+        const exportStatement = `export * from './${componentName}';\n`
+        const duplicateExport = `export * from './${componentName}';\n`
 
-        if (componentType === 'atoms') {
-          exportStatement = `export * from './${componentName}/${componentName}';\n`
-        } else {
-          exportStatement = `export * from './lib/${componentName}';\n`
-        }
-
-        if (!indexContent.includes(exportStatement.trim())) {
+        if (
+          !indexContent.includes(exportStatement.trim()) &&
+          !indexContent.includes(duplicateExport.trim())
+        ) {
           fs.appendFileSync(indexFilePath, exportStatement)
           console.log(`✅ Đã cập nhật index.ts để export component mới`)
+
+          // Format index file
+          formatFile(indexFilePath)
+        } else if (indexContent.includes(duplicateExport.trim())) {
+          console.log(`ℹ️ Phát hiện export dư thừa trong index.ts, sửa lại...`)
+          // Replace duplicated export
+          const newContent = indexContent.replace(duplicateExport, '')
+          fs.writeFileSync(indexFilePath, newContent)
+
+          // Add correct export if it doesn't exist
+          if (!newContent.includes(exportStatement.trim())) {
+            fs.appendFileSync(indexFilePath, exportStatement)
+          }
+
+          console.log(`✅ Đã sửa export dư thừa trong index.ts`)
+
+          // Format index file
+          formatFile(indexFilePath)
         } else {
           console.log(`ℹ️ Component đã được export trong index.ts`)
         }
@@ -582,15 +813,13 @@ function createComponent(componentName, componentType = null) {
           fs.mkdirSync(indexDir, { recursive: true })
         }
 
-        let exportStatement
-        if (componentType === 'atoms') {
-          exportStatement = `export * from './${componentName}/${componentName}';\n`
-        } else {
-          exportStatement = `export * from './lib/${componentName}';\n`
-        }
+        const exportStatement = `export * from './${componentName}';\n`
 
         fs.writeFileSync(indexFilePath, exportStatement)
         console.log(`✅ Đã tạo file index.ts để export component mới`)
+
+        // Format index file
+        formatFile(indexFilePath)
       }
     } else if (!fileFound) {
       console.log(`❌ Không tìm thấy file component sau khi tạo`)
@@ -598,6 +827,9 @@ function createComponent(componentName, componentType = null) {
         `⚠️ Vui lòng kiểm tra thư mục ui hoặc @/ui xem component đã được tạo ở đó chưa`,
       )
     }
+
+    // Make sure UI directories are completely removed
+    cleanupUIDirectories(libPath)
   } catch (error) {
     console.error('Lỗi:', error.message)
   }
@@ -631,21 +863,18 @@ function askComponentType(componentName) {
   )
 }
 
-// Helper function to clean up empty directories
-function cleanupEmptyDirectories(basePath) {
-  const dirsToCheck = [
-    path.join(basePath, 'src', 'ui'),
-    path.join(basePath, 'src', '@', 'ui'),
-    path.join(basePath, 'src', '@'),
-    path.join(basePath, 'src', 'lib', 'ui'),
-    path.join(basePath, 'src', 'lib', '@', 'ui'),
-    path.join(basePath, 'src', 'lib', '@'),
-  ]
-
-  for (const dir of dirsToCheck) {
-    if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) {
-      fs.rmdirSync(dir)
-    }
+// Function to format a file using Prettier
+function formatFile(filePath) {
+  try {
+    console.log(`🔄 Đang format file ${path.basename(filePath)}...`)
+    execSync(`npx prettier --write "${filePath}"`, { stdio: 'ignore' })
+    console.log(`✅ Đã format file ${path.basename(filePath)}`)
+    return true
+  } catch (error) {
+    console.log(
+      `⚠️ Không thể format file ${path.basename(filePath)}: ${error.message}`,
+    )
+    return false
   }
 }
 

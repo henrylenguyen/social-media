@@ -2,13 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "baseUrl": ".",
+    "rootDir": "src",
     "types": [
       "node",
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts"
     ],
-    "rootDir": "src",
-    "baseUrl": ".",
     "jsx": "react-jsx",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
   },
@@ -32,5 +32,10 @@
     "**/*.stories.jsx",
     "**/*.stories.tsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
 }

@@ -21,7 +21,8 @@
     "**/*.stories.ts",
     "**/*.stories.jsx",
     "**/*.stories.js",
-    "**/*.stories.mdx"
+    "**/*.stories.mdx",
+    "../atoms/src/label/label.tsx"
   ],
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }

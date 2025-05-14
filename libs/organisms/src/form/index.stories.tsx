@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from './button'
+import { Form } from './form'
 
 /**
- * Button component from shadcn UI
+ * Form component from shadcn UI
  */
-const meta: Meta<typeof Button> = {
-  title: 'Atoms/Button',
-  component: Button,
+const meta: Meta<typeof Form> = {
+  title: 'Organisms/Form',
+  component: Form,
   tags: ['autodocs'],
   argTypes: {
     // Define controls for the component props here
@@ -14,10 +14,10 @@ const meta: Meta<typeof Button> = {
 }
 
 export default meta
-type Story = StoryObj<typeof Button>
+type Story = StoryObj<typeof Form>
 
 /**
- * Default Button component
+ * Default Form component
  */
 export const Default: Story = {
   args: {
