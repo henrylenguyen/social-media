@@ -5,7 +5,10 @@
   "scripts": {
     "create:ui": "node create-ui.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:single": "prettier --write",
+    "storybook": "storybook dev -p 6007 -c .storybook",
+    "build-storybook": "storybook build -c .storybook"
   },
   "private": true,
   "dependencies": {
@@ -15,11 +18,11 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.510.0",
-    "next": "~15.2.4",
+    "next": "14.2.15",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.0.0-insiders.d539a72",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -44,6 +47,7 @@
     "@storybook/addon-essentials": "8.6.12",
     "@storybook/addon-interactions": "^8.6.11",
     "@storybook/core-server": "8.6.12",
+    "@storybook/csf-tools": "^8.6.12",
     "@storybook/jest": "^0.2.3",
     "@storybook/nextjs": "8.6.12",
     "@storybook/react-vite": "8.6.12",
@@ -55,6 +59,7 @@
     "@swc/helpers": "~0.5.11",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.1.0",
+    "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.17.46",
     "@types/react": "19.0.0",

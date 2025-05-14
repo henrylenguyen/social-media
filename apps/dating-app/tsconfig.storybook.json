@@ -1,19 +1,30 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "out-tsc/storybook",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "exclude": ["components/**/*.spec.ts", "components/**/*.test.ts"],
   "include": [
-    "components/**/*.stories.ts",
-    "components/**/*.stories.js",
-    "components/**/*.stories.jsx",
-    "components/**/*.stories.tsx",
-    "components/**/*.stories.mdx",
-    ".storybook/*.js",
-    ".storybook/*.ts"
-  ]
+    "**/*.stories.tsx",
+    "**/*.stories.ts",
+    "**/*.stories.jsx",
+    "**/*.stories.js",
+    "**/*.stories.mdx",
+    "../../libs/atoms/src/**/*.{ts,tsx}",
+    "../../libs/molecules/src/**/*.{ts,tsx}"
+  ],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }

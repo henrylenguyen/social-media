@@ -21,6 +21,6 @@ type Story = StoryObj<typeof Button>
  */
 export const Default: Story = {
   args: {
-    // Define default props here
+    children: 'Button',
   },
 }

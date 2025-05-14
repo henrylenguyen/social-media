@@ -1,4 +1,4 @@
-import { NumberStep } from '@social-media/atoms'
+import { NumberStepWithText } from "@social-media/molecules"
 
 interface AuthLayoutProps {
   children: React.ReactNode
@@ -11,8 +11,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           <div className='flex items-center justify-center'>
             <h1 className='text-center text-3xl font-bold text-white'>Match</h1>
           </div>
+          <NumberStepWithText step="1">Tạo hồ sơ hấp dẫn</NumberStepWithText>
+          <NumberStepWithText step="2">Khám phá những người phù hợp</NumberStepWithText>
+          <NumberStepWithText step="3">Bắt đầu cuộc trò chuyện thú vị</NumberStepWithText>
           <div>
-            <NumberStep>1</NumberStep>
             {children}
           </div>
         </div>

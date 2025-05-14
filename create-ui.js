@@ -204,16 +204,17 @@ function createStorybookFile(componentName, componentType, componentFilePath) {
   let storyFilePath
   let storyImportPath
 
+  // Always create story file with the name index.stories.tsx
   if (componentType === 'atoms') {
     storyFilePath = path.join(
       path.dirname(componentFilePath),
-      `${componentName}.stories.tsx`,
+      `index.stories.tsx`,
     )
     storyImportPath = `./${componentName}`
   } else {
     storyFilePath = path.join(
       path.dirname(componentFilePath),
-      `${componentName}.stories.tsx`,
+      `index.stories.tsx`,
     )
     storyImportPath = `./${componentName}`
   }

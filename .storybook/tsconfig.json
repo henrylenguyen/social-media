@@ -1,0 +1,35 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@social-media/atoms": ["../libs/atoms/src"],
+      "@social-media/atoms/*": ["../libs/atoms/src/*"],
+      "@social-media/molecules": ["../libs/molecules/src"],
+      "@social-media/molecules/*": ["../libs/molecules/src/*"],
+      "@social-media/organisms": ["../libs/organisms/src"],
+      "@social-media/organisms/*": ["../libs/organisms/src/*"],
+      "@social-media/templates": ["../libs/templates/src"],
+      "@social-media/templates/*": ["../libs/templates/src/*"]
+    }
+  },
+  "include": [
+    "../libs/**/*.stories.ts",
+    "../libs/**/*.stories.tsx",
+    "../libs/**/*.stories.js",
+    "../libs/**/*.stories.jsx",
+    "../libs/**/*.stories.mdx",
+    "*.ts",
+    "*.js"
+  ]
+}

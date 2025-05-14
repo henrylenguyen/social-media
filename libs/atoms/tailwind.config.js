@@ -8,7 +8,7 @@ module.exports = {
   // But customize the content for this library if needed
   content: [
     './src/**/*.{ts,tsx,js,jsx,html}',
-    '!./src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
+    './src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
     ...rootTailwindConfig.content,
   ],
 };
