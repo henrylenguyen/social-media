@@ -13,6 +13,10 @@
   },
   "files": [],
   "include": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.jsx",
+    "src/**/*.js",
     "**/*.stories.tsx",
     "**/*.stories.ts",
     "**/*.stories.jsx",
