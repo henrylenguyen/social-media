@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import GridLayout from './gridLayout'
 
 const meta: Meta<typeof GridLayout> = {
-  title: 'Orrganisms/GridLayout',
+  title: 'Organisms/GridLayout',
   component: GridLayout,
   tags: ['autodocs'],
   parameters: {

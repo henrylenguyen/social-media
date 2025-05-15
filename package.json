@@ -8,7 +8,8 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "format:single": "prettier --write",
     "storybook": "storybook dev -p 6007 -c .storybook",
-    "build-storybook": "storybook build -c .storybook"
+    "build-storybook": "storybook build -c .storybook",
+    "dating:dev": "nx run dating-app:dev"
   },
   "private": true,
   "dependencies": {

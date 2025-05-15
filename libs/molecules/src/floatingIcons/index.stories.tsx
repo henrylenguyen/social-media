@@ -55,6 +55,7 @@ export const Default: Story = {
         size: 'md',
       },
     ],
+    haveContainer: true,
   },
 }
 
@@ -77,5 +78,6 @@ export const FewerItems: Story = {
         size: 'sm',
       },
     ],
+    haveContainer: true,
   },
 }

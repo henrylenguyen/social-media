@@ -60,6 +60,13 @@ export interface FloatingIconsProps {
    * Dùng để thay đổi kiểu dáng của toàn bộ component.
    */
   className?: string
+
+  /**
+   * Cho biết có hiển thị container layout cho các icon hay không.
+   * Nếu không có container, nó sẽ lấy layout nào có position 'relative' .
+   *
+   */
+  haveContainer?: boolean
 }
 
 /**
@@ -67,7 +74,11 @@ export interface FloatingIconsProps {
  * Mỗi biểu tượng sẽ di chuyển theo đường dẫn ngẫu nhiên nhưng có tính xác định,
  * với tốc độ và độ trễ khác nhau để tạo cảm giác tự nhiên.
  */
-const FloatingIcons: React.FC<FloatingIconsProps> = ({ items, className }) => {
+const FloatingIcons: React.FC<FloatingIconsProps> = ({
+  items,
+  className,
+  haveContainer,
+}) => {
   const [isClient, setIsClient] = React.useState(false)
 
   // Only run on client-side
@@ -172,7 +183,7 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({ items, className }) => {
   }
 
   return (
-    <div className={cn('floating-icons-container', className)}>
+    <div className={cn(haveContainer ?? 'floating-icons-container', className)}>
       {items.map((item, index) => (
         <div
           key={item.id}
