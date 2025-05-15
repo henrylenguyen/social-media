@@ -1,17 +1,12 @@
 import { motion } from 'framer-motion'
 import * as React from 'react'
 import { cn } from 'src/utils'
+import './styles.css'
 
 /**
  * Component hiển thị chuỗi các bước đăng ký với hiệu ứng hiển thị.
  * Bước active sẽ được hiển thị lớn hơn và có màu đậm hơn,
  * các bước còn lại sẽ nhỏ dần và nhạt dần khi càng xa bước active.
- *
- * @example
- * ```tsx
- * <SignUpStep currentStep={2} totalSteps={4} />
- * <SignUpStep currentStep={1} totalSteps={3} className="my-4" />
- * ```
  */
 export interface ISignUpStepProps {
   /**
@@ -44,10 +39,10 @@ export interface ISignUpStepProps {
   size?: 'sm' | 'md' | 'lg'
 
   /**
-   * Chỉ hiển thị text cho step hiện tại và step tiếp theo
-   * @default true
+   * Khoảng cách giữa các bước, sử dụng để điều chỉnh không gian cho text
+   * @default 'md'
    */
-  showCurrentAndNextTextOnly?: boolean
+  spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }
 
 /**
@@ -61,7 +56,7 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
   stepTexts = [],
   className,
   size = 'md',
-  showCurrentAndNextTextOnly = true,
+  spacing = 'md',
 }) => {
   // Tạo ref để lưu trữ thời gian animation cho hiệu ứng chạy liên tục
   const animatingStep = React.useRef<number>(1)
@@ -81,38 +76,47 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
       active: 22,
       base: 18,
       reduction: 1,
-      lineWidth: 10,
+      lineWidth: 30,
       fontSize: 11,
       textSize: 10,
-      gap: 0,
     },
     md: {
       active: 26,
       base: 22,
       reduction: 1.5,
-      lineWidth: 15,
+      lineWidth: 45,
       fontSize: 12,
       textSize: 11,
-      gap: 0.5,
     },
     lg: {
       active: 30,
       base: 25,
       reduction: 2,
-      lineWidth: 20,
+      lineWidth: 60,
       fontSize: 14,
       textSize: 12,
-      gap: 1,
     },
   }
 
-  const { active, base, reduction, lineWidth, fontSize, textSize, gap } =
+  // Spacing adjustments for text width
+  const spacingMap = {
+    xs: { gapMultiplier: 0.6, textWidth: 60 },
+    sm: { gapMultiplier: 1, textWidth: 80 },
+    md: { gapMultiplier: 1.5, textWidth: 100 },
+    lg: { gapMultiplier: 2, textWidth: 120 },
+    xl: { gapMultiplier: 2.5, textWidth: 140 },
+  }
+
+  const { active, base, reduction, lineWidth, fontSize, textSize } =
     sizeMap[size]
+  const { gapMultiplier, textWidth } = spacingMap[spacing]
+
+  // Increase line width based on spacing choice
+  const adjustedLineWidth = lineWidth * gapMultiplier
 
   return (
-    <div className={cn('flex flex-col w-full', className)}>
-      {/* Circles and connecting lines */}
-      <div className={`flex items-center justify-center gap-${gap}`}>
+    <div className={cn('signup-step-wrapper', className)}>
+      <div className={cn('signup-step-container', `spacing-${spacing}`)}>
         {Array.from({ length: totalSteps }).map((_, index) => {
           const stepNumber = index + 1
           const distanceFromCurrent = Math.abs(currentStep - stepNumber)
@@ -132,41 +136,35 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
           const sizeReduction = Math.min(distanceFromCurrent * reduction, 6)
           const circleSize = isActive ? active : base - sizeReduction
 
-          // Xác định xem có nên hiển thị text hay không
-          const shouldShowText =
-            stepTexts[index] &&
-            (!showCurrentAndNextTextOnly || isActive || isNext || isCompleted)
-
           return (
             <React.Fragment key={stepNumber}>
               {stepNumber > 1 && (
                 <div
-                  className='flex-shrink-0'
-                  style={{ width: `${lineWidth}px` }}
+                  className='step-line'
+                  style={{ width: `${adjustedLineWidth}px` }}
                 >
-                  <div className='h-[1.5px] w-full bg-white/70 relative overflow-hidden'>
-                    {stepNumber <= currentStep && (
-                      <motion.div
-                        className='absolute top-0 bottom-0 left-0 w-full'
-                        style={{
-                          background:
-                            'linear-gradient(to right, rgba(255, 107, 107, 0.9), rgba(255, 107, 107, 0.7))',
-                        }}
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
-                        transition={{
-                          duration: 2,
-                          ease: 'easeInOut',
-                          repeat: Infinity,
-                          delay: (stepNumber - 1) * 0.5,
-                        }}
-                      />
-                    )}
-                  </div>
+                  {stepNumber <= currentStep && (
+                    <motion.div
+                      className='absolute top-0 bottom-0 left-0 w-full'
+                      style={{
+                        background:
+                          'linear-gradient(to right, rgba(255, 107, 107, 0.9), rgba(255, 107, 107, 0.7))',
+                      }}
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '100%' }}
+                      transition={{
+                        duration: 2,
+                        ease: 'easeInOut',
+                        repeat: Infinity,
+                        delay: (stepNumber - 1) * 0.5,
+                      }}
+                    />
+                  )}
                 </div>
               )}
+
               <div
-                className='flex-shrink-0 relative'
+                className='step-circle-container'
                 style={{ width: `${Math.max(circleSize, 28)}px` }}
               >
                 <motion.div
@@ -223,19 +221,11 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                   </span>
                 </motion.div>
 
-                {/* Text labels below circles */}
-                {shouldShowText && (
-                  <motion.div
-                    className='absolute left-1/2 transform -translate-x-1/2 mt-1'
-                    style={{
-                      top: `${circleSize + 2}px`,
-                      width:
-                        size === 'sm'
-                          ? '65px'
-                          : size === 'md'
-                          ? '75px'
-                          : '85px',
-                    }}
+                {/* Text labels below circles - now always shows */}
+                {stepTexts[index] && (
+                  <div
+                    className='step-text-container'
+                    style={{ top: `${circleSize + 2}px` }}
                   >
                     <motion.span
                       className={cn(
@@ -247,13 +237,7 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                       }}
                       initial={{ opacity: 0, y: -5 }}
                       animate={{
-                        opacity: isActive
-                          ? 1
-                          : isNext
-                          ? 0.8
-                          : isCompleted
-                          ? 0.6
-                          : 0,
+                        opacity: isActive ? 1 : isNext ? 0.8 : 0.6,
                         y: 0,
                         scale: isActive ? 1 : isNext ? 0.95 : 0.9,
                       }}
@@ -261,7 +245,7 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                     >
                       {stepTexts[index]}
                     </motion.span>
-                  </motion.div>
+                  </div>
                 )}
               </div>
             </React.Fragment>

@@ -28,6 +28,14 @@ const meta: Meta<typeof SignUpStep> = {
       control: 'text',
       description: 'CSS class để tùy chỉnh component',
     },
+    size: {
+      control: { type: 'select', options: ['sm', 'md', 'lg'] },
+      description: 'Kích thước của component',
+    },
+    spacing: {
+      control: { type: 'select', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
+      description: 'Khoảng cách giữa các bước',
+    },
   },
 }
 
@@ -63,6 +71,7 @@ export const FiveSteps: Story = {
     currentStep: 3,
     totalSteps: 5,
     stepTexts: ['Bắt đầu', 'Tài khoản', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    spacing: 'md',
   },
 }
 
@@ -84,6 +93,7 @@ export const ManySteps: Story = {
   args: {
     currentStep: 2,
     totalSteps: 7,
+    spacing: 'xs',
     stepTexts: [
       'Bắt đầu',
       'Tài khoản',
@@ -103,6 +113,7 @@ export const LongTextLabels: Story = {
   args: {
     currentStep: 2,
     totalSteps: 4,
+    spacing: 'xl',
     stepTexts: [
       'Thông tin tài khoản',
       'Chi tiết cá nhân',
@@ -140,53 +151,53 @@ export const Progress: Story = {
 
     return (
       <div className='flex flex-col gap-8 p-4'>
-        <div className='p-4 border rounded-lg'>
+        <div className='p-4 rounded-lg'>
           <h3 className='font-semibold mb-3 text-white'>Bước 1/5</h3>
           <SignUpStep
             currentStep={1}
             totalSteps={5}
             stepTexts={steps}
-            className='w-[300px]'
+            spacing='lg'
           />
         </div>
 
-        <div className='p-4 border rounded-lg'>
+        <div className='p-4 rounded-lg'>
           <h3 className='font-semibold mb-3 text-white'>Bước 2/5</h3>
           <SignUpStep
             currentStep={2}
             totalSteps={5}
             stepTexts={steps}
-            className='w-[300px]'
+            spacing='lg'
           />
         </div>
 
-        <div className='p-4 border rounded-lg'>
+        <div className='p-4 rounded-lg'>
           <h3 className='font-semibold mb-3 text-white'>Bước 3/5</h3>
           <SignUpStep
             currentStep={3}
             totalSteps={5}
             stepTexts={steps}
-            className='w-[300px]'
+            spacing='lg'
           />
         </div>
 
-        <div className='p-4 border rounded-lg'>
+        <div className='p-4 rounded-lg'>
           <h3 className='font-semibold mb-3 text-white'>Bước 4/5</h3>
           <SignUpStep
             currentStep={4}
             totalSteps={5}
             stepTexts={steps}
-            className='w-[300px]'
+            spacing='lg'
           />
         </div>
 
-        <div className='p-4 border rounded-lg'>
+        <div className='p-4 rounded-lg'>
           <h3 className='font-semibold mb-3 text-white'>Bước 5/5</h3>
           <SignUpStep
             currentStep={5}
             totalSteps={5}
             stepTexts={steps}
-            className='w-[300px]'
+            spacing='lg'
           />
         </div>
       </div>

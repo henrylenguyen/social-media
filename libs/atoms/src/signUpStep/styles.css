@@ -1,0 +1,50 @@
+.signup-step-wrapper {
+  width: 100%;
+}
+
+.signup-step-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.step-line {
+  height: 1.5px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.step-circle-container {
+  position: relative;
+}
+
+.step-text-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Spacing options */
+.spacing-xs .step-text-container {
+  width: 60px;
+}
+
+.spacing-sm .step-text-container {
+  width: 80px;
+}
+
+.spacing-md .step-text-container {
+  width: 100px;
+}
+
+.spacing-lg .step-text-container {
+  width: 120px;
+}
+
+.spacing-xl .step-text-container {
+  width: 140px;
+}
