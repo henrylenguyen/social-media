@@ -1,6 +1,11 @@
 export * from './avatar/avatar'
 export * from './button/button'
+export { default as CircleWithImage } from './circleWithImage/circleWithImage'
+export { default as GridLayout } from './gridLayout/gridLayout'
 export * from './input/input'
 export * from './label/label'
 export { default as NumberStep } from './numberStep/numberStep'
+export { default } from './signUpStep/signUpStep'
+export type { ISignUpStepProps } from './signUpStep/signUpStep'
+
 export * from './utils'

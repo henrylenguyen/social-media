@@ -45,11 +45,11 @@ const NumberStep: React.FunctionComponent<INumberStepProps> = ({
   return (
     <div
       className={cn(
-        'w-[50px] h-[50px] rounded-full bg-white flex items-center justify-center text-2xl',
+        'w-[50px] h-[50px] rounded-full bg-primary-gradient-to-right flex items-center justify-center text-2xl',
         className,
       )}
     >
-      <span className={cn('text-primary', textClassName)}>{children || 1}</span>
+      <span className={cn('text-white', textClassName)}>{children || 1}</span>
     </div>
   )
 }

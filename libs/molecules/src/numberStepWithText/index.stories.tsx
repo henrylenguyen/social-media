@@ -7,11 +7,11 @@ const meta: Meta<typeof NumberStepWithText> = {
   parameters: {
     layout: 'centered',
     backgrounds: {
-      default: 'primary',
-    }
+      default: 'dark-light',
+    },
   },
   tags: ['autodocs'],
-};
+}
 
 export default meta;
 type Story = StoryObj<typeof NumberStepWithText>;

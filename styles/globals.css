@@ -92,20 +92,20 @@ body {
 
 /* Gradient Background Classes */
 .bg-primary-gradient-to-right {
-  background-image: linear-gradient(to right, #FF6B6B, #FF9E80);
+  background-image: linear-gradient(to right, #ff6b6b, #ff9e80);
 }
 .bg-primary-gradient-to-left {
-  background-image: linear-gradient(to left, #FF6B6B, #FF9E80);
+  background-image: linear-gradient(to left, #ff6b6b, #ff9e80);
 }
 .bg-primary-gradient-to-top {
-  background-image: linear-gradient(to top, #FF6B6B, #FF9E80);
+  background-image: linear-gradient(to top, #ff6b6b, #ff9e80);
 }
 .bg-primary-gradient-to-bottom {
-  background-image: linear-gradient(to bottom, #FF6B6B, #FF9E80);
+  background-image: linear-gradient(to bottom, #ff6b6b, #ff9e80);
 }
 
 .bg-secondary-blue-gradient {
-  background-image: linear-gradient(to right, #2E86DE, #54A0FF);
+  background-image: linear-gradient(to right, #2e86de, #54a0ff);
 }
 
 .bg-secondary-green-gradient {
@@ -113,23 +113,26 @@ body {
 }
 
 .bg-secondary-gold-gradient {
-  background-image: linear-gradient(to right, #FED330, #F7B731);
+  background-image: linear-gradient(to right, #fed330, #f7b731);
 }
 
 .bg-secondary-purple-gradient {
-  background-image: linear-gradient(to right, #9C27B0, #D500F9);
+  background-image: linear-gradient(to right, #9c27b0, #d500f9);
 }
 
+.bg-primary-purple-gradient {
+  background-image: linear-gradient(135deg, #2e1065, #2e1065);
+}
 /* Text Gradient Classes */
 .text-primary-gradient {
-  background-image: linear-gradient(to right, #FF6B6B, #FF9E80);
+  background-image: linear-gradient(to right, #ff6b6b, #ff9e80);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .text-secondary-blue-gradient {
-  background-image: linear-gradient(to right, #2E86DE, #54A0FF);
+  background-image: linear-gradient(to right, #2e86de, #54a0ff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -143,14 +146,14 @@ body {
 }
 
 .text-secondary-gold-gradient {
-  background-image: linear-gradient(to right, #FED330, #F7B731);
+  background-image: linear-gradient(to right, #fed330, #f7b731);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .text-secondary-purple-gradient {
-  background-image: linear-gradient(to right, #9C27B0, #D500F9);
+  background-image: linear-gradient(to right, #9c27b0, #d500f9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -160,7 +163,7 @@ body {
 .border-primary-gradient {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-                   linear-gradient(to right, #FF6B6B, #FF9E80);
+    linear-gradient(to right, #ff6b6b, #ff9e80);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
@@ -168,7 +171,7 @@ body {
 .border-secondary-blue-gradient {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-                   linear-gradient(to right, #2E86DE, #54A0FF);
+    linear-gradient(to right, #2e86de, #54a0ff);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
@@ -176,7 +179,7 @@ body {
 .border-secondary-green-gradient {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-                   linear-gradient(to right, #20bf6b, #26de81);
+    linear-gradient(to right, #20bf6b, #26de81);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
@@ -184,7 +187,7 @@ body {
 .border-secondary-gold-gradient {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-                   linear-gradient(to right, #FED330, #F7B731);
+    linear-gradient(to right, #fed330, #f7b731);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
@@ -192,7 +195,7 @@ body {
 .border-secondary-purple-gradient {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-                   linear-gradient(to right, #9C27B0, #D500F9);
+    linear-gradient(to right, #9c27b0, #d500f9);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }

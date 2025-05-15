@@ -39,6 +39,8 @@ export interface NumberStepWithTextProps {
    * Dùng để tùy chỉnh kiểu dáng riêng cho phần text.
    */
   textClassName?: string
+
+  slogan?: string
 }
 
 /**
@@ -50,13 +52,17 @@ const NumberStepWithText: React.FC<NumberStepWithTextProps> = ({
   className,
   step = 1,
   textClassName,
+  slogan,
 }) => {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-6', className)}>
       <NumberStep className='flex-shrink-0'>{step}</NumberStep>
-      <p className={cn('text-2xl font-bold text-white', textClassName)}>
-        {children}
-      </p>
+      <div className='flex flex-col gap-2'>
+        <p className={cn('text-2xl font-bold text-white', textClassName)}>
+          {children}
+        </p>
+        <span className='text-[16px] text-text-light'>{slogan}</span>
+      </div>
     </div>
   )
 }

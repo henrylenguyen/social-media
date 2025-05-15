@@ -1,11 +1,5 @@
-import AuthLayout from '@/components/authLayout/AuthLayout'
-
 const App = () => {
-  return (
-    <>
-      <AuthLayout>div phair</AuthLayout>
-    </>
-  )
+  return <>app component</>
 }
 
 export default App
