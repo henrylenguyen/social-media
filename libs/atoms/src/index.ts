@@ -1,3 +1,4 @@
+"use client"
 export * from './avatar/avatar'
 export * from './button/button'
 export { default as CircleWithImage } from './circleWithImage/circleWithImage'

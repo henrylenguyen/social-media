@@ -4,21 +4,8 @@ import { cn } from 'src/utils'
 import './floatingIcons.css'
 
 /**
- * Component hiển thị nhiều biểu tượng hình tròn di chuyển trôi nổi với hiệu ứng animation.
- * Thường được sử dụng để tạo hiệu ứng trang trí hoặc hiển thị danh sách avatar người dùng một cách sinh động.
- *
- * @example
- * ```tsx
- * <FloatingIcons
- *   items={[
- *     { id: 1, imageUrl: "/images/avatar1.jpg", size: "md" },
- *     { id: 2, imageUrl: "/images/avatar2.jpg", size: "sm" },
- *     { id: 3, imageUrl: "/images/avatar3.jpg", size: "lg" }
- *   ]}
- * />
- * ```
+ * Interface mô tả một item trong danh sách các biểu tượng trôi nổi.
  */
-
 export interface FloatingItem {
   /**
    * Định danh duy nhất cho mỗi biểu tượng.
@@ -28,6 +15,8 @@ export interface FloatingItem {
 
   /**
    * Đường dẫn hình ảnh hoặc ReactNode sẽ được hiển thị trong biểu tượng.
+   * - Nếu là string: Hiển thị hình ảnh
+   * - Nếu là ReactNode: Hiển thị trực tiếp nội dung đó (thường là icon, SVG)
    */
   imageUrl: string | React.ReactNode
 
@@ -36,7 +25,6 @@ export interface FloatingItem {
    * - 'sm': Nhỏ (75% kích thước mặc định)
    * - 'md': Trung bình (kích thước mặc định)
    * - 'lg': Lớn (125% kích thước mặc định)
-   *
    * @default 'md'
    */
   size?: 'sm' | 'md' | 'lg'
@@ -48,6 +36,34 @@ export interface FloatingItem {
   className?: string
 }
 
+/**
+ * Component hiển thị nhiều biểu tượng hình tròn di chuyển trôi nổi với hiệu ứng animation.
+ * Hỗ trợ cả Next.js Image và thẻ img thông thường cho khả năng tương thích tối đa.
+ *
+ * @example Sử dụng trong React thông thường:
+ * ```tsx
+ * const items = [
+ *   { id: 1, imageUrl: '/images/avatar1.jpg', size: 'md' },
+ *   { id: 2, imageUrl: <HeartIcon width={60} height={60} />, size: 'lg' },
+ * ];
+ *
+ * <FloatingIcons
+ *   items={items}
+ *   position="back"
+ *   haveContainer={true}
+ * />
+ * ```
+ *
+ * @example Sử dụng với Next.js Image:
+ * ```tsx
+ * <FloatingIcons
+ *   items={items}
+ *   position="back"
+ *   haveContainer={false}
+ *   useNextImage={true} // Kích hoạt tối ưu hóa hình ảnh của Next.js
+ * />
+ * ```
+ */
 export interface FloatingIconsProps {
   /**
    * Mảng các đối tượng FloatingItem cần hiển thị.
@@ -63,18 +79,27 @@ export interface FloatingIconsProps {
 
   /**
    * Cho biết có hiển thị container layout cho các icon hay không.
-   * Nếu không có container, nó sẽ lấy layout nào có position 'relative'.
+   * - true: Tạo một container riêng với kích thước 100% viewport
+   * - false: Hiển thị trực tiếp trong container cha
+   * @default true
    */
   haveContainer?: boolean
 
   /**
    * Xác định vị trí hiển thị của các biểu tượng.
-   * - 'front': Hiển thị phía trước nội dung (mặc định)
+   * - 'front': Hiển thị phía trước nội dung (z-index cao hơn)
    * - 'back': Hiển thị phía sau nội dung và có độ mờ hơn
-   *
    * @default 'front'
    */
   position?: 'front' | 'back'
+
+  /**
+   * Xác định có sử dụng Next.js Image cho các icon có imageUrl là string hay không.
+   * - true: Sử dụng Next.js Image để tối ưu hóa (chỉ hoạt động trong môi trường Next.js)
+   * - false: Sử dụng thẻ img thông thường (tương thích với mọi môi trường)
+   * @default false
+   */
+  useNextImage?: boolean
 }
 
 /**
@@ -86,7 +111,8 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({
   items,
   className,
   haveContainer,
-  position = 'front', // Default to front
+  position = 'front',
+  useNextImage = false,
 }) => {
   const [isClient, setIsClient] = React.useState(false)
 
@@ -111,7 +137,7 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({
         }
       })
     }
-  }, [items.length]) // Only re-run if the number of items changes
+  }, [items.length])
 
   const getSizeClass = (size?: 'sm' | 'md' | 'lg') => {
     switch (size) {
@@ -223,6 +249,12 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({
           <CircleWithImage
             imageUrl={item.imageUrl}
             className={getIconClasses(item)}
+            useNextImage={useNextImage}
+            alt={
+              typeof item.imageUrl === 'string'
+                ? `Floating icon ${item.id}`
+                : undefined
+            }
           />
         </div>
       ))}
