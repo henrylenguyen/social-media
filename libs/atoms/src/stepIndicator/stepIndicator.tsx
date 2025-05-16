@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion'
 import * as React from 'react'
-import { cn } from 'src/utils'
+import { cn } from 'src/utils/cn'
 import './styles.css'
+import useStepIndicator from './useStepIndicator'
 
 /**
  * Component hiển thị chuỗi các bước đăng ký với hiệu ứng hiển thị.
  * Bước active sẽ được hiển thị lớn hơn và có màu đậm hơn,
- * các bước còn lại sẽ nhỏ dần và nhạt dần khi càng xa bước active.
+ * các bước còn lại sẽ nhỏ dần và nhạt dần khi càng xa bước active (nếu isGraduallySmaller=true).
  */
-export interface ISignUpStepProps {
+export interface IStepIndicatorProps {
   /**
    * Bước hiện tại đang active (bắt đầu từ 1)
    * @default 1
@@ -43,32 +44,75 @@ export interface ISignUpStepProps {
    * @default 'md'
    */
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
+  /**
+   * Xác định có áp dụng hiệu ứng kích thước giảm dần khi xa khỏi bước active không
+   * Nếu true: Các bước càng xa bước active sẽ càng nhỏ dần
+   * Nếu false: Tất cả các bước đều có kích thước bằng nhau
+   * @default true
+   */
+  isGraduallySmaller?: boolean
+
+  /**
+   * Xác định có cho phép click vào các bước để chuyển đổi không
+   * @default false
+   */
+  isCanClick?: boolean
+
+  /**
+   * Callback được gọi khi người dùng click vào một bước khác (chỉ hoạt động khi isCanClick=true)
+   * @param step Số bước được click
+   */
+  onStepChange?: (step: number) => void
 }
 
 /**
  * Component hiển thị tiến trình các bước đăng ký với hiệu ứng thị giác.
  * Bước hiện tại sẽ được làm nổi bật với kích thước lớn hơn và màu sắc đậm hơn.
- * Các bước càng xa bước hiện tại sẽ càng nhỏ và nhạt màu hơn.
+ * Các bước còn lại có thể giữ nguyên kích thước hoặc nhỏ dần tùy vào cấu hình.
  */
-const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
+const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
   currentStep = 1,
   totalSteps = 3,
   stepTexts = [],
   className,
   size = 'md',
   spacing = 'md',
+  isGraduallySmaller = true,
+  isCanClick = false,
+  onStepChange,
 }) => {
-  // Tạo ref để lưu trữ thời gian animation cho hiệu ứng chạy liên tục
-  const animatingStep = React.useRef<number>(1)
+  const [isClient, setIsClient] = React.useState(false)
 
-  // Sử dụng effect để cập nhật animating step
+  // Sử dụng hook để quản lý logic
+  const { handleStepClick, createKeyframes } = useStepIndicator({
+    currentStep,
+    isCanClick,
+    onStepChange,
+  })
+
+  // Chỉ chạy ở phía client
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      animatingStep.current =
-        animatingStep.current < currentStep ? animatingStep.current + 1 : 1
-    }, 2000) // Thời gian để chuyển từ step này sang step tiếp theo
-    return () => clearInterval(interval)
-  }, [currentStep])
+    setIsClient(true)
+
+    // Tạo keyframes cho animation
+    Array.from({ length: totalSteps }).forEach((_, index) => {
+      createKeyframes(index)
+    })
+
+    // Dọn dẹp khi unmount
+    return () => {
+      Array.from({ length: totalSteps }).forEach((_, index) => {
+        const animationName = `float-item-${index}`
+        const existingStyle = document.querySelector(
+          `style[data-animation="${animationName}"]`,
+        )
+        if (existingStyle) {
+          existingStyle.remove()
+        }
+      })
+    }
+  }, [totalSteps, createKeyframes])
 
   // Size mapping
   const sizeMap = {
@@ -109,7 +153,7 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
 
   const { active, base, reduction, lineWidth, fontSize, textSize } =
     sizeMap[size]
-  const { gapMultiplier, textWidth } = spacingMap[spacing]
+  const { gapMultiplier } = spacingMap[spacing]
 
   // Increase line width based on spacing choice
   const adjustedLineWidth = lineWidth * gapMultiplier
@@ -132,9 +176,16 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
             ? 1
             : Math.max(0.7, 1 - distanceFromCurrent * 0.1)
 
-          // Kích thước của step
-          const sizeReduction = Math.min(distanceFromCurrent * reduction, 6)
-          const circleSize = isActive ? active : base - sizeReduction
+          // Kích thước của step - tùy thuộc vào isGraduallySmaller
+          let circleSize
+          if (isGraduallySmaller) {
+            // Nếu bật chế độ nhỏ dần, tính kích thước dựa trên khoảng cách từ bước hiện tại
+            const sizeReduction = Math.min(distanceFromCurrent * reduction, 6)
+            circleSize = isActive ? active : base - sizeReduction
+          } else {
+            // Nếu không bật chế độ nhỏ dần, chỉ có bước active lớn hơn, còn lại bằng nhau
+            circleSize = isActive ? active : base
+          }
 
           return (
             <React.Fragment key={stepNumber}>
@@ -164,8 +215,12 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
               )}
 
               <div
-                className='step-circle-container'
+                className={cn(
+                  'step-circle-container',
+                  isCanClick && 'cursor-pointer',
+                )}
                 style={{ width: `${Math.max(circleSize, 28)}px` }}
+                onClick={() => handleStepClick(stepNumber)}
               >
                 <motion.div
                   className={cn(
@@ -183,8 +238,8 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                   }}
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{
-                    scale,
-                    opacity,
+                    scale: isClient ? scale : 1,
+                    opacity: isClient ? opacity : 1,
                     boxShadow: isActive
                       ? [
                           '0 0 0 0 rgba(255, 107, 107, 0.5)',
@@ -201,10 +256,14 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                       },
                     },
                   }}
-                  whileHover={{
-                    scale: scale + 0.05,
-                    transition: { duration: 0.2 },
-                  }}
+                  whileHover={
+                    isCanClick
+                      ? {
+                          scale: scale + 0.05,
+                          transition: { duration: 0.2 },
+                        }
+                      : undefined
+                  }
                 >
                   <span
                     className={cn(
@@ -213,7 +272,11 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
                     )}
                     style={{
                       fontSize: `${
-                        fontSize - Math.min(distanceFromCurrent * 0.5, 2)
+                        fontSize -
+                        Math.min(
+                          isGraduallySmaller ? distanceFromCurrent * 0.5 : 0,
+                          2,
+                        )
                       }px`,
                     }}
                   >
@@ -256,4 +319,4 @@ const SignUpStep: React.FunctionComponent<ISignUpStepProps> = ({
   )
 }
 
-export default SignUpStep
+export default StepIndicator
