@@ -10,7 +10,7 @@ import {
 } from '@social-media/organisms'
 import * as React from 'react'
 import useSignIn from './useSignIn'
-
+import Link from 'next/link'
 export interface ISignInProps {
   className?: string
 }
@@ -138,12 +138,12 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ className }) => {
           <div className='mt-6 text-center text-sm'>
             <p className='text-gray-600'>
               Chưa có tài khoản?{' '}
-              <a
-                href='#'
+              <Link
+                href='/sign-up'
                 className='text-red-400 hover:text-red-500 font-medium'
               >
                 Đăng ký ngay
-              </a>
+              </Link>
             </p>
           </div>
         </div>
