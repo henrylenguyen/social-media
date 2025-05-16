@@ -80,6 +80,7 @@ const config: StorybookConfig = {
           // Add an alias for any src/ imports to look in atoms library first
           src: path.resolve(__dirname, '../libs/atoms/src'),
           '@': path.resolve(__dirname, '../apps/dating-app/src'),
+          '@social-media/assets': path.resolve(__dirname, '../assets'),
         },
       },
       css: {

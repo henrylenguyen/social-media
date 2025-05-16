@@ -17,7 +17,8 @@ export default [
           allow: [
             '^.*/eslint(\\.base)?\\.config\\.[cm]?js$',
             // Allow imports from src/utils within the same library
-            '^src/utils/.*$'
+            '^src/utils/.*$',
+            '^@assets/.*$',
           ],
           depConstraints: [
             {
@@ -43,4 +44,4 @@ export default [
     // Override or add rules here
     rules: {},
   },
-];
+]

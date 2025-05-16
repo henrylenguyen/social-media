@@ -19,7 +19,8 @@
     "customConditions": ["development"],
     "paths": {
       "@social-media/styles": ["./styles/globals.css"],
-      "@styles/*": ["./styles/*"]
+      "@styles/*": ["./styles/*"],
+      "@social-media/assets/*": ["./assets/*"]
     }
   }
 }

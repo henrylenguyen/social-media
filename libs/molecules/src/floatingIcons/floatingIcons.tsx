@@ -63,10 +63,18 @@ export interface FloatingIconsProps {
 
   /**
    * Cho biết có hiển thị container layout cho các icon hay không.
-   * Nếu không có container, nó sẽ lấy layout nào có position 'relative' .
-   *
+   * Nếu không có container, nó sẽ lấy layout nào có position 'relative'.
    */
   haveContainer?: boolean
+
+  /**
+   * Xác định vị trí hiển thị của các biểu tượng.
+   * - 'front': Hiển thị phía trước nội dung (mặc định)
+   * - 'back': Hiển thị phía sau nội dung và có độ mờ hơn
+   *
+   * @default 'front'
+   */
+  position?: 'front' | 'back'
 }
 
 /**
@@ -78,6 +86,7 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({
   items,
   className,
   haveContainer,
+  position = 'front', // Default to front
 }) => {
   const [isClient, setIsClient] = React.useState(false)
 
@@ -182,17 +191,38 @@ const FloatingIcons: React.FC<FloatingIconsProps> = ({
     }
   }
 
+  // Determine container classes based on position prop
+  const containerClasses = cn(
+    haveContainer ?? 'floating-icons-container',
+    position === 'back'
+      ? 'floating-icons-background'
+      : 'floating-icons-foreground',
+    className,
+  )
+
+  // Determine icon classes based on position prop
+  const getIconClasses = (item: FloatingItem) => {
+    return cn(
+      'shadow-lg',
+      getSizeClass(item.size),
+      position === 'back'
+        ? 'opacity-30 hover:opacity-40'
+        : 'opacity-90 hover:opacity-100',
+      item.className,
+    )
+  }
+
   return (
-    <div className={cn(haveContainer ?? 'floating-icons-container', className)}>
+    <div className={containerClasses}>
       {items.map((item, index) => (
         <div
           key={item.id}
-          className='floating-icon'
+          className={cn('floating-icon', position === 'back' ? 'z-0' : 'z-10')}
           style={getAnimationStyle(index)}
         >
           <CircleWithImage
             imageUrl={item.imageUrl}
-            className={cn('shadow-lg', getSizeClass(item.size), item.className)}
+            className={getIconClasses(item)}
           />
         </div>
       ))}

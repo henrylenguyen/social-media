@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import * as React from 'react'
 import { cn } from 'src/utils/cn'
 
@@ -13,7 +12,7 @@ const CircleWithImage: React.FunctionComponent<ICircleWithImageProps> = ({
   return (
     <div
       className={cn(
-        'w-[80px] h-[80px] rounded-full bg-white flex items-center justify-center text-2xl p-3',
+        'w-[90px] h-[90px] rounded-full bg-white flex items-center justify-center text-2xl p-2',
         className,
       )}
     >

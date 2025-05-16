@@ -21,6 +21,7 @@ const nextConfig = {
       ),
       '@styles': path.resolve(__dirname, '../../styles'),
       '@': path.resolve(__dirname, './src'),
+      '@social-media/assets': path.resolve(__dirname, '../../assets'),
     }
     return config
   },

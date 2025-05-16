@@ -20,7 +20,7 @@
       "@social-media/organisms": ["../libs/organisms/src"],
       "@social-media/organisms/*": ["../libs/organisms/src/*"],
       "@social-media/templates": ["../libs/templates/src"],
-      "@social-media/templates/*": ["../libs/templates/src/*"]
+      "@social-media/templates/*": ["../libs/templates/src/*"],
     }
   },
   "include": [

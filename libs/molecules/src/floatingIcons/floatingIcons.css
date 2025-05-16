@@ -19,3 +19,23 @@
   transform: scale(1.1);
   z-index: 10;
 }
+
+/* Position classes */
+.floating-icons-foreground {
+  z-index: 10;
+  pointer-events: none; /* Allow clicks to pass through to underlying elements */
+}
+
+.floating-icons-foreground .floating-icon {
+  pointer-events: auto; /* Re-enable pointer events for the icons themselves */
+}
+
+.floating-icons-background {
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Additional styling for background floating icons */
+.floating-icons-background .floating-icon img {
+  filter: blur(1px);
+}
