@@ -47,15 +47,20 @@ const GridLayout: React.FC<GridLayoutProps> = ({
               </NumberStepWithText>
             </div>
             <div>{leftChildren}</div>
-            <div className='flex flex-col items-center text-white mt-8'>
+            {/* <div className='flex flex-col items-center text-white mt-8'>
               <button className='bg-white text-purple-900 font-semibold py-2 px-4 rounded-full flex items-center'>
                 <span className='mr-2'>⭐</span> Tải ứng dụng ngay
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
-      <div className={cn('w-full h-full p-10', rightClassName)}>
+      <div
+        className={cn(
+          'w-full h-full px-10 flex flex-col justify-center items-center',
+          rightClassName,
+        )}
+      >
         {rightChildren}
       </div>
     </div>

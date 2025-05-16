@@ -4,18 +4,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
-})
+const formSchema = z
+  .object({
+    email: z.string().nonempty('Email không được để trống'),
+    password: z.string().nonempty('Mật khẩu không được để trống'),
+  })
+  .required()
 
 const useSignIn = () => {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
+      email: '',
+      password: '',
     },
   })
 

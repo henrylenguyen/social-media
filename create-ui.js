@@ -548,7 +548,7 @@ function handleAdditionalComponents(libPath, componentType) {
 
             // Update atoms index.ts
             const atomsIndexPath = path.join(atomsDir, 'src', 'index.ts')
-            const exportStatement = `export * from './${componentName}';\n`
+            const exportStatement = `export * from './${componentName}/${componentName}';\n`
 
             if (fs.existsSync(atomsIndexPath)) {
               const indexContent = fs.readFileSync(atomsIndexPath, 'utf8')
@@ -755,33 +755,21 @@ function createComponent(componentName, componentType = null) {
       // Create Storybook file
       createStorybookFile(componentName, componentType, targetFilePath)
 
-      // Create index.ts file in component directory if needed (for molecules and organisms)
-      if (componentType !== 'atoms') {
-        const indexComponentPath = path.join(componentDir, 'index.ts')
-        if (!fs.existsSync(indexComponentPath)) {
-          fs.writeFileSync(
-            indexComponentPath,
-            `export * from './${componentName}';\n`,
-          )
-          console.log(`✅ Đã tạo file index.ts trong thư mục component`)
-
-          // Format index file
-          formatFile(indexComponentPath)
-        }
-      }
-
       // Update main index.ts to export new component
       const indexFilePath = path.join(libPath, 'src', 'index.ts')
 
       if (fs.existsSync(indexFilePath)) {
         const indexContent = fs.readFileSync(indexFilePath, 'utf8')
-        // Use component directory to export correctly, avoid double export
-        const exportStatement = `export * from './${componentName}';\n`
-        const duplicateExport = `export * from './${componentName}';\n`
+        // Use component file path to export directly from the component file
+        const exportStatement = `export * from './${componentName}/${componentName}';\n`
+        const duplicateExport = `export * from './${componentName}/${componentName}';\n`
+        // Check for old style export that might exist
+        const oldStyleExport = `export * from './${componentName}';\n`
 
         if (
           !indexContent.includes(exportStatement.trim()) &&
-          !indexContent.includes(duplicateExport.trim())
+          !indexContent.includes(duplicateExport.trim()) &&
+          !indexContent.includes(oldStyleExport.trim())
         ) {
           fs.appendFileSync(indexFilePath, exportStatement)
           console.log(`✅ Đã cập nhật index.ts để export component mới`)
@@ -803,6 +791,18 @@ function createComponent(componentName, componentType = null) {
 
           // Format index file
           formatFile(indexFilePath)
+        } else if (indexContent.includes(oldStyleExport.trim())) {
+          console.log(`ℹ️ Phát hiện export kiểu cũ trong index.ts, sửa lại...`)
+          // Replace old style export with new style export
+          const newContent = indexContent.replace(
+            oldStyleExport,
+            exportStatement,
+          )
+          fs.writeFileSync(indexFilePath, newContent)
+          console.log(`✅ Đã sửa export kiểu cũ trong index.ts`)
+
+          // Format index file
+          formatFile(indexFilePath)
         } else {
           console.log(`ℹ️ Component đã được export trong index.ts`)
         }
@@ -813,7 +813,7 @@ function createComponent(componentName, componentType = null) {
           fs.mkdirSync(indexDir, { recursive: true })
         }
 
-        const exportStatement = `export * from './${componentName}';\n`
+        const exportStatement = `export * from './${componentName}/${componentName}';\n`
 
         fs.writeFileSync(indexFilePath, exportStatement)
         console.log(`✅ Đã tạo file index.ts để export component mới`)

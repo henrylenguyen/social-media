@@ -1,4 +1,4 @@
-"use client"
+'use client'
 export * from './avatar/avatar'
 export * from './button/button'
 export { default as CircleWithImage } from './circleWithImage/circleWithImage'
@@ -8,4 +8,5 @@ export { default as NumberStep } from './numberStep/numberStep'
 export { default } from './signUpStep/signUpStep'
 export type { ISignUpStepProps } from './signUpStep/signUpStep'
 
+export * from './select/select'
 export * from './utils'
