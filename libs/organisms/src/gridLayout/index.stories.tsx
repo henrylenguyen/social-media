@@ -14,8 +14,5 @@ export default meta
 type Story = StoryObj<typeof GridLayout>
 
 export const Default: Story = {
-  args: {
-    leftChildren: <div>left</div>,
-    rightChildren: <div>right</div>,
-  },
+  
 }

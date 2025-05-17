@@ -25,9 +25,9 @@ const meta: Meta<typeof StepIndicator> = {
       control: { type: 'object' },
       description: 'Mảng text hiển thị bên dưới mỗi bước',
     },
-    className: {
+    containerClassName: {
       control: 'text',
-      description: 'CSS class để tùy chỉnh component',
+      description: 'CSS class để tùy chỉnh container chính',
     },
     size: {
       control: { type: 'select', options: ['sm', 'md', 'lg'] },
@@ -44,6 +44,24 @@ const meta: Meta<typeof StepIndicator> = {
     isCanClick: {
       control: 'boolean',
       description: 'Có cho phép click vào các bước để chuyển đổi không',
+    },
+    indicatorStyle: {
+      control: {
+        type: 'select',
+        options: [
+          'primary',
+          'secondary',
+          'success',
+          'warning',
+          'white-on-dark',
+          'dark-on-light',
+        ],
+      },
+      description: 'Kiểu hiển thị màu sắc cho các chỉ báo bước',
+    },
+    positionText: {
+      control: { type: 'select', options: ['above', 'below'] },
+      description: 'Vị trí hiển thị text của các bước',
     },
   },
 }
@@ -85,70 +103,121 @@ export const FiveSteps: Story = {
 }
 
 /**
- * Ví dụ với bước cuối cùng đang active
+ * Các kiểu màu khác nhau của chỉ báo
  */
-export const LastStepActive: Story = {
-  args: {
-    currentStep: 4,
-    totalSteps: 4,
-    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác nhận', 'Hoàn tất'],
-  },
+const IndicatorStyleDemo = () => {
+  const steps = ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất']
+
+  return (
+    <div className='flex flex-col gap-8 p-6 min-w-[600px]'>
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>Primary (Mặc định)</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='primary'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>Secondary</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='secondary'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>Success</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='success'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>Warning</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='warning'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>White on Dark</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='white-on-dark'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-gray-100'>
+        <h3 className='font-semibold mb-2 text-gray-800'>Dark on Light</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          indicatorStyle='dark-on-light'
+        />
+      </div>
+    </div>
+  )
+}
+
+export const IndicatorStyles: Story = {
+  render: () => <IndicatorStyleDemo />,
 }
 
 /**
- * Ví dụ với nhiều bước (7 bước)
+ * Vị trí text khác nhau (trên và dưới)
  */
-export const ManySteps: Story = {
-  args: {
-    currentStep: 2,
-    totalSteps: 7,
-    spacing: 'xs',
-    stepTexts: [
-      'Bắt đầu',
-      'Tài khoản',
-      'Thông tin',
-      'Sở thích',
-      'Xác nhận',
-      'Liên kết',
-      'Hoàn tất',
-    ],
-  },
+const TextPositionDemo = () => {
+  const steps = ['Bước 1', 'Bước 2', 'Bước 3', 'Bước 4']
+
+  return (
+    <div className='flex flex-col gap-8 p-6'>
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>
+          Text Bên Dưới (Mặc định)
+        </h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          positionText='below'
+        />
+      </div>
+
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-4 text-white'>Text Bên Trên</h3>
+        <StepIndicator
+          currentStep={2}
+          totalSteps={4}
+          stepTexts={steps}
+          positionText='above'
+        />
+      </div>
+    </div>
+  )
+}
+
+export const TextPosition: Story = {
+  render: () => <TextPositionDemo />,
 }
 
 /**
- * Ví dụ với văn bản dài hơn để kiểm tra hiển thị
+ * Ví dụ kết hợp nhiều tùy chọn
  */
-export const LongTextLabels: Story = {
-  args: {
-    currentStep: 2,
-    totalSteps: 4,
-    spacing: 'xl',
-    stepTexts: [
-      'Thông tin tài khoản',
-      'Chi tiết cá nhân',
-      'Xác nhận email và SĐT',
-      'Hoàn tất đăng ký',
-    ],
-  },
-}
-
-/**
- * Ví dụ với lớp tùy chỉnh thêm rộng và có background
- */
-export const CustomClass: Story = {
-  args: {
-    currentStep: 2,
-    totalSteps: 3,
-    stepTexts: ['Bắt đầu', 'Nhập thông tin', 'Hoàn thành'],
-    className: 'p-8 bg-green-800 rounded-lg',
-
-  },
-}
-
-/**
- * Component sử dụng đúng quy tắc hook cho story có tính năng click
- */
-const ClickableStepDemo = () => {
+const CombinedOptionsDemo = () => {
   const [active, setActive] = React.useState(1)
 
   // Xử lý thay đổi bước
@@ -157,199 +226,148 @@ const ClickableStepDemo = () => {
   }
 
   return (
-    <div className='p-6 rounded-md'>
-      <h3 className='text-white font-semibold mb-3'>
-        Click vào các bước để chuyển đổi
-      </h3>
-      <p className='text-white/80 mb-4'>Bước hiện tại: {active}</p>
-
-      <StepIndicator
-        currentStep={active}
-        totalSteps={5}
-        stepTexts={[
-          'Tài khoản',
-          'Thông tin',
-          'Sở thích',
-          'Xác minh',
-          'Hoàn tất',
-        ]}
-        isCanClick={true}
-        onStepChange={handleStepChange}
-        spacing='md'
-      />
-    </div>
-  )
-}
-
-/**
- * Ví dụ có thể click vào các bước để chuyển đổi
- */
-export const Clickable: Story = {
-  render: () => <ClickableStepDemo />,
-}
-
-/**
- * Component với cả hai tính năng
- */
-const WithoutGraduallySmallerDemo = () => {
-  return (
-    <div className='flex flex-col gap-8 p-4'>
-      <div>
-        <h3 className='text-white font-semibold mb-3'>
-          Có hiệu ứng nhỏ dần (isGraduallySmaller=true)
+    <div className='flex flex-col gap-8 p-6'>
+      <div className='p-6 rounded-lg bg-gray-100'>
+        <h3 className='font-semibold mb-4 text-gray-800'>
+          Dark on Light + Text Phía Trên + Có Thể Click
         </h3>
         <StepIndicator
-          currentStep={3}
-          totalSteps={5}
+          currentStep={active}
+          totalSteps={4}
           stepTexts={[
-            'Bắt đầu',
             'Tài khoản',
-            'Thông tin',
-            'Xác minh',
+            'Thông tin cá nhân',
+            'Xác minh email',
             'Hoàn tất',
           ]}
-          isGraduallySmaller={true}
-        />
-      </div>
-
-      <div>
-        <h3 className='text-white font-semibold mb-3'>
-          Không có hiệu ứng nhỏ dần (isGraduallySmaller=false)
-        </h3>
-        <StepIndicator
-          currentStep={3}
-          totalSteps={5}
-          stepTexts={[
-            'Bắt đầu',
-            'Tài khoản',
-            'Thông tin',
-            'Xác minh',
-            'Hoàn tất',
-          ]}
+          indicatorStyle='dark-on-light'
+          positionText='above'
+          isCanClick={true}
+          onStepChange={handleStepChange}
           isGraduallySmaller={false}
         />
-      </div>
-    </div>
-  )
-}
-
-/**
- * Ví dụ so sánh giữa có và không có hiệu ứng nhỏ dần
- */
-export const WithAndWithoutGraduallySmaller: Story = {
-  render: () => <WithoutGraduallySmallerDemo />,
-}
-
-/**
- * Component kết hợp tính năng
- */
-const ClickableWithoutGraduallySmallerDemo = () => {
-  const [active, setActive] = React.useState(1)
-
-  return (
-    <div className='p-6 rounded-md'>
-      <h3 className='text-white font-semibold mb-3'>
-        Có thể click và không nhỏ dần
-      </h3>
-      <p className='text-white/80 mb-4'>Bước hiện tại: {active}</p>
-
-      <StepIndicator
-        currentStep={active}
-        totalSteps={5}
-        stepTexts={[
-          'Tài khoản',
-          'Thông tin',
-          'Sở thích',
-          'Xác minh',
-          'Hoàn tất',
-        ]}
-        isCanClick={true}
-        onStepChange={setActive}
-        isGraduallySmaller={false}
-        spacing='md'
-      />
-    </div>
-  )
-}
-
-/**
- * Ví dụ kết hợp cả hai tính năng (có thể click và không nhỏ dần)
- */
-export const ClickableWithoutGraduallySmaller: Story = {
-  render: () => <ClickableWithoutGraduallySmallerDemo />,
-}
-
-/**
- * Component hiển thị tiến trình
- */
-const ProgressDemo = () => {
-  const steps = [
-    'Tài khoản',
-    'Thông tin cá nhân',
-    'Sở thích',
-    'Xác minh',
-    'Hoàn tất',
-  ]
-
-  return (
-    <div className='flex flex-col gap-8 p-4'>
-      <div className='p-4 rounded-lg'>
-        <h3 className='font-semibold mb-3 text-white'>Bước 1/5</h3>
-        <StepIndicator
-          currentStep={1}
-          totalSteps={5}
-          stepTexts={steps}
-          spacing='lg'
-        />
+        <p className='mt-4 text-center text-gray-600'>
+          Bước hiện tại: {active} - Click vào các bước để chuyển đổi
+        </p>
       </div>
 
-      <div className='p-4 rounded-lg'>
-        <h3 className='font-semibold mb-3 text-white'>Bước 2/5</h3>
+      <div className='p-6 rounded-lg bg-secondary-purple-dark'>
+        <h3 className='font-semibold mb-2 text-white'>
+          Success + Text Phía Dưới + Size Lớn
+        </h3>
         <StepIndicator
           currentStep={2}
-          totalSteps={5}
-          stepTexts={steps}
-          spacing='lg'
-        />
-      </div>
-
-      <div className='p-4 rounded-lg'>
-        <h3 className='font-semibold mb-3 text-white'>Bước 3/5</h3>
-        <StepIndicator
-          currentStep={3}
-          totalSteps={5}
-          stepTexts={steps}
-          spacing='lg'
-        />
-      </div>
-
-      <div className='p-4 rounded-lg'>
-        <h3 className='font-semibold mb-3 text-white'>Bước 4/5</h3>
-        <StepIndicator
-          currentStep={4}
-          totalSteps={5}
-          stepTexts={steps}
-          spacing='lg'
-        />
-      </div>
-
-      <div className='p-4 rounded-lg'>
-        <h3 className='font-semibold mb-3 text-white'>Bước 5/5</h3>
-        <StepIndicator
-          currentStep={5}
-          totalSteps={5}
-          stepTexts={steps}
-          spacing='lg'
+          totalSteps={4}
+          stepTexts={['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất']}
+          indicatorStyle='success'
+          positionText='below'
+          size='lg'
+          spacing='xl'
         />
       </div>
     </div>
   )
 }
 
+export const CombinedOptions: Story = {
+  render: () => <CombinedOptionsDemo />,
+}
+
 /**
- * Trang đăng ký thực tế thường có nhiều bước
- * Ví dụ dạng tiến trình
+ * Ví dụ trong các ngữ cảnh sử dụng thực tế
  */
-export const Progress: Story = {
-  render: () => <ProgressDemo />,
+const RealWorldExample = () => {
+  return (
+    <div className='flex flex-col gap-8 p-6 max-w-4xl'>
+      {/* Biểu mẫu đặt hàng */}
+      <div className='border rounded-lg overflow-hidden'>
+        <div className='bg-gray-100 p-6 border-b'>
+          <h3 className='font-medium text-lg'>Quy trình đặt hàng</h3>
+        </div>
+        <div className='p-6'>
+          <StepIndicator
+            currentStep={2}
+            totalSteps={5}
+            stepTexts={[
+              'Giỏ hàng',
+              'Thông tin giao hàng',
+              'Phương thức thanh toán',
+              'Xác nhận',
+              'Hoàn tất',
+            ]}
+            indicatorStyle='secondary'
+            positionText='below'
+            spacing='md'
+          />
+
+          <div className='mt-12 p-6 border rounded bg-gray-50'>
+            <h4 className='font-medium mb-2'>Thông tin giao hàng</h4>
+            <p className='text-sm text-gray-500 mb-4'>
+              Vui lòng điền thông tin giao hàng của bạn
+            </p>
+            {/* Form fields would go here */}
+            <div className='mt-6 flex justify-between'>
+              <button className='px-4 py-2 border rounded hover:bg-gray-100'>
+                Quay lại
+              </button>
+              <button className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
+                Tiếp tục
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trang đăng ký */}
+      <div className='bg-secondary-purple-gradient rounded-lg p-6'>
+        <div className='max-w-xl mx-auto'>
+          <h2 className='text-white text-xl font-bold mb-6 text-center'>
+            Tạo tài khoản mới
+          </h2>
+
+          <StepIndicator
+            currentStep={1}
+            totalSteps={3}
+            stepTexts={[
+              'Thông tin tài khoản',
+              'Thông tin cá nhân',
+              'Xác nhận email',
+            ]}
+            indicatorStyle='white-on-dark'
+            positionText='below'
+            spacing='lg'
+          />
+
+          <div className='mt-8 bg-white p-6 rounded-lg shadow-lg'>
+            <h3 className='font-medium mb-4'>Thông tin tài khoản</h3>
+            {/* Form would go here */}
+            <div className='mt-6 flex justify-end'>
+              <button className='px-6 py-2 bg-primary text-white rounded-full hover:bg-red-500'>
+                Tiếp tục
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const RealWorldExamples: Story = {
+  render: () => <RealWorldExample />,
+}
+
+/**
+ * Ví dụ trên nền trắng (Light Backgrounds)
+ */
+export const OnLightBackground: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác nhận', 'Hoàn tất'],
+    indicatorStyle: 'dark-on-light',
+  },
+  parameters: {
+    backgrounds: { default: 'light' },
+  },
 }

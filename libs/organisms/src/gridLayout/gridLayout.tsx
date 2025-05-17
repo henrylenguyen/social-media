@@ -2,16 +2,14 @@ import { NumberStepWithText } from '@social-media/molecules'
 import { cn } from 'src/utils'
 import './styles.css'
 interface GridLayoutProps {
-  leftChildren: React.ReactNode
-  rightChildren: React.ReactNode
-  leftClassName?: string
+  children: React.ReactNode
   rightClassName?: string
+  leftClassName?: string
 }
 const GridLayout: React.FC<GridLayoutProps> = ({
-  leftChildren,
-  rightChildren,
   leftClassName,
   rightClassName,
+  children,
 }) => {
   return (
     <div className='grid justify-center items-center w-full h-screen grid-cols-2'>
@@ -46,7 +44,6 @@ const GridLayout: React.FC<GridLayoutProps> = ({
                 Bắt đầu cuộc trò chuyện thú vị
               </NumberStepWithText>
             </div>
-            <div>{leftChildren}</div>
             {/* <div className='flex flex-col items-center text-white mt-8'>
               <button className='bg-white text-purple-900 font-semibold py-2 px-4 rounded-full flex items-center'>
                 <span className='mr-2'>⭐</span> Tải ứng dụng ngay
@@ -61,7 +58,7 @@ const GridLayout: React.FC<GridLayoutProps> = ({
           rightClassName,
         )}
       >
-        {rightChildren}
+        {children}
       </div>
     </div>
   )

@@ -5,6 +5,22 @@ import './styles.css'
 import useStepIndicator from './useStepIndicator'
 
 /**
+ * Style tùy chọn cho chỉ báo các bước
+ */
+export type IndicatorStyleType =
+  | 'primary' // màu cam của theme (default) - phù hợp với nền tối
+  | 'secondary' // màu xanh dương - phù hợp với nền tối
+  | 'success' // màu xanh lá - phù hợp với nền tối
+  | 'warning' // màu vàng - phù hợp với nền tối
+  | 'white-on-dark' // màu trắng (active) trên nền tối
+  | 'dark-on-light' // màu tối (active) trên nền sáng
+
+/**
+ * Vị trí hiển thị text của các bước
+ */
+export type TextPositionType = 'above' | 'below'
+
+/**
  * Component hiển thị chuỗi các bước đăng ký với hiệu ứng hiển thị.
  * Bước active sẽ được hiển thị lớn hơn và có màu đậm hơn,
  * các bước còn lại sẽ nhỏ dần và nhạt dần khi càng xa bước active (nếu isGraduallySmaller=true).
@@ -31,7 +47,7 @@ export interface IStepIndicatorProps {
   /**
    * Class CSS tùy chỉnh cho container chính
    */
-  className?: string
+  containerClassName?: string
 
   /**
    * Kích thước cho component, có thể truyền vào 'sm', 'md', hoặc 'lg'
@@ -64,6 +80,18 @@ export interface IStepIndicatorProps {
    * @param step Số bước được click
    */
   onStepChange?: (step: number) => void
+
+  /**
+   * Kiểu hiển thị màu sắc cho các chỉ báo bước
+   * @default 'primary'
+   */
+  indicatorStyle?: IndicatorStyleType
+
+  /**
+   * Vị trí hiển thị text của các bước
+   * @default 'below'
+   */
+  positionText?: TextPositionType
 }
 
 /**
@@ -75,12 +103,14 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
   currentStep = 1,
   totalSteps = 3,
   stepTexts = [],
-  className,
+  containerClassName,
   size = 'md',
   spacing = 'md',
   isGraduallySmaller = true,
   isCanClick = false,
   onStepChange,
+  indicatorStyle = 'primary',
+  positionText = 'below',
 }) => {
   const [isClient, setIsClient] = React.useState(false)
 
@@ -151,15 +181,140 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
     xl: { gapMultiplier: 2.5, textWidth: 140 },
   }
 
+  // Style mapping cho các loại indicator
+  const styleMap = {
+    primary: {
+      active: 'bg-primary',
+      completed: 'bg-white',
+      default: 'bg-white/70',
+      text: {
+        active: 'text-white',
+        default: 'text-gray-600',
+      },
+      line: 'linear-gradient(to right, rgba(255, 107, 107, 0.9), rgba(255, 107, 107, 0.7))',
+      stepText: {
+        active: 'text-white font-medium',
+        default: 'text-white/80',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(255, 107, 107, 0.5)',
+        '0 0 0 3px rgba(255, 107, 107, 0.2)',
+        '0 0 0 0 rgba(255, 107, 107, 0)',
+      ],
+    },
+    secondary: {
+      active: 'bg-secondary-blue',
+      completed: 'bg-white',
+      default: 'bg-white/70',
+      text: {
+        active: 'text-white',
+        default: 'text-gray-600',
+      },
+      line: 'linear-gradient(to right, rgba(46, 134, 222, 0.9), rgba(84, 160, 255, 0.7))',
+      stepText: {
+        active: 'text-white font-medium',
+        default: 'text-white/80',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(46, 134, 222, 0.5)',
+        '0 0 0 3px rgba(46, 134, 222, 0.2)',
+        '0 0 0 0 rgba(46, 134, 222, 0)',
+      ],
+    },
+    success: {
+      active: 'bg-success',
+      completed: 'bg-white',
+      default: 'bg-white/70',
+      text: {
+        active: 'text-white',
+        default: 'text-gray-600',
+      },
+      line: 'linear-gradient(to right, rgba(27, 228, 161, 0.9), rgba(27, 228, 161, 0.7))',
+      stepText: {
+        active: 'text-white font-medium',
+        default: 'text-white/80',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(27, 228, 161, 0.5)',
+        '0 0 0 3px rgba(27, 228, 161, 0.2)',
+        '0 0 0 0 rgba(27, 228, 161, 0)',
+      ],
+    },
+    warning: {
+      active: 'bg-warning',
+      completed: 'bg-white',
+      default: 'bg-white/70',
+      text: {
+        active: 'text-gray-800',
+        default: 'text-gray-600',
+      },
+      line: 'linear-gradient(to right, rgba(254, 211, 48, 0.9), rgba(254, 211, 48, 0.7))',
+      stepText: {
+        active: 'text-white font-medium',
+        default: 'text-white/80',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(254, 211, 48, 0.5)',
+        '0 0 0 3px rgba(254, 211, 48, 0.2)',
+        '0 0 0 0 rgba(254, 211, 48, 0)',
+      ],
+    },
+    'white-on-dark': {
+      active: 'bg-white',
+      completed: 'bg-white/80',
+      default: 'bg-white/50',
+      text: {
+        active: 'text-gray-800',
+        default: 'text-gray-800',
+      },
+      line: 'linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7))',
+      stepText: {
+        active: 'text-white font-medium',
+        default: 'text-white/80',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(255, 255, 255, 0.5)',
+        '0 0 0 3px rgba(255, 255, 255, 0.2)',
+        '0 0 0 0 rgba(255, 255, 255, 0)',
+      ],
+    },
+    'dark-on-light': {
+      active: 'bg-gray-800',
+      completed: 'bg-gray-600',
+      default: 'bg-gray-300',
+      text: {
+        active: 'text-white',
+        default: 'text-gray-800',
+      },
+      line: 'linear-gradient(to right, rgba(51, 51, 51, 0.9), rgba(51, 51, 51, 0.7))',
+      stepText: {
+        active: 'text-gray-800 font-medium',
+        default: 'text-gray-600',
+      },
+      boxShadow: [
+        '0 0 0 0 rgba(51, 51, 51, 0.5)',
+        '0 0 0 3px rgba(51, 51, 51, 0.2)',
+        '0 0 0 0 rgba(51, 51, 51, 0)',
+      ],
+    },
+  }
+
   const { active, base, reduction, lineWidth, fontSize, textSize } =
     sizeMap[size]
-  const { gapMultiplier } = spacingMap[spacing]
+  const { gapMultiplier, textWidth } = spacingMap[spacing]
+  const selectedStyle = styleMap[indicatorStyle]
 
   // Increase line width based on spacing choice
   const adjustedLineWidth = lineWidth * gapMultiplier
 
   return (
-    <div className={cn('signup-step-wrapper', className)}>
+    <div
+      className={cn(
+        'signup-step-wrapper',
+        containerClassName,
+        indicatorStyle === 'dark-on-light' && 'dark-line',
+      )}
+    >
       <div className={cn('signup-step-container', `spacing-${spacing}`)}>
         {Array.from({ length: totalSteps }).map((_, index) => {
           const stepNumber = index + 1
@@ -187,19 +342,28 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
             circleSize = isActive ? active : base
           }
 
+          // Xác định vị trí của text
+          const textPosition =
+            positionText === 'above'
+              ? { bottom: `${circleSize + 2}px` }
+              : { top: `${circleSize + 2}px` }
+
           return (
             <React.Fragment key={stepNumber}>
               {stepNumber > 1 && (
                 <div
-                  className='step-line'
+                  className={cn(
+                    'step-line',
+                    indicatorStyle === 'dark-on-light' &&
+                      'border-t border-gray-300',
+                  )}
                   style={{ width: `${adjustedLineWidth}px` }}
                 >
                   {stepNumber <= currentStep && (
                     <motion.div
                       className='absolute top-0 bottom-0 left-0 w-full'
                       style={{
-                        background:
-                          'linear-gradient(to right, rgba(255, 107, 107, 0.9), rgba(255, 107, 107, 0.7))',
+                        background: selectedStyle.line,
                       }}
                       initial={{ x: '-100%' }}
                       animate={{ x: '100%' }}
@@ -222,14 +386,40 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                 style={{ width: `${Math.max(circleSize, 28)}px` }}
                 onClick={() => handleStepClick(stepNumber)}
               >
+                {/* Text labels above circles if position is 'above' */}
+                {positionText === 'above' && stepTexts[index] && (
+                  <div className='step-text-container' style={textPosition}>
+                    <motion.span
+                      className={cn(
+                        'block text-center whitespace-normal hyphens-auto leading-tight',
+                        isActive
+                          ? selectedStyle.stepText.active
+                          : selectedStyle.stepText.default,
+                      )}
+                      style={{
+                        fontSize: `${textSize}px`,
+                      }}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{
+                        opacity: isActive ? 1 : isNext ? 0.8 : 0.6,
+                        y: 0,
+                        scale: isActive ? 1 : isNext ? 0.95 : 0.9,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {stepTexts[index]}
+                    </motion.span>
+                  </div>
+                )}
+
                 <motion.div
                   className={cn(
                     'rounded-full flex items-center justify-center',
                     isActive
-                      ? 'bg-primary'
+                      ? selectedStyle.active
                       : isCompleted
-                      ? 'bg-white'
-                      : 'bg-white/70',
+                      ? selectedStyle.completed
+                      : selectedStyle.default,
                   )}
                   style={{
                     width: `${circleSize}px`,
@@ -240,13 +430,7 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                   animate={{
                     scale: isClient ? scale : 1,
                     opacity: isClient ? opacity : 1,
-                    boxShadow: isActive
-                      ? [
-                          '0 0 0 0 rgba(255, 107, 107, 0.5)',
-                          '0 0 0 3px rgba(255, 107, 107, 0.2)',
-                          '0 0 0 0 rgba(255, 107, 107, 0)',
-                        ]
-                      : 'none',
+                    boxShadow: isActive ? selectedStyle.boxShadow : 'none',
                     transition: {
                       duration: 0.3,
                       ease: 'easeOut',
@@ -268,7 +452,9 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                   <span
                     className={cn(
                       'font-medium',
-                      isActive ? 'text-white' : 'text-gray-600',
+                      isActive
+                        ? selectedStyle.text.active
+                        : selectedStyle.text.default,
                     )}
                     style={{
                       fontSize: `${
@@ -284,16 +470,15 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                   </span>
                 </motion.div>
 
-                {/* Text labels below circles - now always shows */}
-                {stepTexts[index] && (
-                  <div
-                    className='step-text-container'
-                    style={{ top: `${circleSize + 2}px` }}
-                  >
+                {/* Text labels below circles if position is 'below' */}
+                {positionText === 'below' && stepTexts[index] && (
+                  <div className='step-text-container' style={textPosition}>
                     <motion.span
                       className={cn(
                         'block text-center whitespace-normal hyphens-auto leading-tight',
-                        isActive ? 'text-white font-medium' : 'text-white/80',
+                        isActive
+                          ? selectedStyle.stepText.active
+                          : selectedStyle.stepText.default,
                       )}
                       style={{
                         fontSize: `${textSize}px`,

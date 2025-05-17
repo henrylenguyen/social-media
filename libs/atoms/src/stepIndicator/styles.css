@@ -16,6 +16,13 @@
   background: rgba(255, 255, 255, 0.7);
 }
 
+/* Style specific for dark-on-light theme */
+.dark-line .step-line {
+  background: rgba(200, 200, 200, 0.7);
+  height: 2px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 .step-circle-container {
   position: relative;
 }
