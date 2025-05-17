@@ -1,0 +1,14 @@
+{
+  "name": "@social-media/assets",
+  "version": "0.0.1",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

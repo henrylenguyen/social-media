@@ -1,6 +1,6 @@
 import { GridLayout } from '@social-media/organisms'
-import LeftLayout from './leftLayout'
 import SignIn from './signIn'
+import LeftLayout from '@/app/(auth)/leftLayout'
 const SignInPage = () => {
   return (
     <GridLayout leftChildren={<LeftLayout />} leftClassName='relative'>
