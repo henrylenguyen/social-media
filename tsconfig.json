@@ -19,7 +19,7 @@
       "path": "./libs/templates"
     },
     {
-      "path": "./assets/*"
+      "path": "./assets"
     },
   ],
   "ts-node": {

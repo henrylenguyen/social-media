@@ -43,7 +43,6 @@ export interface IGridLayoutProps {
  * Component hiển thị layout dạng lưới hai cột, thường được sử dụng cho trang đăng nhập, đăng ký hoặc onboarding.
  * Cột bên trái có gradient màu tím đậm, các bước hướng dẫn và branding.
  * Cột bên phải chứa nội dung chính như form, biểu mẫu.
- 
  */
 const GridLayout: React.FC<IGridLayoutProps> = ({
   leftChildren,
@@ -53,9 +52,10 @@ const GridLayout: React.FC<IGridLayoutProps> = ({
   showDefaultLeftContent = true,
 }) => {
   return (
-    <div className='grid justify-center items-center w-full h-screen grid-cols-2'>
-      <div className='background-circle h-screen w-full flex items-center justify-center'>
-        <div className='w-full h-full px-8 py-4'>
+    <div className='grid grid-cols-2 h-screen overflow-hidden'>
+      {/* Left column */}
+      <div className='background-circle h-screen overflow-hidden'>
+        <div className='w-full h-full px-8 py-4 overflow-auto'>
           <div className={cn('w-full grid gap-4 h-full p-10', leftClassName)}>
             {showDefaultLeftContent && (
               <>
@@ -93,13 +93,17 @@ const GridLayout: React.FC<IGridLayoutProps> = ({
           </div>
         </div>
       </div>
-      <div
-        className={cn(
-          'w-full h-full px-10 flex flex-col justify-center items-center',
-          rightClassName,
-        )}
-      >
-        {children}
+
+      {/* Right column */}
+      <div className='h-screen overflow-auto'>
+        <div
+          className={cn(
+            'w-full h-full py-4 px-10 flex flex-col justify-center items-center',
+            rightClassName,
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   )

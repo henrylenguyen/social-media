@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useLayoutEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -19,15 +20,7 @@ const formSchema: z.ZodType<SignUpFormData> = z
       .string()
       .nonempty('Email không được để trống')
       .email('Email không hợp lệ'),
-    password: z
-      .string()
-      .nonempty('Mật khẩu không được để trống')
-      .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
-      .max(20, 'Mật khẩu không được quá 20 ký tự')
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-        'Mật khẩu phải có ít nhất 1 chữ cái viết hoa, 1 chữ cái viết thường, 1 số và 1 ký tự đặc biệt',
-      ),
+    password: z.string().nonempty('Mật khẩu không được để trống'),
     confirmPassword: z
       .string()
       .nonempty('Nhập lại mật khẩu không được để trống'),
@@ -41,7 +34,14 @@ const formSchema: z.ZodType<SignUpFormData> = z
   })
 
 const useSignUp = () => {
-  // 1. Define your form.
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false,
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,18 +51,52 @@ const useSignUp = () => {
       terms: false,
     },
   })
+  const { watch, setError, clearErrors } = form
 
-  // 2. Define a submit handler.
+  // Sử dụng useLayoutEffect để theo dõi sự thay đổi của password, vì useLayoutEffect sẽ tối ưu hơn 
+  useLayoutEffect(() => {
+    const password = watch('password')
+    const length = password.length >= 6
+    const uppercase = /[A-Z]/.test(password)
+    const lowercase = /[a-z]/.test(password)
+    const number = /\d/.test(password)
+    const specialChar = /[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/.test(password)
+    setPasswordStrength({
+      length,
+      uppercase,
+      lowercase,
+      number,
+      specialChar,
+    })
+    if (!length || !uppercase || !lowercase || !number || !specialChar) {
+      setError('password', {
+        type: 'manual',
+        message: 'Mật khẩu chưa đúng định dạng yêu cầu!',
+      })
+    } else {
+      clearErrors('password')
+    }
+    return () => {
+      setPasswordStrength({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        specialChar: false,
+      })
+    }
+  }, [clearErrors, setError, watch])
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
   }
 
-  // 3. Return the form and submit handler.
   return {
     form,
     onSubmit,
+    passwordStrength,
   }
 }
 
