@@ -1,8 +1,7 @@
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import type { StorybookConfig } from '@storybook/nextjs'
 import { join } from 'path'
-import { mergeConfig } from 'vite'
 
-const config = {
+const config: StorybookConfig = {
   stories: [
     '../libs/**/*.stories.@(js|jsx|ts|tsx|mdx)',
     '../apps/**/*.stories.@(js|jsx|ts|tsx|mdx)',
@@ -15,55 +14,52 @@ const config = {
   ],
 
   framework: {
-    name: '@storybook/react-vite',
-    options: {},
+    name: '@storybook/nextjs',
+    options: {
+      builder: {
+        useSWC: true,
+      },
+    },
   },
 
   docs: {
     autodocs: true,
   },
 
-  viteFinal: async (config) => {
-    // Tạo plugin đơn giản để xử lý tất cả các import Next.js
-    const nextJsPlugin = {
-      name: 'vite-plugin-nextjs-mock',
-      resolveId(id) {
-        // Bắt và xử lý tất cả import từ Next.js
-        if (id.startsWith('next/')) {
-          return { id: 'virtual:next-module', external: false }
-        }
-        return null
-      },
-      load(id) {
-        if (id === 'virtual:next-module') {
-          // Trả về module rỗng
-          return 'export default () => null; export const useRouter = () => ({}); export const usePathname = () => "/";'
-        }
-        return null
-      },
+  webpackFinal: async (config) => {
+    // Đảm bảo có `config.resolve` trước khi thêm alias
+    if (!config.resolve) {
+      config.resolve = {}
     }
 
-    // Định nghĩa process.env
-    config.define = {
-      ...config.define,
-      'process.env': JSON.stringify(process.env || {}),
+    // Đảm bảo có `config.resolve.alias` trước khi thêm giá trị
+    if (!config.resolve.alias) {
+      config.resolve.alias = {}
     }
 
-    // Thêm plugins và cấu hình
-    return mergeConfig(config, {
-      plugins: [nxViteTsPaths(), nextJsPlugin],
-      resolve: {
-        alias: {
-          '@social-media/atoms': join(__dirname, '../libs/atoms/src'),
-          '@social-media/molecules': join(__dirname, '../libs/molecules/src'),
-          '@social-media/organisms': join(__dirname, '../libs/organisms/src'),
-          '@social-media/templates': join(__dirname, '../libs/templates/src'),
-          '@': join(__dirname, '../apps/dating-app/src'),
-          src: join(__dirname, '../libs/atoms/src'),
-        },
-        dedupe: ['react', 'react-dom'],
-      },
-    })
+    // Cấu hình các alias cho đúng với cấu trúc dự án
+    // @ts-ignore
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // Library paths
+      '@social-media/atoms': join(__dirname, '../libs/atoms/src'),
+      '@social-media/molecules': join(__dirname, '../libs/molecules/src'),
+      '@social-media/organisms': join(__dirname, '../libs/organisms/src'),
+      '@social-media/templates': join(__dirname, '../libs/templates/src'),
+      '@social-media/assets': join(__dirname, '../libs/assets/src'),
+
+      // App paths
+      '@': join(__dirname, '../apps/dating-app/src'),
+
+      // Utils path cho các component trong libs
+      src: join(__dirname, '../libs/atoms/src'),
+      'src/utils': join(__dirname, '../libs/atoms/src/utils'),
+      'src/utils/cn': join(__dirname, '../libs/atoms/src/utils/cn'),
+    }
+
+    // Thêm các rule cần thiết nếu có
+
+    return config
   },
 }
 

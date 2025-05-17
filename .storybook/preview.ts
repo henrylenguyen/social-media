@@ -1,10 +1,10 @@
-import '@social-media/styles';
-import type { Preview } from "@storybook/react";
-import React from 'react';
+import type { Preview } from '@storybook/react'
+import '../styles/globals.css'
+
 
 const preview: Preview = {
   parameters: {
-    actions: { argTypesRegex: "^on[A-Z].*" },
+    actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -13,8 +13,14 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Dating App'],
+        order: ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages'],
         method: 'alphabetical',
+      },
+    },
+    nextjs: {
+      appDirectory: true, // Hỗ trợ App Router của Next.js
+      navigation: {
+        pathname: '/',
       },
     },
     backgrounds: {
@@ -30,14 +36,14 @@ const preview: Preview = {
         { name: 'light', value: '#ffffff' },
         { name: 'light-dark', value: '#F5F5F5' },
         { name: 'dark-light', value: '#2E1065' },
-      ]
+      ],
     },
   },
-};
 
-export default preview;
+  // Thêm decorators toàn cục nếu cần
+  decorators: [
+    // (Story) => <Story />
+  ],
+}
 
-// Hàm wrap mỗi story bằng React.createElement
-export const decorators = [
-  (Story) => React.createElement(Story, null)
-];
+export default preview

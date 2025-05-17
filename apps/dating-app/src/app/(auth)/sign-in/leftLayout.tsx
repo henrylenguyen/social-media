@@ -1,10 +1,8 @@
+import { DateIcons } from '@social-media/assets'
+import { FloatingIcons } from '@social-media/molecules'
+import * as React from 'react'
 
-import * as React from 'react';
-import {DateIcons} from '@social-media/assets'
-import { FloatingIcons } from '@social-media/molecules';
-
-interface ILeftLayoutProps {
-}
+interface ILeftLayoutProps {}
 
 const LeftLayout: React.FunctionComponent<ILeftLayoutProps> = (props) => {
   const backgroundItems: Array<{
@@ -40,7 +38,6 @@ const LeftLayout: React.FunctionComponent<ILeftLayoutProps> = (props) => {
       items={backgroundItems}
     />
   )
-};
+}
 
-export default LeftLayout;
-
+export default LeftLayout

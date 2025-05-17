@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import SignIn from './signIn'
+import SignInPage from './page'
 
-const meta: Meta<typeof SignIn> = {
-  title: 'Pages/SignIn',
-  component: SignIn,
+const meta: Meta<typeof SignInPage> = {
+  title: 'Pages/SignInPage',
+  component: SignInPage,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -11,7 +11,7 @@ const meta: Meta<typeof SignIn> = {
 }
 
 export default meta
-type Story = StoryObj<typeof SignIn>
+type Story = StoryObj<typeof SignInPage>
 
 /**
  * Mặc định hiển thị form đăng nhập
