@@ -46,7 +46,7 @@ const config: StorybookConfig = {
       '@social-media/molecules': join(__dirname, '../libs/molecules/src'),
       '@social-media/organisms': join(__dirname, '../libs/organisms/src'),
       '@social-media/templates': join(__dirname, '../libs/templates/src'),
-      '@social-media/assets': join(__dirname, '../libs/assets/src'),
+      '@social-media/assets': join(__dirname, '../assets'),
 
       // App paths
       '@': join(__dirname, '../apps/dating-app/src'),

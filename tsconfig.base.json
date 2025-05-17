@@ -20,7 +20,7 @@
     "paths": {
       "@social-media/styles": ["./styles/globals.css"],
       "@styles/*": ["./styles/*"],
-      "@social-media/assets/*": ["./assets/*"]
+      "@social-media/assets/*": ["./assets"]
     }
   }
 }
