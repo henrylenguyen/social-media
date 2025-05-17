@@ -56,6 +56,21 @@ interface ICircleWithImageProps {
   useNextImage?: boolean
 }
 
+/**
+ * Kiểm tra có đang chạy trong môi trường Storybook không
+ */
+const isStorybook = () => {
+  try {
+    return (
+      typeof window !== 'undefined' &&
+      window.location &&
+      window.location.href.includes('story')
+    )
+  } catch (e) {
+    return false
+  }
+}
+
 const CircleWithImage: React.FunctionComponent<ICircleWithImageProps> = ({
   className,
   imageUrl,
@@ -66,16 +81,21 @@ const CircleWithImage: React.FunctionComponent<ICircleWithImageProps> = ({
   const isClient = typeof window !== 'undefined'
   const [NextImageComponent, setNextImageComponent] = React.useState<any>(null)
 
-  // Chỉ import Next/Image khi client-side và cần dùng
+  // Chỉ import Next/Image khi client-side, cần dùng và không phải trong Storybook
   React.useEffect(() => {
-    if (isClient && useNextImage) {
-      import('next/image')
-        .then((module) => {
-          setNextImageComponent(() => module.default)
-        })
-        .catch((err) => {
-          console.warn('Next/Image không khả dụng:', err)
-        })
+    // Nếu đang chạy trong Storybook, bỏ qua việc import next/image
+    if (isClient && useNextImage && !isStorybook()) {
+      try {
+        import('next/image')
+          .then((module) => {
+            setNextImageComponent(() => module.default)
+          })
+          .catch((err) => {
+            console.warn('Next/Image không khả dụng:', err)
+          })
+      } catch (e) {
+        console.warn('Error importing next/image:', e)
+      }
     }
   }, [isClient, useNextImage])
 
@@ -88,7 +108,7 @@ const CircleWithImage: React.FunctionComponent<ICircleWithImageProps> = ({
       )}
     >
       {imageUrl && typeof imageUrl === 'string' ? (
-        useNextImage && NextImageComponent ? (
+        useNextImage && NextImageComponent && !isStorybook() ? (
           // Sử dụng Next Image khi có sẵn và được yêu cầu
           React.createElement(NextImageComponent, {
             src: imageUrl ?? 'https://i.pravatar.cc/150?u=3',

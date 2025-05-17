@@ -1,98 +1,67 @@
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
-import type { StorybookConfig } from '@storybook/react-vite'
-import react from '@vitejs/plugin-react'
-import fs from 'fs'
-import path from 'path'
+import { join } from 'path'
 import { mergeConfig } from 'vite'
 
-// Dynamically resolve content for src/utils/cn to make it available to all libraries
-const cnUtilContent = fs.readFileSync(
-  path.resolve(__dirname, '../libs/atoms/src/utils/cn.ts'),
-  'utf-8',
-)
-
-const config: StorybookConfig = {
-  // Include stories from all libraries and apps
+const config = {
   stories: [
-    '../libs/atoms/src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../libs/molecules/src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../libs/organisms/src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../libs/templates/src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
-    '../apps/dating-app/src/**/*.stories.@(js|jsx|ts|tsx|mdx)',
+    '../libs/**/*.stories.@(js|jsx|ts|tsx|mdx)',
+    '../apps/**/*.stories.@(js|jsx|ts|tsx|mdx)',
   ],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+
+  addons: [
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    '@storybook/addon-links',
+  ],
+
   framework: {
     name: '@storybook/react-vite',
     options: {},
   },
-  // Cấu hình sắp xếp stories thông qua tham số
+
   docs: {
     autodocs: true,
-    defaultName: 'Documentation',
   },
-  // Trong Storybook 8, sử dụng parameters trong preview.ts thay vì sortStories ở đây
+
   viteFinal: async (config) => {
+    // Tạo plugin đơn giản để xử lý tất cả các import Next.js
+    const nextJsPlugin = {
+      name: 'vite-plugin-nextjs-mock',
+      resolveId(id) {
+        // Bắt và xử lý tất cả import từ Next.js
+        if (id.startsWith('next/')) {
+          return { id: 'virtual:next-module', external: false }
+        }
+        return null
+      },
+      load(id) {
+        if (id === 'virtual:next-module') {
+          // Trả về module rỗng
+          return 'export default () => null; export const useRouter = () => ({}); export const usePathname = () => "/";'
+        }
+        return null
+      },
+    }
+
+    // Định nghĩa process.env
+    config.define = {
+      ...config.define,
+      'process.env': JSON.stringify(process.env || {}),
+    }
+
+    // Thêm plugins và cấu hình
     return mergeConfig(config, {
-      plugins: [
-        react(),
-        nxViteTsPaths(),
-        // Add a virtual module for src/utils/cn
-        {
-          name: 'virtual-modules-resolver',
-          resolveId(id: string) {
-            // Handle imports for src/utils/cn
-            if (id === 'src/utils/cn') {
-              return '\0virtual:cn'
-            }
-            // Handle any other imports from 'src/'
-            if (id.startsWith('src/')) {
-              const potentialPath = path.resolve(__dirname, '../libs/atoms', id)
-              if (fs.existsSync(potentialPath)) {
-                return potentialPath
-              }
-            }
-            return null
-          },
-          load(id: string) {
-            if (id === '\0virtual:cn') {
-              return cnUtilContent
-            }
-            return null
-          },
-        },
-      ],
+      plugins: [nxViteTsPaths(), nextJsPlugin],
       resolve: {
         alias: {
-          '@social-media/atoms': path.resolve(__dirname, '../libs/atoms/src'),
-          '@social-media/molecules': path.resolve(
-            __dirname,
-            '../libs/molecules/src',
-          ),
-          '@social-media/organisms': path.resolve(
-            __dirname,
-            '../libs/organisms/src',
-          ),
-          '@social-media/templates': path.resolve(
-            __dirname,
-            '../libs/templates/src',
-          ),
-          '@dating-app': path.resolve(__dirname, '../apps/dating-app/src'),
-          // Add an alias for any src/ imports to look in atoms library first
-          src: path.resolve(__dirname, '../libs/atoms/src'),
-          '@': path.resolve(__dirname, '../apps/dating-app/src'),
-          '@social-media/assets': path.resolve(__dirname, '../assets'),
+          '@social-media/atoms': join(__dirname, '../libs/atoms/src'),
+          '@social-media/molecules': join(__dirname, '../libs/molecules/src'),
+          '@social-media/organisms': join(__dirname, '../libs/organisms/src'),
+          '@social-media/templates': join(__dirname, '../libs/templates/src'),
+          '@': join(__dirname, '../apps/dating-app/src'),
+          src: join(__dirname, '../libs/atoms/src'),
         },
-      },
-      css: {
-        postcss: {
-          plugins: [
-            // Use the root tailwind config which already includes content paths from all libraries
-            require('tailwindcss')(
-              path.resolve(__dirname, '../tailwind.config.js'),
-            ),
-            require('autoprefixer'),
-          ],
-        },
+        dedupe: ['react', 'react-dom'],
       },
     })
   },

@@ -1,5 +1,6 @@
 import '@social-media/styles';
 import type { Preview } from "@storybook/react";
+import React from 'react';
 
 const preview: Preview = {
   parameters: {
@@ -35,3 +36,8 @@ const preview: Preview = {
 };
 
 export default preview;
+
+// Hàm wrap mỗi story bằng React.createElement
+export const decorators = [
+  (Story) => React.createElement(Story, null)
+];
