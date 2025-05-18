@@ -1,1 +1,5 @@
-export * from './icons/DateIcons'
+export { default as ChatBubbleIcon } from './icons/ChatBubbleIcon'
+export { default as DatingMessageIcon } from './icons/DatingMessageIcon'
+export { default as ForgotPasswordIllustration } from './icons/ForgotPasswordIllustration'
+export { default as HeartIcon } from './icons/HeartIcon'
+export { default as LocationPinIcon } from './icons/LocationPinIcon'

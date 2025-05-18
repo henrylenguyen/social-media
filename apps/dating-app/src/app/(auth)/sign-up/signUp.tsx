@@ -69,11 +69,9 @@ const SignUp: React.FunctionComponent<ISignUpProps> = ({ className }) => {
                         'Ít nhất 1 ký tự đặc biệt',
                       ]}
                       onStrengthChange={(strength) => {
-                        console.log("strength:", strength)
-                        // Không cần cập nhật state vì component tự quản lý
+                        console.log('strength:', strength)
                       }}
                       showStrengthIndicator={true}
-
                       {...field}
                     />
                   </FormControl>
@@ -81,7 +79,6 @@ const SignUp: React.FunctionComponent<ISignUpProps> = ({ className }) => {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name='confirmPassword'

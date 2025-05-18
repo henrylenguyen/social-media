@@ -75,8 +75,7 @@ module.exports = {
           primary: '#333333',
           secondary: '#666666',
           tertiary: '#999999',
-          light: '#cccccc'
-
+          light: '#cccccc',
         },
         error: '#FF3B5C',
         success: '#1BE4A1',
@@ -102,11 +101,16 @@ module.exports = {
           '50%': { transform: 'translateY(5px) rotate(-5deg)' },
           '75%': { transform: 'translateY(-5px) rotate(2deg)' },
         },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         float: 'float 15s ease-in-out infinite',
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
     },
   },

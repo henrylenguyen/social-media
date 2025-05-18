@@ -79,9 +79,12 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ className }) => {
               </div>
 
               <div className='text-xs'>
-                <a href='#' className='text-red-400 hover:text-red-500'>
+                <Link
+                  href='/forgot-password'
+                  className='text-red-400 hover:text-red-500'
+                >
                   Quên mật khẩu?
-                </a>
+                </Link>
               </div>
             </div>
 

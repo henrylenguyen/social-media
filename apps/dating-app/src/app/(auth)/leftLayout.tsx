@@ -1,10 +1,17 @@
-import { DateIcons } from '@social-media/assets'
+import {
+  ChatBubbleIcon,
+  DatingMessageIcon,
+  HeartIcon,
+  LocationPinIcon,
+} from '@social-media/assets'
 import { FloatingIcons } from '@social-media/molecules'
 import * as React from 'react'
 
-interface ILeftLayoutProps {}
-
-const LeftLayout: React.FunctionComponent<ILeftLayoutProps> = (props) => {
+interface ILeftLayoutProps {
+  isCustomLayout?: boolean
+}
+const LeftLayout: React.FC<ILeftLayoutProps> = ({ isCustomLayout }) => {
+  // Các biểu tượng nổi cho các trang đăng nhập/đăng ký
   const backgroundItems: Array<{
     id: number
     imageUrl: React.ReactNode
@@ -12,31 +19,34 @@ const LeftLayout: React.FunctionComponent<ILeftLayoutProps> = (props) => {
   }> = [
     {
       id: 1,
-      imageUrl: <DateIcons.HeartIcon width={70} height={70} />,
+      imageUrl: <HeartIcon width={70} height={70} />,
       size: 'md',
     },
     {
       id: 2,
-      imageUrl: <DateIcons.ChatBubbleIcon width={60} height={60} />,
+      imageUrl: <ChatBubbleIcon width={60} height={60} />,
       size: 'md',
     },
     {
       id: 3,
-      imageUrl: <DateIcons.LocationPinIcon width={55} height={55} />,
+      imageUrl: <LocationPinIcon width={55} height={55} />,
       size: 'sm',
     },
     {
       id: 4,
-      imageUrl: <DateIcons.DatingMessageIcon width={120} height={120} />,
+      imageUrl: <DatingMessageIcon width={120} height={120} />,
       size: 'md',
     },
   ]
+
   return (
-    <FloatingIcons
-      haveContainer={false}
-      position='back'
-      items={backgroundItems}
-    />
+    <>
+      <FloatingIcons
+        haveContainer={false}
+        position='back'
+        items={backgroundItems}
+      />
+    </>
   )
 }
 

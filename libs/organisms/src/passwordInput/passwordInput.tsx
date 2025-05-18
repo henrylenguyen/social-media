@@ -1,7 +1,7 @@
-
 import { Input } from '@social-media/atoms'
 import { Eye, EyeOff } from 'lucide-react'
 import * as React from 'react'
+import { useFormContext } from 'react-hook-form'
 import { cn } from 'src/utils'
 
 // SVG Icons as components to avoid repetition
@@ -116,7 +116,7 @@ export interface PasswordInputProps
 /**
  * Component nhập mật khẩu với chỉ báo độ mạnh.
  * Hiển thị các yêu cầu về mật khẩu và cập nhật trạng thái đáp ứng.
- * Hỗ trợ tích hợp với React Hook Form.
+ * Tích hợp hoàn toàn với React Hook Form.
  *
  * @example Cách sử dụng cơ bản
  * ```tsx
@@ -155,11 +155,18 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
         'Ít nhất 1 ký tự đặc biệt',
       ],
       className,
+      onChange,
       onStrengthChange,
+      value,
+      name,
       ...props
     },
     ref,
   ) => {
+    // Kiểm tra xem component có được sử dụng trong React Hook Form không
+    const formContext = useFormContext()
+    const inFormContext = formContext && name ? true : false
+
     // Định nghĩa trạng thái mặc định cho độ mạnh
     const [passwordStrength, setPasswordStrength] =
       React.useState<PasswordStrength>({
@@ -173,6 +180,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 
     // State cho việc hiển thị/ẩn mật khẩu
     const [showPassword, setShowPassword] = React.useState(false)
+
+    // State để lưu trữ giá trị mật khẩu khi không sử dụng trong form context
+    const [localValue, setLocalValue] = React.useState(value || '')
 
     // Yêu cầu mặc định cho mật khẩu
     const defaultRequirements: PasswordRequirements = {
@@ -189,10 +199,16 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
       ...requirements,
     }
 
-    // Xử lý sự kiện khi giá trị input thay đổi
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const password = e.target.value
+    // Cập nhật mật khẩu từ form nếu nó thay đổi
+    React.useEffect(() => {
+      if (value !== undefined && value !== localValue) {
+        setLocalValue(value as string)
+        updatePasswordStrength(value as string)
+      }
+    }, [value])
 
+    // Hàm để cập nhật trạng thái độ mạnh mật khẩu
+    const updatePasswordStrength = (password: string) => {
       // Chỉ cập nhật nếu người dùng đã nhập ít nhất 1 ký tự
       const shouldShowIndicator = password.length > 0
 
@@ -213,10 +229,23 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
       if (onStrengthChange) {
         onStrengthChange(strength)
       }
+    }
 
-      // Gọi sự kiện onChange gốc nếu được cung cấp
-      if (props.onChange) {
-        props.onChange(e)
+    // Xử lý sự kiện khi giá trị input thay đổi
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value
+
+      // Cập nhật giá trị local nếu không sử dụng trong form context
+      if (!inFormContext) {
+        setLocalValue(newValue)
+      }
+
+      // Cập nhật độ mạnh mật khẩu
+      updatePasswordStrength(newValue)
+
+      // Gọi onChange từ props nếu được cung cấp
+      if (onChange) {
+        onChange(e)
       }
     }
 
@@ -224,6 +253,10 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     const togglePasswordVisibility = () => {
       setShowPassword(!showPassword)
     }
+
+    // Lấy giá trị hiện tại của mật khẩu
+    const currentValue =
+      inFormContext && name ? formContext.getValues(name) || '' : localValue
 
     return (
       <div className={cn('space-y-2', containerClassName)}>
@@ -233,6 +266,8 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
             className={cn('pr-10', className)}
             onChange={handleChange}
             ref={ref}
+            value={inFormContext && name ? undefined : localValue}
+            name={name}
             {...props}
           />
           <button
@@ -369,3 +404,4 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 PasswordInput.displayName = 'PasswordInput'
 
 export default PasswordInput
+export { PasswordInput }

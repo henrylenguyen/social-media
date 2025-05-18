@@ -55,7 +55,7 @@ const GridLayout: React.FC<IGridLayoutProps> = ({
     <div className='grid grid-cols-2 h-screen overflow-hidden'>
       {/* Left column */}
       <div className='background-circle h-screen overflow-hidden'>
-        <div className='w-full h-full px-8 py-4 overflow-auto'>
+        <div className='w-full h-full px-8 py-4 overflow-hidden'>
           <div className={cn('w-full grid gap-4 h-full p-10', leftClassName)}>
             {showDefaultLeftContent && (
               <>
