@@ -1,26 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-
-// Define interface for the form data
-interface SignUpFormData {
-  email: string
-  password: string
-  confirmPassword: string
-  terms: boolean
-}
-
-// Password validation requirements
-const passwordRequirements = {
-  minLength: 6,
-  hasUppercase: /[A-Z]/,
-  hasLowercase: /[a-z]/,
-  hasNumber: /\d/,
-  hasSpecialChar: /[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/,
-}
 
 // Define the basic schema WITHOUT any validation messages
 const formSchema = z
@@ -72,7 +54,7 @@ const formSchema = z
     }
 
     // Sequential password requirements validation
-    if (data.password.length < passwordRequirements.minLength) {
+    if (data.password.length < 6) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Mật khẩu phải có ít nhất 6 ký tự',
@@ -81,7 +63,7 @@ const formSchema = z
       return
     }
 
-    if (!passwordRequirements.hasUppercase.test(data.password)) {
+    if (!/[A-Z]/.test(data.password)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Mật khẩu phải có ít nhất 1 chữ cái viết hoa',
@@ -90,7 +72,7 @@ const formSchema = z
       return
     }
 
-    if (!passwordRequirements.hasLowercase.test(data.password)) {
+    if (!/[a-z]/.test(data.password)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Mật khẩu phải có ít nhất 1 chữ cái viết thường',
@@ -99,7 +81,7 @@ const formSchema = z
       return
     }
 
-    if (!passwordRequirements.hasNumber.test(data.password)) {
+    if (!/\d/.test(data.password)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Mật khẩu phải có ít nhất 1 số',
@@ -108,7 +90,7 @@ const formSchema = z
       return
     }
 
-    if (!passwordRequirements.hasSpecialChar.test(data.password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/.test(data.password)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Mật khẩu phải có ít nhất 1 ký tự đặc biệt',
@@ -124,11 +106,11 @@ const formSchema = z
       !data.email ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) ||
       !data.password ||
-      data.password.length < passwordRequirements.minLength ||
-      !passwordRequirements.hasUppercase.test(data.password) ||
-      !passwordRequirements.hasLowercase.test(data.password) ||
-      !passwordRequirements.hasNumber.test(data.password) ||
-      !passwordRequirements.hasSpecialChar.test(data.password)
+      data.password.length < 6 ||
+      !/[A-Z]/.test(data.password) ||
+      !/[a-z]/.test(data.password) ||
+      !/\d/.test(data.password) ||
+      !/[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/.test(data.password)
     ) {
       return
     }
@@ -160,11 +142,11 @@ const formSchema = z
       !data.email ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) ||
       !data.password ||
-      data.password.length < passwordRequirements.minLength ||
-      !passwordRequirements.hasUppercase.test(data.password) ||
-      !passwordRequirements.hasLowercase.test(data.password) ||
-      !passwordRequirements.hasNumber.test(data.password) ||
-      !passwordRequirements.hasSpecialChar.test(data.password) ||
+      data.password.length < 6 ||
+      !/[A-Z]/.test(data.password) ||
+      !/[a-z]/.test(data.password) ||
+      !/\d/.test(data.password) ||
+      !/[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/.test(data.password) ||
       !data.confirmPassword ||
       data.password !== data.confirmPassword
     ) {
@@ -182,16 +164,7 @@ const formSchema = z
   })
 
 const useSignUp = () => {
-  // Password strength state
-  const [passwordStrength, setPasswordStrength] = useState({
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    number: false,
-    specialChar: false,
-    showIndicator: false,
-  })
-
+  // Khởi tạo form với react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -204,34 +177,15 @@ const useSignUp = () => {
     shouldFocusError: true,
   })
 
-  const { watch, formState } = form
-  const { touchedFields, dirtyFields } = formState
-  const password = watch('password')
-
-  // Update password strength when password changes
-  useEffect(() => {
-    // Only show indicators if password field is dirty or touched
-    if (dirtyFields.password || touchedFields.password) {
-      setPasswordStrength({
-        length: password.length >= 6,
-        uppercase: /[A-Z]/.test(password),
-        lowercase: /[a-z]/.test(password),
-        number: /\d/.test(password),
-        specialChar: /[!@#$%^&*()_+\-=[\]{}|;:'",.<>/?\\~`]/.test(password),
-        showIndicator: true,
-      })
-    }
-  }, [password, touchedFields.password, dirtyFields.password])
-
+  // Xử lý khi submit form
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values
+    // Xử lý form (gửi API, chuyển trang,...)
     console.log(values)
   }
 
   return {
     form,
     onSubmit,
-    passwordStrength,
   }
 }
 

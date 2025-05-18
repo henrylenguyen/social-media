@@ -10,5 +10,8 @@
       "default": "./src/index.ts"
     },
     "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "input-otp": "^1.4.2"
   }
 }
