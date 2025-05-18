@@ -9,6 +9,7 @@ export { default } from './stepIndicator/stepIndicator'
 export type { IStepIndicatorProps } from './stepIndicator/stepIndicator'
 
 export * from './checkbox/checkbox'
+export * from './countdownTimer/countdownTimer'
 export * from './inputOtp/inputOtp'
 export * from './select/select'
 export * from './utils'
