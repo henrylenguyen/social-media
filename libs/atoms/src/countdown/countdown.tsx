@@ -11,6 +11,12 @@ export interface CountdownProps {
   timerEnd: string
 
   /**
+   * Múi giờ offset (ví dụ: 7 cho GMT+7 - Việt Nam)
+   * Mặc định là múi giờ local của trình duyệt
+   */
+  timeZoneOffset?: number
+
+  /**
    * Hàm được gọi khi hết thời gian đếm ngược
    */
   onFinish?: () => void
@@ -34,7 +40,6 @@ export interface CountdownProps {
    * Bật hiệu ứng chớp nháy trong 10 giây cuối
    */
   animationTimerEnd?: boolean
-
   /**
    * Màu chữ cho hiệu ứng chớp nháy (mặc định là màu đỏ)
    */
@@ -52,11 +57,13 @@ const Countdown: React.FC<CountdownProps> = ({
   fontSize = '1rem',
   animationTimerEnd = false,
   animationColor = '#FF5A5A',
+  timeZoneOffset,
 }) => {
   // Lấy dữ liệu đếm ngược từ hook
   const { hours, minutes, seconds, isFinished, totalSeconds } = useCountdown(
     timerEnd,
     onFinish,
+    timeZoneOffset,
   )
 
   // State để kiểm soát hiệu ứng nhấp nháy (hiển thị/ẩn)

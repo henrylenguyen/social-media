@@ -28,6 +28,10 @@ const meta: Meta<typeof CountdownTimer> = {
       control: { type: 'range', min: 2, max: 20, step: 1 },
       description: 'Độ dày của đường viền vòng tròn',
     },
+    timeZoneOffset: {
+      control: 'number',
+      description: 'Offset múi giờ (ví dụ: 7 cho GMT+7 - Việt Nam)',
+    },
   },
 }
 
@@ -97,5 +101,20 @@ export const WithDateFormat: Story = {
     timerEnd: '19/05/2025',
     size: 100,
     strokeWidth: 6,
+  },
+}
+
+/**
+ * Đồng hồ đếm ngược sử dụng múi giờ Việt Nam (GMT+7)
+ */
+export const WithVietnamTimeZone: Story = {
+  args: {
+    // Sử dụng thời gian UTC
+    timerEnd: '2025-05-19T13:30:00Z', // 13:30 UTC = 20:30 GMT+7
+    size: 100,
+    strokeWidth: 6,
+    textColor: '#FF5A5A',
+    progressColor: '#FF5A5A',
+    timeZoneOffset: 7, // Múi giờ Việt Nam (GMT+7)
   },
 }

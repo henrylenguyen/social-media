@@ -1,4 +1,5 @@
 import {
+  Countdown,
   CountdownTimer,
   InputOTP,
   InputOTPGroup,
@@ -27,11 +28,12 @@ const AuthOTPComponent: React.FC<IOTPComponentProps> = React.memo(() => {
         <CardHeader className='text-center items-center'>
           <CountdownTimer
             onFinish={() => {
-              console.log("Hoàn thành")
+              console.log('Hoàn thành')
             }}
             size={50}
             strokeWidth={2}
-            timerEnd='2025-05-18T15:19:59.061Z'
+            timerEnd='2025-05-18T08:19:59.061Z'
+            timeZoneOffset={7} // Múi giờ Việt Nam (GMT+7)
           />
           <CardTitle>Xác thực OTP</CardTitle>
           <CardDescription>
@@ -58,11 +60,22 @@ const AuthOTPComponent: React.FC<IOTPComponentProps> = React.memo(() => {
           </div>
         </CardContent>
         <CardFooter className='flex flex-col items-center justify-center'>
-          <div className='flex items-center gap-2'>
-            <span className='text-sm text-gray-500'>Bạn chưa nhận được mã?</span>
+          <div className='flex items-center gap-2 flex-col'>
+            <span className='text-sm text-gray-500'>
+              Bạn chưa nhận được mã?
+            </span>
+            <div>
+              <span>Thử lại sau: </span>
+              <Countdown
+                timerEnd='2025-05-19T13:19:59.061Z'
+                timeZoneOffset={7}
+                onFinish={() => {
+                  console.log('Hoàn thành')
+                }}
+              />
+            </div>
           </div>
         </CardFooter>
-
       </Card>
     </div>
   )

@@ -44,6 +44,12 @@ export interface CountdownTimerProps {
    * Độ dày của đường viền vòng tròn tiến trình
    */
   strokeWidth?: number
+
+  /**
+   * Múi giờ offset (ví dụ: 7 cho GMT+7 - Việt Nam)
+   * Mặc định là múi giờ local của trình duyệt
+   */
+  timeZoneOffset?: number
 }
 
 /**
@@ -58,11 +64,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   bgColor = '#F6F6F6',
   size = 100,
   strokeWidth = 6,
+  timeZoneOffset,
 }) => {
   // Lấy dữ liệu đếm ngược từ hook
   const { hours, minutes, seconds, isFinished, progress } = useCountdown(
     timerEnd,
     onFinish,
+    timeZoneOffset,
   )
 
   // Định dạng giá trị thời gian luôn có 2 chữ số

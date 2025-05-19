@@ -35,6 +35,10 @@ const meta: Meta<typeof Countdown> = {
       control: 'color',
       description: 'Màu chữ khi nhấp nháy trong 10 giây cuối',
     },
+    timeZoneOffset: {
+      control: 'number',
+      description: 'Offset múi giờ (ví dụ: 7 cho GMT+7 - Việt Nam)',
+    },
   },
 }
 
@@ -172,6 +176,23 @@ export const ExactlyTenSeconds: Story = {
     textColor: '#333333',
     animationTimerEnd: true,
     animationColor: '#FF0000',
+  },
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
+}
+
+/**
+ * Đồng hồ đếm ngược sử dụng múi giờ Việt Nam (GMT+7)
+ */
+export const WithVietnamTimeZone: Story = {
+  args: {
+    // Sử dụng thời gian UTC
+    timerEnd: '2025-05-19T20:40:00Z', // 13:30 UTC = 20:30 GMT+7
+    fontSize: '1.5rem',
+    textColor: '#333333',
+    timeZoneOffset: 7, // Múi giờ Việt Nam (GMT+7)
+    animationTimerEnd: true,
   },
   parameters: {
     chromatic: { disableSnapshot: true },

@@ -1,4 +1,6 @@
 // hooks/useCountdown.ts
+import { isValid, parseISO } from 'date-fns'
+import { toZonedTime } from 'date-fns-tz'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -17,11 +19,13 @@ interface CountdownData {
  * Hook tùy chỉnh để quản lý logic đếm ngược thời gian
  * @param timerEnd - Thời gian kết thúc dạng ISO hoặc định dạng DD/MM/YYYY
  * @param onFinish - Hàm callback được gọi khi hết thời gian
+ * @param timeZoneOffset - Offset múi giờ (ví dụ: 7 cho GMT+7). Mặc định sử dụng múi giờ local
  * @returns Đối tượng CountdownData chứa các giá trị thời gian
  */
 export const useCountdown = (
   timerEnd: string,
   onFinish?: () => void,
+  timeZoneOffset?: number,
 ): CountdownData => {
   // State lưu trữ giá trị đếm ngược
   const [countdown, setCountdown] = useState<CountdownData>({
@@ -36,45 +40,58 @@ export const useCountdown = (
   // Đánh dấu đã gọi callback onFinish hay chưa
   const onFinishCalledRef = useRef(false)
 
-  /**
-   * Phân tích chuỗi thời gian kết thúc thành đối tượng Date
-   * Hỗ trợ định dạng ISO và DD/MM/YYYY
-   */
-  const parseEndTime = (timeString: string): Date => {
-    // Kiểm tra nếu là định dạng ISO
-    const isoDate = new Date(timeString)
-
-    // Nếu là định dạng ISO hợp lệ
-    if (!isNaN(isoDate.getTime())) {
-      return isoDate
-    }
-
-    // Kiểm tra nếu là định dạng DD/MM/YYYY
-    const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
-    const match = timeString.match(ddmmyyyyRegex)
-
-    if (match) {
-      const [_, day, month, year] = match
-      // Tháng trong JavaScript Date bắt đầu từ 0
-      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-    }
-
-    // Mặc định 5 phút từ hiện tại nếu định dạng không hợp lệ
-    console.warn(
-      'Định dạng ngày không hợp lệ. Sử dụng mặc định 5 phút từ bây giờ.',
-    )
-    const defaultDate = new Date()
-    defaultDate.setMinutes(defaultDate.getMinutes() + 5)
-    return defaultDate
-  }
   // Effect xử lý đếm ngược
   useEffect(() => {
-    // Chuyển đổi thời gian kết thúc
-    const endTime = parseEndTime(timerEnd)
-    const currentTime = new Date()
+    // Định nghĩa lại hàm parseEndTime trong useEffect để tránh warning
+    const parseEndTime = (timeString: string): Date => {
+      const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
+      const match = timeString.match(ddmmyyyyRegex)
+      if (match) {
+        const [, day, month, year] = match
+        if (timeZoneOffset !== undefined) {
+          let tz = ''
+          if (timeZoneOffset > 0) tz = `Etc/GMT-${timeZoneOffset}`
+          else if (timeZoneOffset < 0)
+            tz = `Etc/GMT+${Math.abs(timeZoneOffset)}`
+          else tz = 'Etc/GMT'
+          const isoString = `${year}-${month.padStart(2, '0')}-${day.padStart(
+            2,
+            '0',
+          )}T00:00:00.000+00:00`
+          return toZonedTime(isoString, tz)
+        }
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+      }
+      let date: Date
+      if (timeString.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(timeString)) {
+        date = parseISO(timeString)
+        if (timeZoneOffset !== undefined) {
+          let tz = ''
+          if (timeZoneOffset > 0) tz = `Etc/GMT-${timeZoneOffset}`
+          else if (timeZoneOffset < 0)
+            tz = `Etc/GMT+${Math.abs(timeZoneOffset)}`
+          else tz = 'Etc/GMT'
+          return toZonedTime(date, tz)
+        }
+        return date
+      }
+      date = new Date(timeString)
+      if (isValid(date)) return date
+      const defaultDate = new Date()
+      defaultDate.setMinutes(defaultDate.getMinutes() + 5)
+      return defaultDate
+    }
 
-    // Tính toán thời gian ban đầu tính bằng mili giây
-    const duration = endTime.getTime() - currentTime.getTime()
+    const endTime = parseEndTime(timerEnd)
+
+    // Hàm tính toán thời gian còn lại với hỗ trợ múi giờ
+    const calculateRemainingTime = () => {
+      const now = new Date()
+      return endTime.getTime() - now.getTime()
+    }
+
+    // Tính toán thời gian ban đầu
+    const duration = calculateRemainingTime()
 
     // Reset trạng thái gọi callback khi timerEnd thay đổi
     onFinishCalledRef.current = false
@@ -90,7 +107,7 @@ export const useCountdown = (
         totalSeconds: 0,
       })
 
-      // Gọi callback onFinish nếu có và chưa được gọi
+      // Gọi callback onFinish
       if (onFinish && !onFinishCalledRef.current) {
         onFinish()
         onFinishCalledRef.current = true
@@ -160,7 +177,7 @@ export const useCountdown = (
 
     // Xóa interval khi component unmount
     return () => clearInterval(timer)
-  }, [timerEnd, onFinish])
+  }, [timerEnd, onFinish, timeZoneOffset])
 
   return countdown
 }
