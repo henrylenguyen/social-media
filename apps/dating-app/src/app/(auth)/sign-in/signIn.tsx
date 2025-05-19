@@ -1,6 +1,13 @@
 'use client'
 import { Button, cn, Input } from '@social-media/atoms'
 import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@social-media/molecules'
+import {
   Form,
   FormControl,
   FormField,
@@ -23,116 +30,122 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ className }) => {
     <div
       className={cn('w-full max-w-md flex flex-col justify-center', className)}
     >
-      <div className='p-8 border border-border rounded-lg shadow-sm bg-white'>
-        <div className='text-center mb-6'>
-          <h1 className='text-2xl font-bold text-gray-800'>Đăng nhập</h1>
-        </div>
+      <Card>
+        <CardHeader className='text-center'>
+          <CardTitle>Đăng nhập</CardTitle>
+        </CardHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Nhập địa chỉ email của bạn'
-                      type='email'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Nhập địa chỉ email của bạn'
+                        type='email'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
-                  <FormControl>
-                    <Input placeholder='********' type='password' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mật khẩu</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='********'
+                        type='password'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center'>
-                <input
-                  id='remember-me'
-                  name='remember-me'
-                  type='checkbox'
-                  className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
-                />
-                <label
-                  htmlFor='remember-me'
-                  className='ml-2 block text-xs text-gray-700'
-                >
-                  Ghi nhớ đăng nhập
-                </label>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center'>
+                  <input
+                    id='remember-me'
+                    name='remember-me'
+                    type='checkbox'
+                    className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+                  />
+                  <label
+                    htmlFor='remember-me'
+                    className='ml-2 block text-xs text-gray-700'
+                  >
+                    Ghi nhớ đăng nhập
+                  </label>
+                </div>
+
+                <div className='text-xs'>
+                  <Link
+                    href='/forgot-password'
+                    className='text-red-400 hover:text-red-500'
+                  >
+                    Quên mật khẩu?
+                  </Link>
+                </div>
               </div>
 
-              <div className='text-xs'>
-                <Link
-                  href='/forgot-password'
-                  className='text-red-400 hover:text-red-500'
-                >
-                  Quên mật khẩu?
-                </Link>
+              <Button
+                type='submit'
+                className='w-full bg-red-400 hover:bg-red-500 text-white'
+              >
+                Đăng nhập
+              </Button>
+            </form>
+          </Form>
+
+          <div className='mt-4'>
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center mt-2'>
+                <div className='w-full border-t border-gray-300'></div>
+              </div>
+              <div className='relative flex justify-center text-xs'>
+                <span className='px-2 bg-white text-gray-500'>
+                  Hoặc đăng nhập với
+                </span>
               </div>
             </div>
 
-            <Button
-              type='submit'
-              className='w-full bg-red-400 hover:bg-red-500 text-white'
-            >
-              Đăng nhập
-            </Button>
-          </form>
-        </Form>
-
-        <div className='mt-4'>
-          <div className='relative'>
-            <div className='absolute inset-0 flex items-center mt-2'>
-              <div className='w-full border-t border-gray-300'></div>
-            </div>
-            <div className='relative flex justify-center text-xs'>
-              <span className='px-2 bg-white text-gray-500'>
-                Hoặc đăng nhập với
-              </span>
+            <div className='mt-4 grid grid-cols-3 gap-2'>
+              <button
+                type='button'
+                className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
+              >
+                Google
+              </button>
+              <button
+                type='button'
+                className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
+              >
+                Facebook
+              </button>
+              <button
+                type='button'
+                className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
+              >
+                Apple
+              </button>
             </div>
           </div>
+        </CardContent>
 
-          <div className='mt-4 grid grid-cols-3 gap-2'>
-            <button
-              type='button'
-              className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
-            >
-              Google
-            </button>
-            <button
-              type='button'
-              className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
-            >
-              Facebook
-            </button>
-            <button
-              type='button'
-              className='w-full py-1.5 px-2 border border-solid border-gray-300 rounded-md shadow-sm bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none'
-            >
-              Apple
-            </button>
-          </div>
-        </div>
-
-        <div className='mt-4 text-center text-xs'>
-          <p className='text-gray-600'>
+        <CardFooter className='flex justify-center'>
+          <p className='text-gray-600 text-xs'>
             Chưa có tài khoản?{' '}
             <Link
               href='/sign-up'
@@ -141,10 +154,11 @@ const SignIn: React.FunctionComponent<ISignInProps> = ({ className }) => {
               Đăng ký ngay
             </Link>
           </p>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   )
 }
 
 export default SignIn
+

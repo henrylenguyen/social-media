@@ -21,7 +21,13 @@
     "**/*.stories.ts",
     "**/*.stories.jsx",
     "**/*.stories.js",
-    "**/*.stories.mdx"
+    "**/*.stories.mdx",
+    "src/**/*.stories.tsx",
+    "src/**/*.stories.ts"
   ],
-  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }
