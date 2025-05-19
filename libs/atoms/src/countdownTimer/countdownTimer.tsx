@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+// libs/atoms/src/countdownTimer/countdownTimer.tsx
+import React, { useEffect, useMemo } from 'react'
 import { useCountdown } from './useCountdownTimer'
 
 /**
@@ -66,6 +67,15 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   strokeWidth = 6,
   timeZoneOffset,
 }) => {
+  // Hiển thị thông tin debug trong môi trường development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `CountdownTimer: timerEnd=${timerEnd}, timeZoneOffset=${timeZoneOffset}`,
+      )
+    }
+  }, [timerEnd, timeZoneOffset])
+
   // Lấy dữ liệu đếm ngược từ hook
   const { hours, minutes, seconds, isFinished, progress } = useCountdown(
     timerEnd,

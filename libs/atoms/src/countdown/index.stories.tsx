@@ -1,3 +1,4 @@
+// libs/atoms/src/countdown/index.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import Countdown from './countdown'
@@ -45,27 +46,20 @@ const meta: Meta<typeof Countdown> = {
 export default meta
 type Story = StoryObj<typeof Countdown>
 
-// Hàm hỗ trợ tạo ngày trong tương lai
-const getFutureDate = (minutes: number): string => {
+/**
+ * Hàm tạo ngày trong tương lai dựa trên số phút
+ * @param minutes Số phút từ thời điểm hiện tại
+ * @returns Chuỗi ISO cho thời gian trong tương lai
+ */
+const getFutureTime = (minutes: number): string => {
   const date = new Date()
-  // Thêm một chút thời gian dự phòng để đảm bảo component có thể hiển thị đúng
-  // khi storybook load xong
-  date.setTime(date.getTime() + Math.round(minutes * 60 * 1000) + 2000) // Thêm 2s dự phòng
+  date.setMinutes(date.getMinutes() + minutes)
   return date.toISOString()
 }
 
 /**
- * Đồng hồ đếm ngược mặc định với 5 phút
+ * Decorator để đảm bảo đồng hồ đếm ngược sẽ luôn hiển thị đúng thời gian
  */
-export const Default: Story = {
-  args: {
-    timerEnd: getFutureDate(5),
-    fontSize: '1.5rem',
-    textColor: '#333333',
-  },
-}
-
-// Decorator để đảm bảo đồng hồ đếm ngược sẽ luôn hiển thị đúng thời gian
 const CountdownWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -81,22 +75,35 @@ const CountdownWrapper: React.FC<{ children: React.ReactNode }> = ({
 }
 
 /**
+ * Đồng hồ đếm ngược mặc định với 5 phút
+ */
+export const Default: Story = {
+  args: {
+    timerEnd: getFutureTime(5),
+    fontSize: '1.5rem',
+    textColor: '#333333',
+  },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
+}
+
+/**
  * Đồng hồ đếm ngược với hiệu ứng chớp nháy trong 10 giây cuối
+ * Sử dụng 20 giây từ thời điểm hiện tại để dễ quan sát
  */
 export const WithBlinkingAnimation: Story = {
   args: {
-    // Thời gian là 20 giây từ hiện tại - đảm bảo có đủ thời gian để thấy đếm ngược
-    timerEnd: (() => {
-      const date = new Date()
-      date.setSeconds(date.getSeconds() + 20) // 20 giây từ hiện tại
-      return date.toISOString()
-    })(),
+    timerEnd: getFutureTime(1 / 3), // 20 giây từ hiện tại
     fontSize: '1.5rem',
     textColor: '#333333',
     animationTimerEnd: true,
     animationColor: '#FF5A5A',
   },
-  // Sử dụng decorator để đảm bảo countdown luôn được khởi tạo lại khi xem
   decorators: [
     (Story) => (
       <CountdownWrapper>
@@ -114,12 +121,19 @@ export const WithBlinkingAnimation: Story = {
  */
 export const LargeSize: Story = {
   args: {
-    timerEnd: getFutureDate(10),
+    timerEnd: getFutureTime(10),
     fontSize: '2.5rem',
     textColor: '#2563EB',
     animationTimerEnd: true,
     animationColor: '#FF0000',
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
 
 /**
@@ -127,7 +141,7 @@ export const LargeSize: Story = {
  */
 export const AlreadyFinished: Story = {
   args: {
-    timerEnd: '2021-01-01',
+    timerEnd: getFutureTime(-5), // 5 phút trước
     fontSize: '1.5rem',
     textColor: '#888888',
   },
@@ -135,11 +149,18 @@ export const AlreadyFinished: Story = {
 
 /**
  * Đồng hồ với định dạng ngày DD/MM/YYYY
+ * Lưu ý: Sử dụng ngày trong tương lai không xa
  */
 export const WithDateFormat: Story = {
   args: {
     // Tạo ngày trong tương lai với định dạng DD/MM/YYYY
-    timerEnd: '19/05/2025',
+    timerEnd: (() => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      return `${String(tomorrow.getDate()).padStart(2, '0')}/${String(
+        tomorrow.getMonth() + 1,
+      ).padStart(2, '0')}/${tomorrow.getFullYear()}`
+    })(),
     fontSize: '1.5rem',
     textColor: '#333333',
     animationTimerEnd: true,
@@ -151,12 +172,19 @@ export const WithDateFormat: Story = {
  */
 export const CustomColors: Story = {
   args: {
-    timerEnd: getFutureDate(3),
+    timerEnd: getFutureTime(3),
     fontSize: '2rem',
     textColor: '#6D28D9',
     animationTimerEnd: true,
     animationColor: '#DC2626',
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
 
 /**
@@ -164,19 +192,19 @@ export const CustomColors: Story = {
  */
 export const ExactlyTenSeconds: Story = {
   args: {
-    // Set to exactly 10 seconds from now (minus a tiny bit to account for load time)
-    timerEnd: (() => {
-      const date = new Date()
-      date.setSeconds(date.getSeconds() + 10)
-      // Trừ một chút để đảm bảo hiển thị đúng 10s khi story load xong
-      date.setMilliseconds(date.getMilliseconds() - 300)
-      return date.toISOString()
-    })(),
+    timerEnd: getFutureTime(10 / 60), // 10 giây từ hiện tại
     fontSize: '2rem',
     textColor: '#333333',
     animationTimerEnd: true,
     animationColor: '#FF0000',
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
   parameters: {
     chromatic: { disableSnapshot: true },
   },
@@ -187,14 +215,18 @@ export const ExactlyTenSeconds: Story = {
  */
 export const WithVietnamTimeZone: Story = {
   args: {
-    // Sử dụng thời gian UTC
-    timerEnd: '2025-05-19T20:40:00Z', // 13:30 UTC = 20:30 GMT+7
+    // Sử dụng thời gian 5 phút trong tương lai, nhưng hiển thị theo GMT+7
+    timerEnd: getFutureTime(5),
     fontSize: '1.5rem',
     textColor: '#333333',
     timeZoneOffset: 7, // Múi giờ Việt Nam (GMT+7)
     animationTimerEnd: true,
   },
-  parameters: {
-    chromatic: { disableSnapshot: true },
-  },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }

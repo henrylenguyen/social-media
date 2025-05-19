@@ -1,6 +1,4 @@
-// hooks/useCountdown.ts
-import { isValid, parseISO } from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
+import moment from 'moment-timezone'
 import { useEffect, useRef, useState } from 'react'
 
 /**
@@ -16,8 +14,10 @@ interface CountdownData {
 }
 
 /**
- * Hook tùy chỉnh để quản lý logic đếm ngược thời gian
- * @param timerEnd - Thời gian kết thúc dạng ISO hoặc định dạng DD/MM/YYYY
+ * Hook tùy chỉnh để quản lý logic đếm ngược thời gian với vòng tròn tiến trình
+ * Sử dụng thư viện moment.js để xử lý thời gian chính xác
+ *
+ * @param timerEnd - Thời gian kết thúc dạng ISO, DD/MM/YYYY, hoặc bất kỳ định dạng nào moment.js hỗ trợ
  * @param onFinish - Hàm callback được gọi khi hết thời gian
  * @param timeZoneOffset - Offset múi giờ (ví dụ: 7 cho GMT+7). Mặc định sử dụng múi giờ local
  * @returns Đối tượng CountdownData chứa các giá trị thời gian và tiến độ
@@ -44,52 +44,78 @@ export const useCountdown = (
 
   // Effect xử lý đếm ngược
   useEffect(() => {
-    // Định nghĩa lại hàm parseEndTime trong useEffect để tránh warning
-    const parseEndTime = (timeString: string): Date => {
-      const ddmmyyyyRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
-      const match = timeString.match(ddmmyyyyRegex)
-      if (match) {
-        const [, day, month, year] = match
-        if (timeZoneOffset !== undefined) {
-          let tz = ''
-          if (timeZoneOffset > 0) tz = `Etc/GMT-${timeZoneOffset}`
-          else if (timeZoneOffset < 0)
-            tz = `Etc/GMT+${Math.abs(timeZoneOffset)}`
-          else tz = 'Etc/GMT'
-          const isoString = `${year}-${month.padStart(2, '0')}-${day.padStart(
-            2,
-            '0',
-          )}T00:00:00.000+00:00`
-          return toZonedTime(isoString, tz)
+    /**
+     * Phân tích và chuẩn hóa thời gian kết thúc
+     * Xử lý mọi định dạng và áp dụng múi giờ khi cần
+     */
+    const parseEndTime = (): moment.Moment => {
+      try {
+        let endTime: moment.Moment
+
+        // Xử lý định dạng DD/MM/YYYY
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(timerEnd)) {
+          endTime = moment(timerEnd, 'DD/MM/YYYY')
+        } else {
+          // Xử lý các định dạng khác - moment.js tự động xử lý nhiều định dạng
+          endTime = moment(timerEnd)
         }
-        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-      }
-      let date: Date
-      if (timeString.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(timeString)) {
-        date = parseISO(timeString)
-        if (timeZoneOffset !== undefined) {
-          let tz = ''
-          if (timeZoneOffset > 0) tz = `Etc/GMT-${timeZoneOffset}`
-          else if (timeZoneOffset < 0)
-            tz = `Etc/GMT+${Math.abs(timeZoneOffset)}`
-          else tz = 'Etc/GMT'
-          return toZonedTime(date, tz)
+
+        // Kiểm tra tính hợp lệ của thời gian
+        if (!endTime.isValid()) {
+          console.warn(
+            'Định dạng thời gian không hợp lệ, sử dụng thời gian mặc định',
+          )
+          // Thời gian mặc định: hiện tại + 5 phút
+          return moment().add(5, 'minutes')
         }
-        return date
+
+        // Xử lý múi giờ nếu được cung cấp
+        if (timeZoneOffset !== undefined) {
+          // Nếu timerEnd là UTC (có 'Z' ở cuối) và timeZoneOffset được chỉ định
+          if (timerEnd.endsWith('Z')) {
+            // Parse từ chuỗi UTC, sau đó áp dụng múi giờ mới
+            const utcTime = moment.utc(timerEnd)
+
+            // Tạo múi giờ từ offset
+            const timeZoneName =
+              timeZoneOffset >= 0
+                ? `Etc/GMT-${timeZoneOffset}`
+                : `Etc/GMT+${Math.abs(timeZoneOffset)}`
+
+            // Chuyển đổi sang múi giờ chỉ định
+            return utcTime.tz(timeZoneName)
+          } else {
+            // Nếu không có Z, áp dụng timeZoneOffset trực tiếp
+            // Tính toán offset giữa múi giờ hiện tại và múi giờ được yêu cầu
+            const currentOffset = -moment().utcOffset() / 60 // convert từ phút sang giờ
+            const offsetDiff = timeZoneOffset - currentOffset
+
+            // Áp dụng sự chênh lệch múi giờ
+            return endTime.add(offsetDiff, 'hours')
+          }
+        }
+
+        return endTime
+      } catch (error) {
+        console.error('Lỗi khi phân tích thời gian:', error)
+        // Thời gian mặc định nếu có lỗi
+        return moment().add(5, 'minutes')
       }
-      date = new Date(timeString)
-      if (isValid(date)) return date
-      const defaultDate = new Date()
-      defaultDate.setMinutes(defaultDate.getMinutes() + 5)
-      return defaultDate
     }
 
-    // Chuyển đổi thời gian kết thúc
-    const endTime = parseEndTime(timerEnd)
-    const currentTime = new Date()
+    // Lấy thời gian kết thúc đã xử lý
+    const endTime = parseEndTime()
+    const currentTime = moment()
+
+    // Log trong môi trường development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Thời gian kết thúc:', endTime.format())
+      console.log('Thời gian hiện tại:', currentTime.format())
+      console.log('Thời gian còn lại (mili giây):', endTime.diff(currentTime))
+    }
 
     // Tính toán thời gian ban đầu tính bằng mili giây
-    const duration = endTime.getTime() - currentTime.getTime()
+    const duration = endTime.diff(currentTime)
 
     // Lưu thời gian ban đầu để tính tiến độ
     if (!originalDurationRef.current && duration > 0) {
@@ -117,8 +143,8 @@ export const useCountdown = (
 
     // Cập nhật đếm ngược mỗi giây
     const timer = setInterval(() => {
-      const now = new Date()
-      const remainingTime = endTime.getTime() - now.getTime()
+      const now = moment()
+      const remainingTime = endTime.diff(now)
 
       // Khi hết thời gian
       if (remainingTime <= 0) {
@@ -141,18 +167,15 @@ export const useCountdown = (
       }
 
       // Tính toán các thành phần thời gian còn lại
-      const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24))
-      const hours = Math.floor(
-        (remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-      )
-      const minutes = Math.floor(
-        (remainingTime % (1000 * 60 * 60)) / (1000 * 60),
-      )
-      const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000)
+      const durationObj = moment.duration(remainingTime)
+      const days = Math.floor(durationObj.asDays())
+      const hours = durationObj.hours()
+      const minutes = durationObj.minutes()
+      const seconds = durationObj.seconds()
 
-      // Tính toán tiến độ (còn lại/ban đầu) - ngược lại để vòng tròn giảm dần
+      // Tính toán tiến độ (1 - còn lại/ban đầu) - vòng tròn tăng dần
       const progress = originalDurationRef.current
-        ? remainingTime / originalDurationRef.current
+        ? 1 - remainingTime / originalDurationRef.current
         : 0
 
       // Cập nhật state
@@ -167,12 +190,11 @@ export const useCountdown = (
     }, 1000)
 
     // Tính toán ban đầu
-    const days = Math.floor(duration / (1000 * 60 * 60 * 24))
-    const hours = Math.floor(
-      (duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-    )
-    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((duration % (1000 * 60)) / 1000)
+    const durationObj = moment.duration(duration)
+    const days = Math.floor(durationObj.asDays())
+    const hours = durationObj.hours()
+    const minutes = durationObj.minutes()
+    const seconds = durationObj.seconds()
 
     // Cập nhật giá trị ban đầu
     setCountdown({

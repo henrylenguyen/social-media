@@ -1,3 +1,4 @@
+// libs/atoms/src/countdown/countdown.tsx
 import React, { useEffect, useMemo, useState } from 'react'
 import { useCountdown } from './useCountdown'
 
@@ -59,6 +60,15 @@ const Countdown: React.FC<CountdownProps> = ({
   animationColor = '#FF5A5A',
   timeZoneOffset,
 }) => {
+  // Hiển thị thông tin debug trong môi trường development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `Countdown: timerEnd=${timerEnd}, timeZoneOffset=${timeZoneOffset}`,
+      )
+    }
+  }, [timerEnd, timeZoneOffset])
+
   // Lấy dữ liệu đếm ngược từ hook
   const { hours, minutes, seconds, isFinished, totalSeconds } = useCountdown(
     timerEnd,

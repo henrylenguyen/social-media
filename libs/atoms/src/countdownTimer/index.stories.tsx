@@ -1,4 +1,6 @@
+// libs/atoms/src/countdownTimer/index.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react'
+import React from 'react'
 import CountdownTimer from './countdownTimer'
 
 /**
@@ -38,11 +40,32 @@ const meta: Meta<typeof CountdownTimer> = {
 export default meta
 type Story = StoryObj<typeof CountdownTimer>
 
-// Hàm hỗ trợ tạo ngày trong tương lai
-const getFutureDate = (minutes: number): string => {
+/**
+ * Hàm tạo ngày trong tương lai dựa trên số phút
+ * @param minutes Số phút từ thời điểm hiện tại
+ * @returns Chuỗi ISO cho thời gian trong tương lai
+ */
+const getFutureTime = (minutes: number): string => {
   const date = new Date()
   date.setMinutes(date.getMinutes() + minutes)
   return date.toISOString()
+}
+
+/**
+ * Decorator để đảm bảo đồng hồ đếm ngược sẽ luôn hiển thị đúng thời gian
+ */
+const CountdownWrapper: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [key, setKey] = React.useState(Date.now())
+
+  // Force re-render khi component được mount
+  React.useEffect(() => {
+    // Tạo key mới để re-render countdown
+    setKey(Date.now())
+  }, [])
+
+  return <div key={key}>{children}</div>
 }
 
 /**
@@ -50,10 +73,17 @@ const getFutureDate = (minutes: number): string => {
  */
 export const Default: Story = {
   args: {
-    timerEnd: getFutureDate(5),
+    timerEnd: getFutureTime(5),
     size: 100,
     strokeWidth: 6,
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
 
 /**
@@ -61,10 +91,17 @@ export const Default: Story = {
  */
 export const ShortCountdown: Story = {
   args: {
-    timerEnd: getFutureDate(0.5), // 30 giây
+    timerEnd: getFutureTime(0.5), // 30 giây
     size: 80,
     strokeWidth: 6,
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
 
 /**
@@ -72,13 +109,20 @@ export const ShortCountdown: Story = {
  */
 export const LargeCustomColors: Story = {
   args: {
-    timerEnd: getFutureDate(10),
+    timerEnd: getFutureTime(10),
     size: 140,
     strokeWidth: 10,
     textColor: '#2563EB',
     progressColor: '#2563EB',
     bgColor: '#EFF6FF',
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
 
 /**
@@ -86,7 +130,7 @@ export const LargeCustomColors: Story = {
  */
 export const AlreadyFinished: Story = {
   args: {
-    timerEnd: '2021-01-01',
+    timerEnd: getFutureTime(-5), // 5 phút trước
     size: 80,
     strokeWidth: 6,
   },
@@ -98,7 +142,13 @@ export const AlreadyFinished: Story = {
 export const WithDateFormat: Story = {
   args: {
     // Tạo ngày trong tương lai với định dạng DD/MM/YYYY
-    timerEnd: '19/05/2025',
+    timerEnd: (() => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      return `${String(tomorrow.getDate()).padStart(2, '0')}/${String(
+        tomorrow.getMonth() + 1,
+      ).padStart(2, '0')}/${tomorrow.getFullYear()}`
+    })(),
     size: 100,
     strokeWidth: 6,
   },
@@ -109,12 +159,106 @@ export const WithDateFormat: Story = {
  */
 export const WithVietnamTimeZone: Story = {
   args: {
-    // Sử dụng thời gian UTC
-    timerEnd: '2025-05-19T13:30:00Z', // 13:30 UTC = 20:30 GMT+7
+    // Sử dụng thời gian 5 phút trong tương lai nhưng hiển thị ở GMT+7
+    timerEnd: getFutureTime(5),
     size: 100,
     strokeWidth: 6,
     textColor: '#FF5A5A',
     progressColor: '#FF5A5A',
     timeZoneOffset: 7, // Múi giờ Việt Nam (GMT+7)
   },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
+}
+
+/**
+ * Đồng hồ với tiến trình đã hoàn thành một nửa
+ */
+export const HalfProgress: Story = {
+  render: () => {
+    // Tính thời gian ở chính xác phân nửa tiến trình (đồng hồ sẽ hiển thị cung tròn 50%)
+    // Tạo thời gian ban đầu 10 phút, và lấy thời điểm sau 5 phút
+    const totalMinutes = 10
+
+    const now = new Date()
+    const end = new Date(now.getTime() + totalMinutes * 60 * 1000)
+
+    return (
+      <div className='flex flex-col items-center space-y-4'>
+        <p className='text-sm text-gray-500'>
+          Vòng tròn tiến trình sẽ hiển thị đúng 50%:
+        </p>
+        <CountdownTimer
+          timerEnd={end.toISOString()}
+          size={120}
+          strokeWidth={8}
+          textColor='#2563EB'
+          progressColor='#2563EB'
+          bgColor='#EFF6FF'
+        />
+        <p className='text-xs text-gray-400'>
+          (Trên thực tế, progress sẽ tùy thuộc vào thời điểm render)
+        </p>
+      </div>
+    )
+  },
+}
+
+/**
+ * Nhiều đồng hồ với nhiều kích thước và màu sắc khác nhau
+ */
+export const MultipleTimers: Story = {
+  render: () => {
+    return (
+      <div className='flex flex-wrap gap-8 justify-center'>
+        <CountdownTimer
+          timerEnd={getFutureTime(2)}
+          size={60}
+          strokeWidth={4}
+          textColor='#FF5A5A'
+          progressColor='#FF5A5A'
+          bgColor='#FEF2F2'
+        />
+
+        <CountdownTimer
+          timerEnd={getFutureTime(5)}
+          size={80}
+          strokeWidth={5}
+          textColor='#2563EB'
+          progressColor='#2563EB'
+          bgColor='#EFF6FF'
+        />
+
+        <CountdownTimer
+          timerEnd={getFutureTime(10)}
+          size={100}
+          strokeWidth={6}
+          textColor='#10B981'
+          progressColor='#10B981'
+          bgColor='#ECFDF5'
+        />
+
+        <CountdownTimer
+          timerEnd={getFutureTime(15)}
+          size={120}
+          strokeWidth={8}
+          textColor='#7C3AED'
+          progressColor='#7C3AED'
+          bgColor='#F5F3FF'
+        />
+      </div>
+    )
+  },
+  decorators: [
+    (Story) => (
+      <CountdownWrapper>
+        <Story />
+      </CountdownWrapper>
+    ),
+  ],
 }
