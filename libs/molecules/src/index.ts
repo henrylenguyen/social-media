@@ -4,3 +4,4 @@ export { default as NumberStepWithText } from './numberStepWithText/numberStepWi
 export * from './card/card'
 export * from './floatingIcons'
 export { default as FloatingIcons } from './floatingIcons'
+export { default as Header } from './header/header'

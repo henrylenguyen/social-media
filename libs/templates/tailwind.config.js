@@ -8,7 +8,7 @@ module.exports = {
   // Tùy chỉnh nội dung cho thư viện này nếu cần
   content: [
     './src/**/*.{ts,tsx,js,jsx,html}',
-    '!./src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
+    './src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
     ...rootTailwindConfig.content,
   ],
 };
