@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import StepIndicator from './stepIndicator'
 
+/**
+ * Component hiển thị chuỗi các bước trong quy trình với hiệu ứng thị giác
+ */
 const meta: Meta<typeof StepIndicator> = {
   component: StepIndicator,
   title: 'Atoms/StepIndicator',
@@ -63,6 +66,104 @@ const meta: Meta<typeof StepIndicator> = {
       control: { type: 'select', options: ['above', 'below'] },
       description: 'Vị trí hiển thị text của các bước',
     },
+    textColor: {
+      control: 'color',
+      description: 'Màu cho text của các bước',
+    },
+    lineColor: {
+      options: [
+        'primary',
+        'primary-light',
+        'secondary-blue',
+        'secondary-green',
+        'secondary-gold',
+        'secondary-purple',
+        'success',
+        'error',
+        'warning',
+        'white'
+      ],
+      control: {
+        type: 'select'
+      },
+      description: 'Màu cho đường line tĩnh giữa các bước',
+    },
+    lineAnimationColor: {
+      options: [
+        'primary',
+        'primary-light',
+        'secondary-blue',
+        'secondary-green',
+        'secondary-gold',
+        'secondary-purple',
+        'success',
+        'error',
+        'warning',
+        'white'
+      ],
+      control: {
+        type: 'select'
+      },
+      description: 'Màu cho animation chạy trong line',
+    },
+    disabledStepColor: {
+      options: [
+        'primary',
+        'primary-light',
+        'secondary-blue',
+        'secondary-green',
+        'secondary-gold',
+        'secondary-purple',
+        'success',
+        'error',
+        'warning',
+        'white'
+      ],
+      control: {
+        type: 'select'
+      },
+      description: 'Màu cho các bước bị disabled',
+    },
+    stepColor: {
+      options: [
+        'primary',
+        'primary-light',
+        'secondary-blue',
+        'secondary-green',
+        'secondary-gold',
+        'secondary-purple',
+        'success',
+        'error',
+        'warning',
+        'white'
+      ],
+      control: {
+        type: 'select'
+      },
+      description: 'Màu của số hiển thị giữa vòng tròn',
+    },
+    previousStepColor: {
+      options: [
+        'primary',
+        'primary-light',
+        'secondary-blue',
+        'secondary-green',
+        'secondary-gold',
+        'secondary-purple',
+        'success',
+        'error',
+        'warning',
+        'white'
+      ],
+      control: {
+        type: 'select'
+      },
+      description: 'Màu của các bước đã hoàn thành (trước step active)',
+    },
+    noPreviousStepBlur: {
+      control: 'boolean',
+      description: 'Loại bỏ hiệu ứng blur cho các step trước step active',
+    },
   },
 }
 
@@ -70,7 +171,7 @@ export default meta
 type Story = StoryObj<typeof StepIndicator>
 
 /**
- * Ví dụ mặc định với 3 bước, bước hiện tại là 1
+ * Mặc định - Bước hiện tại là 1
  */
 export const Default: Story = {
   args: {
@@ -99,6 +200,78 @@ export const FiveSteps: Story = {
     totalSteps: 5,
     stepTexts: ['Bắt đầu', 'Tài khoản', 'Thông tin', 'Xác minh', 'Hoàn tất'],
     spacing: 'md',
+  },
+}
+
+/**
+ * Ví dụ với màu text tùy chỉnh
+ */
+export const CustomTextColor: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    textColor: '#53ff00', // Green color (from image)
+    spacing: 'md',
+    isGraduallySmaller: false,
+  },
+}
+
+/**
+ * Ví dụ với màu line tĩnh tùy chỉnh
+ */
+export const CustomLineColor: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    lineColor: 'success',
+    spacing: 'md',
+    isGraduallySmaller: false,
+  },
+}
+
+/**
+ * Ví dụ với màu animation line tùy chỉnh
+ */
+export const CustomAnimationColor: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    lineAnimationColor: 'white',
+    spacing: 'md',
+    isGraduallySmaller: false,
+  },
+}
+
+/**
+ * Ví dụ với màu cho bước disabled
+ */
+export const CustomDisabledStepColor: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    disabledStepColor: 'secondary-purple',
+    spacing: 'md',
+    isGraduallySmaller: false,
+  },
+}
+
+/**
+ * Ví dụ kết hợp các tùy chỉnh màu sắc
+ */
+export const CombinedCustomColors: Story = {
+  args: {
+    currentStep: 2,
+    totalSteps: 4,
+    stepTexts: ['Bắt đầu', 'Thông tin', 'Xác minh', 'Hoàn tất'],
+    textColor: '#FFFFFF',
+    lineColor: 'secondary-purple',
+    lineAnimationColor: 'primary',
+    spacing: 'md',
+    isGraduallySmaller: false,
   },
 }
 
@@ -369,5 +542,28 @@ export const OnLightBackground: Story = {
   },
   parameters: {
     backgrounds: { default: 'light' },
+  },
+}
+
+/**
+ * Ví dụ trang profile setup
+ */
+export const ProfileSetupExample: Story = {
+  args: {
+    currentStep: 1,
+    totalSteps: 6,
+    stepTexts: [
+      'Thông tin cơ bản',
+      'Giới thiệu',
+      'Sở thích',
+      'Mục tiêu',
+      'Thiết lập',
+      'Xác minh',
+    ],
+    isGraduallySmaller: false,
+    isCanClick: true,
+    textColor: '#FFFFFF',
+    lineColor: 'white',
+    lineAnimationColor: 'primary-light',
   },
 }

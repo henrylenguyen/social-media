@@ -1,3 +1,4 @@
+// libs/atoms/src/stepIndicator/stepIndicator.tsx
 import { motion } from 'framer-motion'
 import * as React from 'react'
 import { cn } from 'src/utils/cn'
@@ -14,6 +15,22 @@ export type IndicatorStyleType =
   | 'warning' // màu vàng - phù hợp với nền tối
   | 'white-on-dark' // màu trắng (active) trên nền tối
   | 'dark-on-light' // màu tối (active) trên nền sáng
+
+/**
+ * Màu sắc có sẵn trong hệ thống
+ */
+export type SystemColorType =
+  | 'primary'
+  | 'primary-light'
+  | 'secondary'
+  | 'secondary-blue'
+  | 'secondary-green'
+  | 'secondary-gold'
+  | 'secondary-purple'
+  | 'success'
+  | 'error'
+  | 'warning'
+  | 'white'
 
 /**
  * Vị trí hiển thị text của các bước
@@ -92,6 +109,41 @@ export interface IStepIndicatorProps {
    * @default 'below'
    */
   positionText?: TextPositionType
+
+  /**
+   * Màu sắc cho text của các bước
+   * Có thể là mã màu CSS hợp lệ ("#FFF", "rgb(255, 255, 255)", v.v.)
+   */
+  textColor?: string
+
+  /**
+   * Màu sắc cho đường line tĩnh giữa các bước
+   */
+  lineColor?: SystemColorType | string
+
+  /**
+   * Màu sắc cho animation chạy trong line
+   */
+  lineAnimationColor?: SystemColorType | string
+
+  /**
+   * Màu sắc cho các bước bị disabled (các bước chưa active)
+   */
+  disabledStepColor?: SystemColorType | string
+  /**
+   * Màu sắc cho các bước đã hoàn thành (các bước trước bước active)
+   */
+  previousStepColor?: SystemColorType | string
+  /**
+   * Xác định có làm mờ các bước đã hoàn thành không
+   * @default false
+   */
+  noPreviousStepBlur?: boolean
+  /**
+   * Màu sắc cho các bước (các bước chưa active)
+   */
+  stepColor?: SystemColorType | string
+  
 }
 
 /**
@@ -111,6 +163,13 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
   onStepChange,
   indicatorStyle = 'primary',
   positionText = 'below',
+  textColor,
+  lineColor,
+  lineAnimationColor,
+  disabledStepColor,
+  stepColor,
+  previousStepColor,
+  noPreviousStepBlur = false,
 }) => {
   const [isClient, setIsClient] = React.useState(false)
 
@@ -299,6 +358,74 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
     },
   }
 
+  // Map system colors to their CSS values
+  const getSystemColorValue = (color?: SystemColorType | string) => {
+    if (!color) return undefined
+
+    // If it's a direct CSS color value, return it as is
+    if (
+      typeof color === 'string' &&
+      (color.startsWith('#') ||
+        color.startsWith('rgb') ||
+        color.startsWith('hsl'))
+    ) {
+      return color
+    }
+
+    // Otherwise map the system color to a CSS value
+    switch (color as SystemColorType) {
+      case 'primary':
+        return 'rgba(255, 107, 107, 0.9)' // FF6B6B
+      case 'primary-light':
+        return 'rgba(255, 158, 128, 0.9)' // FF9E80
+      case 'secondary-blue':
+        return 'rgba(46, 134, 222, 0.9)' // 2E86DE
+      case 'secondary-green':
+        return 'rgba(32, 191, 107, 0.9)' // 20BF6B
+      case 'secondary-gold':
+        return 'rgba(254, 211, 48, 0.9)' // FED330
+      case 'secondary-purple':
+        return 'rgba(156, 39, 176, 0.9)' // 9C27B0
+      case 'success':
+        return 'rgba(27, 228, 161, 0.9)' // 1BE4A1
+      case 'error':
+        return 'rgba(255, 59, 92, 0.9)' // FF3B5C
+      case 'warning':
+        return 'rgba(254, 211, 48, 0.9)' // FED330
+      case 'white':
+        return 'rgba(255, 255, 255, 0.9)' // FFFFFF
+      default:
+        return undefined
+    }
+  }
+
+  // Create gradient for the line using the specified colors
+  const getLineGradient = (baseColor?: SystemColorType | string) => {
+    const color = getSystemColorValue(baseColor)
+    if (!color) return undefined
+
+    // If it's already a full CSS color value
+    if (
+      color.startsWith('#') ||
+      color.startsWith('rgb') ||
+      color.startsWith('hsl')
+    ) {
+      // Create a gradient by adjusting opacity for RGB or HSL
+      if (color.startsWith('rgb') || color.startsWith('hsl')) {
+        // For rgb/hsl format, adjust the opacity parameter
+        return `linear-gradient(to right, ${color.replace(
+          /[0-9.]+\)$/,
+          '0.9)',
+        )}, ${color.replace(/[0-9.]+\)$/, '0.7)')})`
+      }
+      // For hex colors, convert to rgba and create gradient
+      return `linear-gradient(to right, ${color}, ${color})`
+    }
+
+    // Create a gradient from more opaque to less opaque
+    return `linear-gradient(to right, ${color}, ${color.replace('0.9', '0.7')})`
+  }
+
   const { active, base, reduction, lineWidth, fontSize, textSize } =
     sizeMap[size]
   const { gapMultiplier, textWidth } = spacingMap[spacing]
@@ -306,6 +433,14 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
 
   // Increase line width based on spacing choice
   const adjustedLineWidth = lineWidth * gapMultiplier
+
+  // Custom line gradient if lineColor is specified
+  const lineGradient = lineColor ? getLineGradient(lineColor) : undefined
+
+  // Custom animation color if lineAnimationColor is specified
+  const animationColor = lineAnimationColor
+    ? getSystemColorValue(lineAnimationColor)
+    : undefined
 
   return (
     <div
@@ -357,13 +492,23 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                     indicatorStyle === 'dark-on-light' &&
                       'border-t border-gray-300',
                   )}
-                  style={{ width: `${adjustedLineWidth}px` }}
+                  style={{
+                    width: `${adjustedLineWidth}px`,
+                    background: lineColor
+                      ? getSystemColorValue(lineColor)
+                      : undefined,
+                    backgroundColor: lineColor
+                      ? getSystemColorValue(lineColor)
+                      : undefined,
+                  }}
                 >
                   {stepNumber <= currentStep && (
                     <motion.div
                       className='absolute top-0 bottom-0 left-0 w-full'
                       style={{
-                        background: selectedStyle.line,
+                        background: lineAnimationColor
+                          ? getLineGradient(lineAnimationColor)
+                          : selectedStyle.line,
                       }}
                       initial={{ x: '-100%' }}
                       animate={{ x: '100%' }}
@@ -398,6 +543,7 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                       )}
                       style={{
                         fontSize: `${textSize}px`,
+                        color: textColor,
                       }}
                       initial={{ opacity: 0, y: 5 }}
                       animate={{
@@ -415,21 +561,39 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                 <motion.div
                   className={cn(
                     'rounded-full flex items-center justify-center',
+                    // Chỉ áp dụng các lớp style mặc định khi không có màu sắc tùy chỉnh
                     isActive
                       ? selectedStyle.active
-                      : isCompleted
+                      : isCompleted && !previousStepColor
                       ? selectedStyle.completed
-                      : selectedStyle.default,
+                      : !isActive && !isCompleted && !disabledStepColor
+                      ? selectedStyle.default
+                      : '',
                   )}
                   style={{
                     width: `${circleSize}px`,
                     height: `${circleSize}px`,
                     margin: '0 auto',
+                    backgroundColor:
+                      isCompleted && previousStepColor
+                        ? getSystemColorValue(previousStepColor)
+                        : !isActive && !isCompleted && disabledStepColor
+                        ? getSystemColorValue(disabledStepColor)
+                        : undefined,
                   }}
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{
-                    scale: isClient ? scale : 1,
-                    opacity: isClient ? opacity : 1,
+                    scale: isClient
+                      ? isCompleted && noPreviousStepBlur
+                        ? 1
+                        : scale
+                      : 1,
+                    opacity: isClient
+                      ? isCompleted && noPreviousStepBlur
+                        ? 1
+                        : opacity
+                      : 1,
+                    // Chỉ áp dụng hiệu ứng boxShadow cho step đang active, không áp dụng cho bất kỳ step nào khác
                     boxShadow: isActive ? selectedStyle.boxShadow : 'none',
                     transition: {
                       duration: 0.3,
@@ -464,6 +628,9 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                           2,
                         )
                       }px`,
+                      color: stepColor
+                        ? getSystemColorValue(stepColor)
+                        : textColor,
                     }}
                   >
                     {stepNumber}
@@ -482,6 +649,7 @@ const StepIndicator: React.FunctionComponent<IStepIndicatorProps> = ({
                       )}
                       style={{
                         fontSize: `${textSize}px`,
+                        color: textColor,
                       }}
                       initial={{ opacity: 0, y: -5 }}
                       animate={{

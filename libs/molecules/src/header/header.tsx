@@ -13,12 +13,9 @@ const Header: React.FunctionComponent<IHeaderProps> = ({
   rightChildren,
 }) => {
   return (
-    <header className='bg-white shadow-md'>
+    <header className={cn('bg-white shadow-md h-[80px]', className)}>
       <div
-        className={cn(
-          'container mx-auto flex items-center justify-between p-4',
-          className,
-        )}
+        className={'container mx-auto flex items-start justify-between p-4 h-full'}
       >
         <div className='flex items-center gap-2'>
           <img
