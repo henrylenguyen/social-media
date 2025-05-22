@@ -13,7 +13,7 @@ const meta: Meta<typeof PhoneMockup> = {
   argTypes: {
     modelId: {
       control: 'select',
-      options: phoneModels.map(model => model.id),
+      options: phoneModels.map((model) => model.id),
       description: 'Model điện thoại',
     },
     phoneColor: {
@@ -42,30 +42,128 @@ const meta: Meta<typeof PhoneMockup> = {
 export default meta
 type Story = StoryObj<typeof PhoneMockup>
 
-// Mock content for the profile preview like the image shows
+// Mock content for the profile preview
 const ProfilePreviewContent = () => (
-  <div className="bg-gray-200 h-full">
-    <div className="relative">
-      <div className="h-40 bg-gradient-to-b from-gray-400 to-gray-600"></div>
-      <div className="absolute top-16 left-1/2 transform -translate-x-1/2">
-        <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
+  <div style={{ width: '100%' }}>
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          height: '160px',
+          background: 'linear-gradient(to bottom, #a0aec0, #4a5568)',
+        }}
+      ></div>
+      <div
+        style={{
+          position: 'absolute',
+          top: '64px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+      >
+        <div
+          style={{
+            width: '96px',
+            height: '96px',
+            backgroundColor: '#d1d5db',
+            borderRadius: '50%',
+          }}
+        ></div>
       </div>
     </div>
-    <div className="pt-14 px-4">
-      <div className="text-center text-xl font-bold text-white">Tên của bạn, 25</div>
-      <div className="text-center text-sm text-white mb-4">Công việc</div>
 
-      <div className="mt-4">
-        <div className="font-medium mb-1">Giới thiệu</div>
-        <div className="text-sm text-gray-600 mb-4">Thêm một vài điều về bản thân...</div>
+    <div style={{ paddingTop: '56px' }}>
+      <div
+        style={{
+          textAlign: 'center',
+          fontSize: '1.25rem',
+          fontWeight: 'bold',
+          color: 'white',
+        }}
+      >
+        Tên của bạn, 25
+      </div>
+
+      <div
+        style={{
+          textAlign: 'center',
+          fontSize: '0.875rem',
+          color: 'white',
+          marginBottom: '16px',
+        }}
+      >
+        Công việc
+      </div>
+
+      <div style={{ marginTop: '16px' }}>
+        <div
+          style={{
+            fontWeight: '500',
+            marginBottom: '4px',
+          }}
+        >
+          Giới thiệu
+        </div>
+
+        <div
+          style={{
+            fontSize: '0.875rem',
+            color: '#4b5563',
+            marginBottom: '16px',
+          }}
+        >
+          Thêm một vài điều về bản thân...
+        </div>
       </div>
 
       <div>
-        <div className="font-medium mb-1">Sở thích</div>
-        <div className="flex gap-2">
-          <div className="bg-white rounded-full px-3 py-1 text-xs">Du lịch</div>
-          <div className="bg-white rounded-full px-3 py-1 text-xs">Ẩm thực</div>
-          <div className="bg-white rounded-full px-3 py-1 text-xs">Sách</div>
+        <div
+          style={{
+            fontWeight: '500',
+            marginBottom: '4px',
+          }}
+        >
+          Sở thích
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '9999px',
+              padding: '4px 12px',
+              fontSize: '0.75rem',
+            }}
+          >
+            Du lịch
+          </div>
+
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '9999px',
+              padding: '4px 12px',
+              fontSize: '0.75rem',
+            }}
+          >
+            Ẩm thực
+          </div>
+
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '9999px',
+              padding: '4px 12px',
+              fontSize: '0.75rem',
+            }}
+          >
+            Sách
+          </div>
         </div>
       </div>
     </div>
@@ -83,7 +181,7 @@ export const Default: Story = {
     showModelSelector: true,
     showColorSelector: true,
     scale: 1,
-    children: <ProfilePreviewContent />
+    children: <ProfilePreviewContent />,
   },
 }
 
@@ -98,7 +196,37 @@ export const PinkPhone: Story = {
     showModelSelector: true,
     showColorSelector: true,
     scale: 1,
-    children: <ProfilePreviewContent />
+    children: <ProfilePreviewContent />,
+  },
+}
+
+/**
+ * iPhone SE
+ */
+export const iPhoneSE: Story = {
+  args: {
+    modelId: 'iphone-se',
+    phoneColor: '#ffffff',
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    showModelSelector: false,
+    showColorSelector: false,
+    scale: 1,
+    children: <ProfilePreviewContent />,
+  },
+}
+
+/**
+ * Galaxy Z Fold
+ */
+export const GalaxyFold: Story = {
+  args: {
+    modelId: 'galaxy-z-fold',
+    phoneColor: '#1a1a1a',
+    shadowColor: 'rgba(0, 0, 0, 0.6)',
+    showModelSelector: false,
+    showColorSelector: false,
+    scale: 1,
+    children: <ProfilePreviewContent />,
   },
 }
 
@@ -107,10 +235,24 @@ export const PinkPhone: Story = {
  */
 export const AllPhoneModels: Story = {
   render: () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
-      {phoneModels.map(model => (
-        <div key={model.id} className="text-center">
-          <p className="mb-2 font-medium">{model.name}</p>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gap: '2rem',
+        padding: '1rem',
+      }}
+    >
+      {phoneModels.map((model) => (
+        <div key={model.id} style={{ textAlign: 'center' }}>
+          <p
+            style={{
+              marginBottom: '0.5rem',
+              fontWeight: '500',
+            }}
+          >
+            {model.name}
+          </p>
           <PhoneMockup
             modelId={model.id}
             showModelSelector={false}
@@ -130,11 +272,25 @@ export const AllPhoneModels: Story = {
  */
 export const DifferentSizes: Story = {
   render: () => (
-    <div className="flex flex-col md:flex-row gap-8 p-4">
-      <div className="text-center">
-        <p className="mb-2 font-medium">Nhỏ (0.7x)</p>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+        padding: '1rem',
+      }}
+    >
+      <div style={{ textAlign: 'center' }}>
+        <p
+          style={{
+            marginBottom: '0.5rem',
+            fontWeight: '500',
+          }}
+        >
+          Nhỏ (0.7x)
+        </p>
         <PhoneMockup
-          modelId="iphone-15"
+          modelId='iphone-15'
           showModelSelector={false}
           showColorSelector={false}
           scale={0.7}
@@ -142,10 +298,18 @@ export const DifferentSizes: Story = {
           <ProfilePreviewContent />
         </PhoneMockup>
       </div>
-      <div className="text-center">
-        <p className="mb-2 font-medium">Mặc định (1x)</p>
+
+      <div style={{ textAlign: 'center' }}>
+        <p
+          style={{
+            marginBottom: '0.5rem',
+            fontWeight: '500',
+          }}
+        >
+          Mặc định (1x)
+        </p>
         <PhoneMockup
-          modelId="iphone-15"
+          modelId='iphone-15'
           showModelSelector={false}
           showColorSelector={false}
           scale={1}
@@ -153,10 +317,18 @@ export const DifferentSizes: Story = {
           <ProfilePreviewContent />
         </PhoneMockup>
       </div>
-      <div className="text-center">
-        <p className="mb-2 font-medium">Lớn (1.3x)</p>
+
+      <div style={{ textAlign: 'center' }}>
+        <p
+          style={{
+            marginBottom: '0.5rem',
+            fontWeight: '500',
+          }}
+        >
+          Lớn (1.3x)
+        </p>
         <PhoneMockup
-          modelId="iphone-15"
+          modelId='iphone-15'
           showModelSelector={false}
           showColorSelector={false}
           scale={1.3}
@@ -179,7 +351,7 @@ export const SamsungBlue: Story = {
     showModelSelector: false,
     showColorSelector: false,
     scale: 1,
-    children: <ProfilePreviewContent />
+    children: <ProfilePreviewContent />,
   },
 }
 
@@ -188,14 +360,54 @@ export const SamsungBlue: Story = {
  */
 export const PreviewLayout: Story = {
   render: () => (
-    <div className="w-full max-w-4xl mx-auto p-6 border rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Xem trước hồ sơ</h2>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-1/3">
-          <h3 className="font-medium mb-3">Thiết bị điện thoại</h3>
+    <div
+      style={{
+        width: '100%',
+        maxWidth: '1024px',
+        margin: '0 auto',
+        padding: '1.5rem',
+        border: '1px solid #e5e7eb',
+        borderRadius: '0.5rem',
+      }}
+    >
+      <h2
+        style={{
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          marginBottom: '1rem',
+        }}
+      >
+        Xem trước hồ sơ
+      </h2>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2rem',
+        }}
+      >
+        <div style={{ flex: '1' }}>
+          <h3
+            style={{
+              fontWeight: '500',
+              marginBottom: '0.75rem',
+              textAlign: 'center',
+            }}
+          >
+            Thiết bị điện thoại
+          </h3>
+
           <select
-            className="w-full p-2 border border-gray-300 rounded-md mb-4"
-            defaultValue="iphone-15"
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+            }}
+            defaultValue='galaxy-s23'
           >
             {phoneModels.map((model) => (
               <option key={model.id} value={model.id}>
@@ -204,25 +416,92 @@ export const PreviewLayout: Story = {
             ))}
           </select>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Màu điện thoại
-            </label>
-            <input
-              type="color"
-              defaultValue="#000000"
-              className="w-full h-8 p-0 border border-gray-300 rounded cursor-pointer"
-            />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '1rem',
+              marginBottom: '1rem',
+            }}
+          >
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '0.25rem',
+                  textAlign: 'center',
+                }}
+              >
+                Màu điện thoại
+              </label>
+
+              <input
+                type='color'
+                defaultValue='#000000'
+                style={{
+                  width: '100%',
+                  height: '2rem',
+                  padding: '0',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.25rem',
+                  cursor: 'pointer',
+                }}
+              />
+            </div>
+
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '0.25rem',
+                  textAlign: 'center',
+                }}
+              >
+                Màu bóng đổ
+              </label>
+
+              <input
+                type='color'
+                defaultValue='#000000'
+                style={{
+                  width: '100%',
+                  height: '2rem',
+                  padding: '0',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.25rem',
+                  cursor: 'pointer',
+                }}
+              />
+            </div>
           </div>
 
-          <p className="text-sm text-gray-500 mt-4">
+          <p
+            style={{
+              fontSize: '0.875rem',
+              color: '#6b7280',
+              marginTop: '1rem',
+              textAlign: 'center',
+            }}
+          >
             Hồ sơ sẽ cập nhật khi bạn điền thông tin
           </p>
         </div>
 
-        <div className="md:w-2/3 flex justify-center">
+        <div
+          style={{
+            flex: '2',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <PhoneMockup
-            modelId="iphone-15"
+            modelId='galaxy-s23'
             showModelSelector={false}
             showColorSelector={false}
           >
