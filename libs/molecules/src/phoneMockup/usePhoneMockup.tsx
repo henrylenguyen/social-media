@@ -1,5 +1,5 @@
 // libs/molecules/src/phoneMockup/usePhoneMockup.tsx
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // Define phone models with their dimensions
 export interface PhoneModel {
@@ -38,6 +38,28 @@ export const phoneModels: PhoneModel[] = [
     aspectRatio: 16 / 9,
   },
   {
+    id: 'iphone-xr',
+    name: 'iPhone XR',
+    width: 415 - 20,
+    height: 795 - 25,
+    bezelWidth: 14,
+    cornerRadius: 38,
+    notchHeight: 36,
+    contentPadding: 15,
+    aspectRatio: 19.5 / 9,
+  },
+  {
+    id: 'iphone-12-pro',
+    name: 'iPhone 12 Pro',
+    width: 410 - 18,
+    height: 800 - 22,
+    bezelWidth: 10,
+    cornerRadius: 35,
+    notchHeight: 30,
+    contentPadding: 15,
+    aspectRatio: 19.5 / 9,
+  },
+  {
     id: 'pixel-7',
     name: 'Google Pixel 7',
     width: 420 - 20,
@@ -58,6 +80,17 @@ export const phoneModels: PhoneModel[] = [
     notchHeight: 20,
     contentPadding: 15,
     aspectRatio: 19.3 / 9,
+  },
+  {
+    id: 'galaxy-a51',
+    name: 'Samsung Galaxy A51',
+    width: 425 - 22,
+    height: 815 - 28,
+    bezelWidth: 11,
+    cornerRadius: 32,
+    notchHeight: 18, // Teardrop notch is smaller
+    contentPadding: 15,
+    aspectRatio: 20 / 9,
   },
   {
     id: 'galaxy-z-fold',
@@ -98,25 +131,36 @@ export const usePhoneMockup = ({
   const [phoneColor, setPhoneColor] = useState(initialPhoneColor)
   const [shadowColor, setShadowColor] = useState(initialShadowColor)
   const [currentTime, setCurrentTime] = useState('')
+  const [batteryLevel, setBatteryLevel] = useState(75) // Battery percentage
 
-  // Update current time
+  // Update current time and battery
   useEffect(() => {
-    const updateTime = () => {
+    const updateTimeAndBattery = () => {
       const now = new Date()
       const hours = now.getHours()
       const minutes = now.getMinutes()
-      setCurrentTime(
-        `${hours}:${minutes < 10 ? '0' + minutes : minutes}${hours >= 12 ? ' PM' : ' AM'}`
-      )
+
+      // Format time based on 24h format
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}`
+      setCurrentTime(timeString)
+
+      // Simulate battery drain (optional - you can remove this)
+      setBatteryLevel((prev) => {
+        const newLevel = prev - 0.1 // Drain 0.1% every minute
+        return newLevel < 10 ? Math.random() * 20 + 80 : newLevel // Reset when too low
+      })
     }
 
-    updateTime() // Initial update
-    const intervalId = setInterval(updateTime, 60000) // Update every minute
+    updateTimeAndBattery() // Initial update
+    const intervalId = setInterval(updateTimeAndBattery, 60000) // Update every minute
 
     return () => clearInterval(intervalId)
   }, [])
 
-  const selectedModel = phoneModels.find(model => model.id === selectedModelId) || phoneModels[0]
+  const selectedModel =
+    phoneModels.find((model) => model.id === selectedModelId) || phoneModels[0]
 
   const handleModelChange = (modelId: string) => {
     setSelectedModelId(modelId)
@@ -136,6 +180,7 @@ export const usePhoneMockup = ({
     phoneColor,
     shadowColor,
     currentTime,
+    batteryLevel,
     handleModelChange,
     handlePhoneColorChange,
     handleShadowColorChange,

@@ -73,6 +73,7 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
     phoneColor: statePhoneColor,
     shadowColor: stateShadowColor,
     currentTime,
+    batteryLevel,
     handleModelChange,
     handlePhoneColorChange,
     handleShadowColorChange,
@@ -112,8 +113,27 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
     selectedModel.id,
   )
 
+  // Determine if model has teardrop notch (Galaxy A51)
+  const hasTeardropNotch = selectedModel.id === 'galaxy-a51'
+
   // Determine if model is foldable
   const isFoldable = selectedModel.isFoldable
+
+  // Determine device OS type
+  const isIOSDevice = [
+    'iphone-15',
+    'iphone-se',
+    'iphone-xr',
+    'iphone-12-pro',
+  ].includes(selectedModel.id)
+  const isAndroidDevice = !isIOSDevice
+
+  // Determine if model uses iOS home indicator
+  const hasiOSHomeIndicator = [
+    'iphone-15',
+    'iphone-xr',
+    'iphone-12-pro',
+  ].includes(selectedModel.id)
 
   // Prepare classes
   const containerClass = `phone-mockup-container ${className || ''}`
@@ -230,7 +250,7 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
           }}
         >
           {/* Camera/speaker elements */}
-          {hasNotch && (
+          {hasNotch && !hasTeardropNotch && (
             <div
               className='phone-mockup-notch'
               style={{
@@ -241,6 +261,19 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
               }}
             >
               <div className='speaker' />
+              <div className='camera' />
+            </div>
+          )}
+
+          {hasTeardropNotch && (
+            <div
+              className='phone-mockup-teardrop-notch'
+              style={{
+                width: `${18 * scale}px`,
+                height: `${18 * scale}px`,
+                top: `${12 * scale}px`,
+              }}
+            >
               <div className='camera' />
             </div>
           )}
@@ -263,11 +296,127 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             className='phone-mockup-status-bar'
             style={{
               height: `${24 * scale}px`,
-              paddingTop: hasCameraCutout ? `${15 * scale}px` : '0',
+              paddingTop:
+                hasCameraCutout || hasTeardropNotch ? `${15 * scale}px` : '0',
+              padding: `${4 * scale}px ${12 * scale}px`,
             }}
           >
-            <div className='time' style={{ fontSize: `${12 * scale}px` }}>
-              {currentTime}
+            {/* Left side - Time */}
+            <div className='status-left'>
+              <div className='time' style={{ fontSize: `${12 * scale}px` }}>
+                {currentTime}
+              </div>
+            </div>
+
+            {/* Right side - Battery, Signal, Wifi */}
+            <div className='status-right' style={{ gap: `${4 * scale}px` }}>
+              {/* Show carrier for iOS, signal bars for Android */}
+              {isIOSDevice ? (
+                <div
+                  className='carrier'
+                  style={{ fontSize: `${11 * scale}px` }}
+                >
+                  Viettel
+                </div>
+              ) : (
+                /* Signal bars for Android */
+                <div className='signal-bars' style={{ gap: `${1 * scale}px` }}>
+                  <div
+                    className='bar bar-1'
+                    style={{
+                      width: `${2 * scale}px`,
+                      height: `${3 * scale}px`,
+                      borderRadius: `${0.5 * scale}px`,
+                    }}
+                  />
+                  <div
+                    className='bar bar-2'
+                    style={{
+                      width: `${2 * scale}px`,
+                      height: `${5 * scale}px`,
+                      borderRadius: `${0.5 * scale}px`,
+                    }}
+                  />
+                  <div
+                    className='bar bar-3'
+                    style={{
+                      width: `${2 * scale}px`,
+                      height: `${7 * scale}px`,
+                      borderRadius: `${0.5 * scale}px`,
+                    }}
+                  />
+                  <div
+                    className='bar bar-4'
+                    style={{
+                      width: `${2 * scale}px`,
+                      height: `${9 * scale}px`,
+                      borderRadius: `${0.5 * scale}px`,
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Wifi icon */}
+              <div
+                className='wifi-icon'
+                style={{
+                  width: `${12 * scale}px`,
+                  height: `${8 * scale}px`,
+                }}
+              >
+                <svg viewBox='0 0 24 16' fill='currentColor'>
+                  <path d='M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3-3 3 3-3 3-3-3zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.86 9.14 5 13z' />
+                </svg>
+              </div>
+
+              {/* Battery percentage for Android */}
+              {isAndroidDevice && (
+                <div
+                  className='battery-percentage'
+                  style={{ fontSize: `${10 * scale}px` }}
+                >
+                  {Math.round(batteryLevel)}%
+                </div>
+              )}
+
+              {/* Battery */}
+              <div
+                className='battery'
+                style={{
+                  width: `${18 * scale}px`,
+                  height: `${9 * scale}px`,
+                  borderRadius: `${1 * scale}px`,
+                  borderWidth: `${0.5 * scale}px`,
+                }}
+              >
+                <div
+                  className={`battery-level ${
+                    batteryLevel <= 20
+                      ? 'low'
+                      : batteryLevel <= 50
+                      ? 'medium'
+                      : batteryLevel <= 90
+                      ? 'high'
+                      : 'full'
+                  }`}
+                  style={{
+                    width: `${Math.max(batteryLevel, 5)}%`,
+                    height: '100%',
+                    borderRadius: `${0.5 * scale}px`,
+                  }}
+                />
+                <div
+                  className='battery-tip'
+                  style={{
+                    width: `${1 * scale}px`,
+                    height: `${4 * scale}px`,
+                    right: `${-1.5 * scale}px`,
+                    borderRadius: `${0 * scale}px ${0.5 * scale}px ${
+                      0.5 * scale
+                    }px ${0 * scale}px`,
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -309,10 +458,27 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             />
           )}
 
+          {/* iOS Home Indicator (iPhone X and later) */}
+          {hasiOSHomeIndicator && (
+            <div
+              className='phone-mockup-ios-home-indicator'
+              style={{
+                width: `${134 * scale}px`,
+                height: `${5 * scale}px`,
+                bottom: `${8 * scale}px`,
+                borderRadius: `${3 * scale}px`,
+              }}
+            />
+          )}
+
           {/* Navigation bar (Android) */}
-          {['pixel-7', 'galaxy-s23', 'xiaomi-13', 'galaxy-z-fold'].includes(
-            selectedModel.id,
-          ) && (
+          {[
+            'pixel-7',
+            'galaxy-s23',
+            'xiaomi-13',
+            'galaxy-z-fold',
+            'galaxy-a51',
+          ].includes(selectedModel.id) && (
             <div
               className='phone-mockup-navigation-bar'
               style={{

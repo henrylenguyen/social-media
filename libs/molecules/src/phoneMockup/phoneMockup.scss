@@ -136,508 +136,23 @@
     }
   }
 
-  &-camera-cutout {
+  &-teardrop-notch {
     position: absolute;
     top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    z-index: 10;
-    width: 50px;
-    height: 12px;
-
-    .camera {
-      width: 10px;
-      height: 10px;
-      background-color: #333;
-      border-radius: 50%;
-      border: 1px solid #444;
-    }
-
-    .flash {
-      width: 6px;
-      height: 6px;
-      background-color: #777;
-      border-radius: 50%;
-    }
-  }
-
-  &-status-bar {
-    padding-top: 10px;
-    width: 100%;
-    z-index: 5;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 24px;
-
-    .time {
-      color: #fff;
-      opacity: 0.9;
-      text-align: center;
-      margin: 0 auto;
-      display: block;
-      width: 100%;
-      font-size: 12px;
-    }
-  }
-
-  &-content {
-    &-outer-container {
-      flex: 1;
-      width: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    &-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      background-color: #f5f5f5;
-      overflow: auto;
-      overflow-x: hidden;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    &-width-limiter {
-      box-sizing: border-box;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
-
-    &-wrapper {
-      box-sizing: border-box;
-      width: 100%;
-    }
-  }
-
-  &-home-button {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: transparent;
-    border: 2px solid #d0d0d0;
-    border-radius: 50%;
-    z-index: 10;
-    width: 40px;
-    height: 40px;
-    bottom: 10px;
-  }
-
-  &-navigation-bar {
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: auto;
-    height: 20px;
-    padding: 5px;
-
-    .nav-buttons {
-      display: flex;
-      gap: 40px;
-
-      .back,
-      .home,
-      .recent {
-        width: 14px;
-        height: 14px;
-        background-color: #fff;
-        border-radius: 50%;
-      }
-
-      .back {
-        clip-path: polygon(60% 0%, 60% 100%, 0% 50%);
-      }
-
-      .home {
-        border-radius: 3px;
-      }
-
-      .recent {
-        border: 2px solid #fff;
-        background-color: transparent;
-      }
-    }
-  }
-
-  &-fold-crease {
-    position: absolute;
-    left: 50%;
-    width: 1px;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
-    z-index: 15;
-    transform: translateX(-50%);
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -2px;
-      width: 5px;
-      height: 100%;
-      background: linear-gradient(to right,
-          rgba(0, 0, 0, 0.1) 0%,
-          rgba(255, 255, 255, 0.1) 30%,
-          rgba(255, 255, 255, 0.3) 50%,
-          rgba(255, 255, 255, 0.1) 70%,
-          rgba(0, 0, 0, 0.1) 100%);
-      opacity: 0.4;
-    }
-  }
-
-  &-folded-area {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 5;
-
-    &:before,
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 50%;
-      background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05));
-      pointer-events: none;
-    }
-
-    &:before {
-      left: 0;
-      z-index: 5;
-    }
-
-    &:after {
-      right: 0;
-      transform: scaleX(-1);
-      z-index: 5;
-    }
-  }
-}
-
-/* Model specific styles with fixed dimensions */
-.phone-model {
-  &-iphone-15 {
-    width: 425px !important;
-    height: 810px !important;
-    border: 8px solid #e0e0e0;
-    border-left-width: 12px;
-    border-right-width: 12px;
-    border-radius: 40px;
-
-    .phone-mockup-inner-container {
-      top: 12px;
-      left: 12px;
-      width: 401px;
-      height: 780px;
-      border-radius: 38px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 371px;
-      max-width: 371px;
-    }
-  }
-
-  &-iphone-se {
-    width: 410px !important;
-    height: 685px !important;
-    border: 14px solid #d8d8d8;
-    border-top-width: 30px;
-    border-bottom-width: 30px;
-    border-radius: 30px;
-
-    .phone-mockup-inner-container {
-      top: 30px;
-      left: 14px;
-      width: 382px;
-      height: 625px;
-      border-radius: 28px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 352px;
-      max-width: 352px;
-    }
-
-    .phone-mockup-status-bar {
-      padding-top: 0;
-    }
-  }
-
-  &-pixel-7 {
-    width: 420px !important;
-    height: 805px !important;
-    border: 8px solid #333;
-    border-left-width: 8px;
-    border-right-width: 8px;
-    border-radius: 35px;
-
-    .phone-mockup-inner-container {
-      top: 8px;
-      left: 8px;
-      width: 404px;
-      height: 785px;
-      border-radius: 33px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 374px;
-      max-width: 374px;
-    }
-
-    .phone-mockup-status-bar {
-      padding-top: 15px;
-    }
-  }
-
-  &-galaxy-s23 {
-    width: 410px !important;
-    height: 800px !important;
-    border: 6px solid #222;
-    border-left-width: 6px;
-    border-right-width: 6px;
-    border-radius: 38px;
-
-    .phone-mockup-inner-container {
-      top: 6px;
-      left: 6px;
-      width: 398px;
-      height: 785px;
-      border-radius: 36px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 368px;
-      max-width: 368px;
-    }
-
-    .phone-mockup-status-bar {
-      padding-top: 15px;
-    }
-  }
-
-  &-galaxy-z-fold {
-    width: 470px !important;
-    height: 865px !important;
-    border: 12px solid #333;
-    border-radius: 30px;
-
-    .phone-mockup-inner-container {
-      top: 12px;
-      left: 12px;
-      width: 446px;
-      height: 835px;
-      border-radius: 28px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 416px;
-      max-width: 416px;
-    }
-
-    .phone-mockup-fold-crease {
-      height: 835px;
-      top: 12px;
-    }
-
-    &.phone-foldable {
-      background-image: linear-gradient(to right, #222, #333, #222);
-
-      .phone-mockup-inner-container {
-        background-image: linear-gradient(to right, #000, #111, #000);
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-      }
-
-      .phone-mockup-content-container {
-        background-image: linear-gradient(to right, rgba(245, 245, 245, 1) 45%,
-            rgba(245, 245, 245, 0.9) 49.8%,
-            rgba(220, 220, 220, 0.9) 50%,
-            rgba(245, 245, 245, 0.9) 50.2%,
-            rgba(245, 245, 245, 1) 55%);
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-      }
-    }
-  }
-
-  &-xiaomi-13 {
-    width: 420px !important;
-    height: 800px !important;
-    border: 8px solid #444;
-    border-left-width: 8px;
-    border-right-width: 8px;
-    border-radius: 32px;
-
-    .phone-mockup-inner-container {
-      top: 8px;
-      left: 8px;
-      width: 404px;
-      height: 780px;
-      border-radius: 30px;
-    }
-
-    .phone-mockup-content-width-limiter {
-      width: 374px;
-      max-width: 374px;
-    }
-  }
-}
-
-/* Responsive styles */
-@media (max-width: 640px) {
-  .phone-mockup-controls {
-    width: 100%;
-  }
-}// libs/molecules/src/phoneMockup/phoneMockup.scss
-
-.phone-mockup {
-  &-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-
-  &-controls {
-    width: 100%;
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-
-    .model-selector {
-      width: 100%;
-
-      select {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 0.25rem;
-        text-align: center;
-      }
-    }
-
-    .color-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-
-      &-item {
-        .label {
-          display: block;
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: #374151;
-          margin-bottom: 0.25rem;
-          text-align: center;
-        }
-
-        input[type="color"] {
-          width: 100%;
-          height: 2rem;
-          padding: 0;
-          border: 1px solid #ccc;
-          border-radius: 0.25rem;
-          cursor: pointer;
-        }
-      }
-    }
-  }
-
-  &-outer-container {
-    position: relative;
-    margin: 15px 0;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    overflow: visible;
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-5px);
-    }
-  }
-
-  &-side-button {
-    position: absolute;
-    background-color: #d0d0d0;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-
-    &.power-button {
-      right: -2px;
-      top: 80px;
-      height: 50px;
-      width: 3px;
-      border-radius: 2px;
-    }
-
-    &.volume-up {
-      left: -2px;
-      top: 80px;
-      height: 30px;
-      width: 3px;
-      border-radius: 2px;
-    }
-
-    &.volume-down {
-      left: -2px;
-      top: 120px;
-      height: 30px;
-      width: 3px;
-      border-radius: 2px;
-    }
-  }
-
-  &-inner-container {
-    position: absolute;
     background-color: #000;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  &-notch {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #000000;
-    z-index: 10;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 32px;
-    width: 100px;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-
-    .speaker {
-      width: 35%;
-      height: 4px;
-      background-color: #333;
-      border-radius: 2px;
-    }
+    z-index: 10;
+    width: 18px;
+    height: 18px;
 
     .camera {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       background-color: #333;
       border-radius: 50%;
       border: 1px solid #444;
@@ -676,23 +191,143 @@
   }
 
   &-status-bar {
-    padding-top: 10px;
+    padding: 4px 12px;
     width: 100%;
     z-index: 5;
     position: relative;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 24px;
+    box-sizing: border-box;
 
-    .time {
-      color: #fff;
-      opacity: 0.9;
-      text-align: center;
-      margin: 0 auto;
-      display: block;
-      width: 100%;
-      font-size: 12px;
+    .status-left {
+      display: flex;
+      align-items: center;
+
+      .time {
+        color: #fff;
+        opacity: 0.9;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .carrier {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+      }
+
+      .battery-percentage {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 10px;
+        font-weight: 500;
+        min-width: 24px;
+        text-align: right;
+      }
+
+      .signal-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 1px;
+
+        .bar {
+          background-color: rgba(255, 255, 255, 0.9);
+          border-radius: 0.5px;
+
+          &.bar-1 {
+            width: 2px;
+            height: 3px;
+          }
+
+          &.bar-2 {
+            width: 2px;
+            height: 5px;
+          }
+
+          &.bar-3 {
+            width: 2px;
+            height: 7px;
+          }
+
+          &.bar-4 {
+            width: 2px;
+            height: 9px;
+          }
+        }
+      }
+
+      .wifi-icon {
+        width: 12px;
+        height: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .battery {
+        position: relative;
+        background-color: transparent;
+        border: 0.5px solid rgba(255, 255, 255, 0.9);
+        border-radius: 1px;
+        width: 18px;
+        height: 9px;
+        display: flex;
+        align-items: center;
+
+        .battery-level {
+          background-color: rgba(255, 255, 255, 0.9);
+          border-radius: 0.5px;
+          width: 75%;
+          height: 100%;
+          transition: width 0.3s ease;
+
+          &.low {
+            background-color: #ff4444;
+            width: 20%;
+          }
+
+          &.medium {
+            background-color: #ffaa00;
+            width: 50%;
+          }
+
+          &.high {
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 75%;
+          }
+
+          &.full {
+            background-color: #00ff44;
+            width: 100%;
+          }
+        }
+
+        .battery-tip {
+          position: absolute;
+          background-color: rgba(255, 255, 255, 0.9);
+          width: 1px;
+          height: 4px;
+          right: -1.5px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-radius: 0 0.5px 0.5px 0;
+        }
+      }
     }
   }
 
@@ -742,6 +377,18 @@
     width: 40px;
     height: 40px;
     bottom: 10px;
+  }
+
+  &-ios-home-indicator {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+    z-index: 10;
+    width: 134px;
+    height: 5px;
+    bottom: 8px;
   }
 
   &-navigation-bar {
@@ -867,7 +514,7 @@
 
   &-iphone-se {
     width: 430px !important;
-      height: 700px !important;
+    height: 700px !important;
     border: 14px solid #d8d8d8;
     border-top-width: 30px;
     border-bottom-width: 30px;
@@ -888,12 +535,95 @@
 
     .phone-mockup-status-bar {
       padding-top: 0;
+
+      .status-right .carrier {
+        display: none;
+      }
+
+      .status-right::before {
+        content: "••••";
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 8px;
+        letter-spacing: 1px;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  &-iphone-xr {
+    width: 440px !important;
+    height: 820px !important;
+    border: 12px solid #333;
+    border-left-width: 14px;
+    border-right-width: 14px;
+    border-radius: 38px;
+
+    .phone-mockup-inner-container {
+      top: 14px;
+      left: 14px;
+      width: 395px;
+      height: 770px;
+      border-radius: 36px;
+    }
+
+    .phone-mockup-content-width-limiter {
+      width: 365px;
+      max-width: 365px;
+    }
+
+    .phone-mockup-notch {
+      width: 120px;
+      height: 36px;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+  }
+
+  &-iphone-12-pro {
+    width: 428px !important;
+    height: 822px !important;
+    border: 8px solid #444;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-radius: 35px;
+
+    .phone-mockup-inner-container {
+      top: 10px;
+      left: 10px;
+      width: 392px;
+      height: 778px;
+      border-radius: 33px;
+    }
+
+    .phone-mockup-content-width-limiter {
+      width: 362px;
+      max-width: 362px;
+    }
+
+    .phone-mockup-notch {
+      width: 90px;
+      height: 30px;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    .phone-mockup-side-button {
+      &.power-button {
+        right: -3px;
+        border-radius: 1px;
+      }
+
+      &.volume-up,
+      &.volume-down {
+        left: -3px;
+        border-radius: 1px;
+      }
     }
   }
 
   &-pixel-7 {
     width: 435px !important;
-      height: 805px !important;
+    height: 805px !important;
     border: 8px solid #333;
     border-left-width: 8px;
     border-right-width: 8px;
@@ -940,6 +670,38 @@
 
     .phone-mockup-status-bar {
       padding-top: 15px;
+    }
+  }
+
+  &-galaxy-a51 {
+    width: 447px !important;
+    height: 843px !important;
+    border: 10px solid #2a2a2a;
+    border-left-width: 11px;
+    border-right-width: 11px;
+    border-radius: 32px;
+
+    .phone-mockup-inner-container {
+      top: 11px;
+      left: 11px;
+      width: 403px;
+      height: 787px;
+      border-radius: 30px;
+    }
+
+    .phone-mockup-content-width-limiter {
+      width: 373px;
+      max-width: 373px;
+    }
+
+    .phone-mockup-teardrop-notch {
+      top: 15px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .phone-mockup-status-bar {
+      padding-top: 20px;
     }
   }
 
