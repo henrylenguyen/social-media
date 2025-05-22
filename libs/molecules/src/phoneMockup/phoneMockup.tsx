@@ -1,63 +1,21 @@
-// libs/molecules/src/phoneMockup/phoneMockup.tsx
-import * as React from 'react'
+// libs/molecules/src/phoneMockup/PhoneMockupComponent.tsx
+
+import React from 'react'
 import './phoneMockup.scss'
+import { deviceTypeHelpers } from './phoneModels'
+import { PhoneMockupProps } from './types'
 import { usePhoneMockup } from './usePhoneMockup'
 
-export interface PhoneMockupProps {
-  /**
-   * Nội dung hiển thị trong mockup điện thoại
-   */
-  children: React.ReactNode
+const DEFAULT_CONTENT = (
+  <div className='phone-default-content'>
+    <div className='phone-default-icon'>📱</div>
+    <div className='phone-default-title'>Phone Content</div>
+    <div className='phone-default-subtitle'>Add your content here</div>
+  </div>
+)
 
-  /**
-   * ID của model điện thoại
-   * @default 'iphone-15'
-   */
-  modelId?: string
-
-  /**
-   * Màu của điện thoại
-   * @default '#000000'
-   */
-  phoneColor?: string
-
-  /**
-   * Màu bóng đổ
-   * @default 'rgba(0, 0, 0, 0.5)'
-   */
-  shadowColor?: string
-
-  /**
-   * Class CSS tùy chỉnh
-   */
-  className?: string
-
-  /**
-   * Hiển thị select chọn mẫu điện thoại
-   * @default true
-   */
-  showModelSelector?: boolean
-
-  /**
-   * Hiển thị chọn màu điện thoại
-   * @default true
-   */
-  showColorSelector?: boolean
-
-  /**
-   * Class CSS tùy chỉnh cho container của điện thoại
-   */
-  phoneContainerClassName?: string
-
-  /**
-   * Kích thước tỷ lệ của điện thoại
-   * @default 1
-   */
-  scale?: number
-}
-
-const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
-  children,
+export const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
+  children = DEFAULT_CONTENT,
   modelId = 'iphone-15',
   phoneColor = '#000000',
   shadowColor = 'rgba(0, 0, 0, 0.5)',
@@ -65,7 +23,8 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
   phoneContainerClassName = '',
   showModelSelector = true,
   showColorSelector = true,
-  scale = 1,
+  showScaleSelector = true,
+  showOrientationToggle = true,
 }) => {
   const {
     phoneModels,
@@ -74,82 +33,80 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
     shadowColor: stateShadowColor,
     currentTime,
     batteryLevel,
+    isCharging,
+    networkType,
+    carrierName,
+    deviceType,
+    orientation,
+    scale,
     handleModelChange,
     handlePhoneColorChange,
     handleShadowColorChange,
+    handleOrientationToggle,
+    handleScaleChange,
   } = usePhoneMockup({
     initialModelId: modelId,
     initialPhoneColor: phoneColor,
     initialShadowColor: shadowColor,
   })
 
-  // Responsive width calculation based on scale factor
-  const getResponsiveWidth = () => {
-    return selectedModel.width * scale
-  }
+  // Calculate responsive dimensions với scale KHÔNG áp dụng cho outer container
+  // Để giống browser device mode: kích thước device cố định, scale content
+  const baseWidth =
+    orientation === 'landscape' ? selectedModel.height : selectedModel.width
+  const baseHeight =
+    orientation === 'landscape' ? selectedModel.width : selectedModel.height
 
-  // Responsive height calculation based on aspect ratio
-  const getResponsiveHeight = () => {
-    return selectedModel.height * scale
-  }
+  // Outer container dimensions (KHÔNG scale - giữ nguyên kích thước)
+  const outerWidth = baseWidth + selectedModel.bezelWidth * 2
+  const outerHeight = baseHeight + selectedModel.bezelWidth * 2.5
 
-  // Calculating bezel width based on model
-  const bezelWidth = selectedModel.bezelWidth * scale
+  // Inner dimensions (KHÔNG scale)
+  const innerWidth = baseWidth
+  const innerHeight = baseHeight
 
-  // Content padding
-  const contentPadding = selectedModel.contentPadding * scale
+  // Scaled values cho UI elements
+  const scaledBezel = selectedModel.bezelWidth
+  const scaledPadding = selectedModel.contentPadding
+  const scaledCornerRadius = selectedModel.cornerRadius
 
-  // Calculate content width (screen width - padding * 2)
-  const contentWidth = getResponsiveWidth() - contentPadding * 2
-
-  // Only display notch if model has one
-  const hasNotch = !!selectedModel.notchHeight
-
-  // Determine if the model is iPhone SE (has home button)
-  const hasiPhoneHomeButton = selectedModel.id === 'iphone-se'
-
-  // Determine if model has camera cutout (e.g., Pixel or Samsung)
-  const hasCameraCutout = ['pixel-7', 'galaxy-s23', 'xiaomi-13'].includes(
+  // Device feature checks
+  const isIOSDevice = deviceTypeHelpers.isIOSDevice(selectedModel.id)
+  const hasNotch = deviceTypeHelpers.hasNotch(selectedModel.id)
+  const hasTeardropNotch = deviceTypeHelpers.hasTeardropNotch(selectedModel.id)
+  const hasCameraCutout = deviceTypeHelpers.hasCameraCutout(selectedModel.id)
+  const hasiPhoneHomeButton = deviceTypeHelpers.hasiPhoneHomeButton(
     selectedModel.id,
   )
+  const hasiOSHomeIndicator = deviceTypeHelpers.hasiOSHomeIndicator(
+    selectedModel.id,
+  )
+  const isFoldable = deviceTypeHelpers.isFoldable(selectedModel.id)
+  const isZFlipCover = deviceTypeHelpers.isZFlipCover(selectedModel.id)
+  const hasAndroidNavBar = deviceTypeHelpers.hasAndroidNavBar(selectedModel.id)
 
-  // Determine if model has teardrop notch (Galaxy A51)
-  const hasTeardropNotch = selectedModel.id === 'galaxy-a51'
-
-  // Determine if model is foldable
-  const isFoldable = selectedModel.isFoldable
-
-  // Determine device OS type
-  const isIOSDevice = [
-    'iphone-15',
-    'iphone-se',
-    'iphone-xr',
-    'iphone-12-pro',
-  ].includes(selectedModel.id)
-  const isAndroidDevice = !isIOSDevice
-
-  // Determine if model uses iOS home indicator
-  const hasiOSHomeIndicator = [
-    'iphone-15',
-    'iphone-xr',
-    'iphone-12-pro',
-  ].includes(selectedModel.id)
-
-  // Prepare classes
-  const containerClass = `phone-mockup-container ${className || ''}`
-  const phoneModelClass = `phone-model-${selectedModel.id}`
-  const phoneClass = `phone-mockup-outer-container ${phoneModelClass} ${
-    phoneContainerClassName || ''
-  } ${isFoldable ? 'phone-foldable' : ''}`
+  // CSS classes
+  const containerClass = `phone-mockup-container ${className}`
+  const phoneClass = `phone-mockup-outer-container phone-model-${
+    selectedModel.id
+  } orientation-${orientation} ${phoneContainerClassName} ${
+    isFoldable ? 'phone-foldable' : ''
+  } ${isZFlipCover ? 'phone-small-cover' : ''}`
 
   return (
     <div className={containerClass}>
+      {/* Controls */}
       <div className='phone-mockup-controls'>
         {showModelSelector && (
-          <div className='model-selector'>
+          <div className='control-group'>
+            <label htmlFor='model-select' className='control-label'>
+              Chọn thiết bị
+            </label>
             <select
+              id='model-select'
               value={selectedModel.id}
               onChange={(e) => handleModelChange(e.target.value)}
+              className='control-select'
             >
               {phoneModels.map((model) => (
                 <option key={model.id} value={model.id}>
@@ -160,19 +117,50 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
           </div>
         )}
 
+        {showScaleSelector && (
+          <div className='control-group'>
+            <label htmlFor='scale-select' className='control-label'>
+              Kích thước hiển thị
+            </label>
+            <select
+              id='scale-select'
+              value={scale}
+              onChange={(e) => handleScaleChange(Number(e.target.value))}
+              className='control-select'
+            >
+              <option value={0.2}>20% - Rất nhỏ</option>
+              <option value={0.3}>30% - Nhỏ</option>
+              <option value={0.4}>40% - Nhỏ vừa</option>
+              <option value={0.5}>50% - Vừa (Mặc định)</option>
+              <option value={0.6}>60% - Vừa lớn</option>
+              <option value={0.7}>70% - Lớn</option>
+              <option value={0.8}>80% - Lớn hơn</option>
+              <option value={0.9}>90% - Rất lớn</option>
+              <option value={1.0}>100% - Kích thước gốc</option>
+            </select>
+          </div>
+        )}
+
         {showColorSelector && (
-          <div className='color-selector'>
-            <div className='color-selector-item'>
-              <label className='label'>Màu điện thoại</label>
+          <div className='control-group control-group-colors'>
+            <div className='control-color-item'>
+              <label htmlFor='phone-color' className='control-label'>
+                Màu điện thoại
+              </label>
               <input
+                id='phone-color'
                 type='color'
                 value={statePhoneColor}
                 onChange={(e) => handlePhoneColorChange(e.target.value)}
+                className='control-color'
               />
             </div>
-            <div className='color-selector-item'>
-              <label className='label'>Màu bóng đổ</label>
+            <div className='control-color-item'>
+              <label htmlFor='shadow-color' className='control-label'>
+                Màu bóng đổ
+              </label>
               <input
+                id='shadow-color'
                 type='color'
                 value={
                   stateShadowColor.startsWith('rgba')
@@ -180,29 +168,60 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
                     : stateShadowColor
                 }
                 onChange={(e) => handleShadowColorChange(e.target.value)}
+                className='control-color'
               />
             </div>
           </div>
         )}
+
+        {showOrientationToggle && !isZFlipCover && (
+          <div className='control-group'>
+            <button
+              onClick={handleOrientationToggle}
+              className='control-orientation-button'
+              type='button'
+              title={`Rotate to ${
+                orientation === 'portrait' ? 'landscape' : 'portrait'
+              }`}
+            >
+              <svg
+                width='16'
+                height='16'
+                viewBox='0 0 24 24'
+                fill='currentColor'
+                className={`control-rotation-icon ${orientation}`}
+              >
+                <path d='M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.5C23.44 4.84 18.29 0 12 0l-.66.03 3.81 3.81 1.33-1.32z' />
+              </svg>
+              <span>
+                {orientation === 'portrait' ? 'Portrait' : 'Landscape'}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Outer device container */}
+      {/* Phone Device - Outer container với kích thước cố định */}
       <div
         className={phoneClass}
         style={{
-          width: `${getResponsiveWidth() + bezelWidth * 2}px`,
-          height: `${getResponsiveHeight() + bezelWidth * 2.5}px`,
+          width: `${outerWidth}px`,
+          height: `${outerHeight}px`,
           backgroundColor: statePhoneColor,
           boxShadow: `0 25px 50px -12px ${stateShadowColor}`,
+          borderRadius: `${scaledCornerRadius}px`,
+          // Scale toàn bộ phone container giống browser device mode
+          transform: `scale(${scale})`,
+          transformOrigin: 'center top',
         }}
       >
-        {/* Fold crease for foldable phones */}
+        {/* Fold crease for foldables */}
         {isFoldable && (
           <div
             className='phone-mockup-fold-crease'
             style={{
-              height: `${getResponsiveHeight()}px`,
-              top: `${bezelWidth}px`,
+              height: `${innerHeight}px`,
+              top: `${scaledBezel}px`,
             }}
           />
         )}
@@ -211,30 +230,31 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
         <div
           className='phone-mockup-side-button power-button'
           style={{
-            top: `${80 * scale}px`,
-            height: `${50 * scale}px`,
-            width: `${3 * scale}px`,
-            borderRadius: `${2 * scale}px`,
+            top: `80px`,
+            height: `50px`,
+            width: `3px`,
+            right: `-2px`,
+            borderRadius: `2px`,
           }}
         />
-
         <div
           className='phone-mockup-side-button volume-up'
           style={{
-            top: `${80 * scale}px`,
-            height: `${30 * scale}px`,
-            width: `${3 * scale}px`,
-            borderRadius: `${2 * scale}px`,
+            top: `80px`,
+            height: `30px`,
+            width: `3px`,
+            left: `-2px`,
+            borderRadius: `2px`,
           }}
         />
-
         <div
           className='phone-mockup-side-button volume-down'
           style={{
-            top: `${120 * scale}px`,
-            height: `${30 * scale}px`,
-            width: `${3 * scale}px`,
-            borderRadius: `${2 * scale}px`,
+            top: `120px`,
+            height: `30px`,
+            width: `3px`,
+            left: `-2px`,
+            borderRadius: `2px`,
           }}
         />
 
@@ -242,22 +262,22 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
         <div
           className='phone-mockup-inner-container'
           style={{
-            top: `${bezelWidth}px`,
-            left: `${bezelWidth}px`,
-            width: `${getResponsiveWidth()}px`,
-            height: `${getResponsiveHeight()}px`,
-            borderRadius: `${(selectedModel.cornerRadius - 2) * scale}px`,
+            top: `${scaledBezel}px`,
+            left: `${scaledBezel}px`,
+            width: `${innerWidth}px`,
+            height: `${innerHeight}px`,
+            borderRadius: `${scaledCornerRadius - 2}px`,
           }}
         >
-          {/* Camera/speaker elements */}
-          {hasNotch && !hasTeardropNotch && (
+          {/* Camera/Speaker Elements */}
+          {hasNotch && (
             <div
               className='phone-mockup-notch'
               style={{
-                height: `${(selectedModel.notchHeight || 0) * scale}px`,
-                width: `${100 * scale}px`,
-                borderBottomLeftRadius: `${12 * scale}px`,
-                borderBottomRightRadius: `${12 * scale}px`,
+                height: `${selectedModel.notchHeight || 0}px`,
+                width: `100px`,
+                borderBottomLeftRadius: `12px`,
+                borderBottomRightRadius: `12px`,
               }}
             >
               <div className='speaker' />
@@ -269,9 +289,9 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             <div
               className='phone-mockup-teardrop-notch'
               style={{
-                width: `${18 * scale}px`,
-                height: `${18 * scale}px`,
-                top: `${12 * scale}px`,
+                width: `18px`,
+                height: `18px`,
+                top: `12px`,
               }}
             >
               <div className='camera' />
@@ -282,8 +302,8 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             <div
               className='phone-mockup-camera-cutout'
               style={{
-                width: `${50 * scale}px`,
-                height: `${12 * scale}px`,
+                width: `50px`,
+                height: `12px`,
               }}
             >
               <div className='camera' />
@@ -291,102 +311,82 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             </div>
           )}
 
-          {/* Status bar */}
+          {/* Status Bar */}
           <div
             className='phone-mockup-status-bar'
             style={{
-              height: `${24 * scale}px`,
-              paddingTop:
-                hasCameraCutout || hasTeardropNotch ? `${15 * scale}px` : '0',
-              padding: `${4 * scale}px ${12 * scale}px`,
+              height: `24px`,
+              padding: `4px 12px`,
+              paddingTop: hasCameraCutout || hasTeardropNotch ? `15px` : `4px`,
             }}
           >
-            {/* Left side - Time */}
             <div className='status-left'>
-              <div className='time' style={{ fontSize: `${12 * scale}px` }}>
+              <div className='time' style={{ fontSize: `12px` }}>
                 {currentTime}
               </div>
             </div>
 
-            {/* Right side - Battery, Signal, Wifi */}
-            <div className='status-right' style={{ gap: `${4 * scale}px` }}>
-              {/* Show carrier for iOS, signal bars for Android */}
+            <div className='status-right' style={{ gap: `4px` }}>
               {isIOSDevice ? (
-                <div
-                  className='carrier'
-                  style={{ fontSize: `${11 * scale}px` }}
-                >
-                  Viettel
+                <div className='carrier' style={{ fontSize: `11px` }}>
+                  {deviceType === 'desktop' ? 'Wi-Fi' : carrierName}
                 </div>
               ) : (
-                /* Signal bars for Android */
-                <div className='signal-bars' style={{ gap: `${1 * scale}px` }}>
-                  <div
-                    className='bar bar-1'
-                    style={{
-                      width: `${2 * scale}px`,
-                      height: `${3 * scale}px`,
-                      borderRadius: `${0.5 * scale}px`,
-                    }}
-                  />
-                  <div
-                    className='bar bar-2'
-                    style={{
-                      width: `${2 * scale}px`,
-                      height: `${5 * scale}px`,
-                      borderRadius: `${0.5 * scale}px`,
-                    }}
-                  />
-                  <div
-                    className='bar bar-3'
-                    style={{
-                      width: `${2 * scale}px`,
-                      height: `${7 * scale}px`,
-                      borderRadius: `${0.5 * scale}px`,
-                    }}
-                  />
-                  <div
-                    className='bar bar-4'
-                    style={{
-                      width: `${2 * scale}px`,
-                      height: `${9 * scale}px`,
-                      borderRadius: `${0.5 * scale}px`,
-                    }}
-                  />
+                <div className='signal-bars' style={{ gap: `1px` }}>
+                  {[1, 2, 3, 4].map((bar) => (
+                    <div
+                      key={bar}
+                      className={`bar bar-${bar} ${
+                        networkType === 'wifi' || bar <= 2 ? 'strong' : ''
+                      }`}
+                      style={{
+                        width: `2px`,
+                        height: `${bar * 2 + 1}px`,
+                        borderRadius: `0.5px`,
+                      }}
+                    />
+                  ))}
                 </div>
               )}
 
-              {/* Wifi icon */}
               <div
-                className='wifi-icon'
+                className={`wifi-icon ${
+                  networkType === 'wifi' ? 'connected' : 'cellular'
+                }`}
                 style={{
-                  width: `${12 * scale}px`,
-                  height: `${8 * scale}px`,
+                  width: `12px`,
+                  height: `8px`,
                 }}
               >
-                <svg viewBox='0 0 24 16' fill='currentColor'>
-                  <path d='M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3-3 3 3-3 3-3-3zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.86 9.14 5 13z' />
-                </svg>
+                {networkType === 'wifi' ? (
+                  <svg viewBox='0 0 24 16' fill='currentColor'>
+                    <path d='M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3-3 3 3-3 3-3-3zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.86 9.14 5 13z' />
+                  </svg>
+                ) : (
+                  <div className='cellular-bars'>
+                    {[1, 2, 3, 4].map((bar) => (
+                      <div key={bar} className='cellular-bar' />
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Battery percentage for Android */}
-              {isAndroidDevice && (
+              {!isIOSDevice && (
                 <div
                   className='battery-percentage'
-                  style={{ fontSize: `${10 * scale}px` }}
+                  style={{ fontSize: `10px` }}
                 >
                   {Math.round(batteryLevel)}%
                 </div>
               )}
 
-              {/* Battery */}
               <div
-                className='battery'
+                className={`battery ${isCharging ? 'charging' : ''}`}
                 style={{
-                  width: `${18 * scale}px`,
-                  height: `${9 * scale}px`,
-                  borderRadius: `${1 * scale}px`,
-                  borderWidth: `${0.5 * scale}px`,
+                  width: `18px`,
+                  height: `9px`,
+                  borderRadius: `1px`,
+                  borderWidth: `0.5px`,
                 }}
               >
                 <div
@@ -401,43 +401,43 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
                   }`}
                   style={{
                     width: `${Math.max(batteryLevel, 5)}%`,
-                    height: '100%',
-                    borderRadius: `${0.5 * scale}px`,
+                    borderRadius: `0.5px`,
                   }}
                 />
+                {isCharging && (
+                  <div
+                    className='charging-indicator'
+                    style={{ fontSize: `6px` }}
+                  >
+                    ⚡
+                  </div>
+                )}
                 <div
                   className='battery-tip'
                   style={{
-                    width: `${1 * scale}px`,
-                    height: `${4 * scale}px`,
-                    right: `${-1.5 * scale}px`,
-                    borderRadius: `${0 * scale}px ${0.5 * scale}px ${
-                      0.5 * scale
-                    }px ${0 * scale}px`,
+                    width: `1px`,
+                    height: `4px`,
+                    right: `-1.5px`,
+                    borderRadius: `0 0.5px 0.5px 0`,
                   }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Main content area with strictly controlled width */}
+          {/* Main Content Area */}
           <div className='phone-mockup-content-outer-container'>
             <div
               className='phone-mockup-content-container'
-              style={{
-                width: `${getResponsiveWidth()}px`,
-              }}
+              style={{ width: `${innerWidth}px` }}
             >
-              {/* Folded area effect for foldable phones */}
-              {isFoldable && <div className='phone-mockup-folded-area'></div>}
+              {isFoldable && <div className='phone-mockup-folded-area' />}
 
-              {/* Actual content with padding applied internally */}
               <div
                 className='phone-mockup-content-width-limiter'
                 style={{
-                  width: `${contentWidth}px`,
-                  maxWidth: `${contentWidth}px`,
-                  padding: `0 ${contentPadding}px`,
+                  width: `${innerWidth - scaledPadding * 2}px`,
+                  padding: `0 ${scaledPadding}px`,
                 }}
               >
                 <div className='phone-mockup-content-wrapper'>{children}</div>
@@ -445,45 +445,37 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
             </div>
           </div>
 
-          {/* Home button (iPhone SE) */}
+          {/* Bottom UI Elements */}
           {hasiPhoneHomeButton && (
             <div
               className='phone-mockup-home-button'
               style={{
-                width: `${40 * scale}px`,
-                height: `${40 * scale}px`,
-                bottom: `${10 * scale}px`,
-                borderWidth: `${2 * scale}px`,
+                width: `40px`,
+                height: `40px`,
+                bottom: `10px`,
+                borderWidth: `2px`,
               }}
             />
           )}
 
-          {/* iOS Home Indicator (iPhone X and later) */}
           {hasiOSHomeIndicator && (
             <div
               className='phone-mockup-ios-home-indicator'
               style={{
-                width: `${134 * scale}px`,
-                height: `${5 * scale}px`,
-                bottom: `${8 * scale}px`,
-                borderRadius: `${3 * scale}px`,
+                width: `134px`,
+                height: `5px`,
+                bottom: `8px`,
+                borderRadius: `3px`,
               }}
             />
           )}
 
-          {/* Navigation bar (Android) */}
-          {[
-            'pixel-7',
-            'galaxy-s23',
-            'xiaomi-13',
-            'galaxy-z-fold',
-            'galaxy-a51',
-          ].includes(selectedModel.id) && (
+          {hasAndroidNavBar && (
             <div
               className='phone-mockup-navigation-bar'
               style={{
-                height: `${20 * scale}px`,
-                padding: `${5 * scale}px`,
+                height: `20px`,
+                padding: `5px`,
               }}
             >
               <div className='nav-buttons'>
@@ -498,6 +490,3 @@ const PhoneMockup: React.FunctionComponent<PhoneMockupProps> = ({
     </div>
   )
 }
-
-export default PhoneMockup
-export { PhoneMockup }

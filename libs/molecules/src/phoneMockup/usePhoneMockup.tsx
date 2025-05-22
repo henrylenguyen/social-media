@@ -1,178 +1,176 @@
-// libs/molecules/src/phoneMockup/usePhoneMockup.tsx
-import { useEffect, useState } from 'react'
+// libs/molecules/src/phoneMockup/usePhoneMockup.ts
 
-// Define phone models with their dimensions
-export interface PhoneModel {
-  id: string
-  name: string
-  width: number
-  height: number
-  bezelWidth: number
-  cornerRadius: number
-  notchHeight?: number
-  contentPadding: number
-  isFoldable?: boolean
-  aspectRatio: number
-}
-
-export const phoneModels: PhoneModel[] = [
-  {
-    id: 'iphone-15',
-    name: 'iPhone 15',
-    width: 425 - 24,
-    height: 810 - 30,
-    bezelWidth: 12,
-    cornerRadius: 40,
-    notchHeight: 32,
-    contentPadding: 15,
-    aspectRatio: 19.5 / 9,
-  },
-  {
-    id: 'iphone-se',
-    name: 'iPhone SE',
-    width: 410 - 32,
-    height: 685 - 40,
-    bezelWidth: 16,
-    cornerRadius: 30,
-    contentPadding: 15,
-    aspectRatio: 16 / 9,
-  },
-  {
-    id: 'iphone-xr',
-    name: 'iPhone XR',
-    width: 415 - 20,
-    height: 795 - 25,
-    bezelWidth: 14,
-    cornerRadius: 38,
-    notchHeight: 36,
-    contentPadding: 15,
-    aspectRatio: 19.5 / 9,
-  },
-  {
-    id: 'iphone-12-pro',
-    name: 'iPhone 12 Pro',
-    width: 410 - 18,
-    height: 800 - 22,
-    bezelWidth: 10,
-    cornerRadius: 35,
-    notchHeight: 30,
-    contentPadding: 15,
-    aspectRatio: 19.5 / 9,
-  },
-  {
-    id: 'pixel-7',
-    name: 'Google Pixel 7',
-    width: 420 - 20,
-    height: 805 - 25,
-    bezelWidth: 10,
-    cornerRadius: 35,
-    notchHeight: 24,
-    contentPadding: 15,
-    aspectRatio: 20 / 9,
-  },
-  {
-    id: 'galaxy-s23',
-    name: 'Samsung Galaxy S23',
-    width: 410 - 16,
-    height: 800 - 20,
-    bezelWidth: 8,
-    cornerRadius: 38,
-    notchHeight: 20,
-    contentPadding: 15,
-    aspectRatio: 19.3 / 9,
-  },
-  {
-    id: 'galaxy-a51',
-    name: 'Samsung Galaxy A51',
-    width: 425 - 22,
-    height: 815 - 28,
-    bezelWidth: 11,
-    cornerRadius: 32,
-    notchHeight: 18, // Teardrop notch is smaller
-    contentPadding: 15,
-    aspectRatio: 20 / 9,
-  },
-  {
-    id: 'galaxy-z-fold',
-    name: 'Samsung Galaxy Z Fold',
-    width: 470 - 20,
-    height: 865 - 25,
-    bezelWidth: 10,
-    cornerRadius: 30,
-    notchHeight: 20,
-    contentPadding: 15,
-    isFoldable: true,
-    aspectRatio: 22.5 / 9,
-  },
-  {
-    id: 'xiaomi-13',
-    name: 'Xiaomi 13',
-    width: 420 - 18,
-    height: 800 - 22.5,
-    bezelWidth: 9,
-    cornerRadius: 32,
-    contentPadding: 15,
-    aspectRatio: 20 / 9,
-  },
-]
-
-export interface UsePhoneMockupProps {
-  initialModelId?: string
-  initialPhoneColor?: string
-  initialShadowColor?: string
-}
+import { useCallback, useEffect, useState } from 'react'
+import { getPhoneModelById, phoneModels } from './phoneModels'
+import {
+  DeviceType,
+  NetworkType,
+  Orientation,
+  UsePhoneMockupProps,
+  UsePhoneMockupReturn,
+} from './types'
 
 export const usePhoneMockup = ({
   initialModelId = 'iphone-15',
   initialPhoneColor = '#000000',
   initialShadowColor = 'rgba(0, 0, 0, 0.5)',
-}: UsePhoneMockupProps = {}) => {
+}: UsePhoneMockupProps = {}): UsePhoneMockupReturn => {
+  // Core state
   const [selectedModelId, setSelectedModelId] = useState(initialModelId)
   const [phoneColor, setPhoneColor] = useState(initialPhoneColor)
   const [shadowColor, setShadowColor] = useState(initialShadowColor)
   const [currentTime, setCurrentTime] = useState('')
-  const [batteryLevel, setBatteryLevel] = useState(75) // Battery percentage
+  const [batteryLevel, setBatteryLevel] = useState(75)
+  const [isCharging, setIsCharging] = useState(false)
+  const [networkType, setNetworkType] = useState<NetworkType>('wifi')
+  const [carrierName, setCarrierName] = useState('Viettel')
+  const [deviceType, setDeviceType] = useState<DeviceType>('mobile')
+  const [orientation, setOrientation] = useState<Orientation>('portrait')
+  const [scale, setScale] = useState(0.5) // Default 50%
 
-  // Update current time and battery
+  const selectedModel = getPhoneModelById(selectedModelId) || phoneModels[0]
+
+  // Device detection and system info
   useEffect(() => {
-    const updateTimeAndBattery = () => {
+    let batteryCleanup: (() => void) | undefined
+    let networkCleanup: (() => void) | undefined
+
+    const detectDeviceInfo = async () => {
+      try {
+        // Device type detection
+        const userAgent = navigator.userAgent.toLowerCase()
+        if (/mobile|android|iphone/.test(userAgent)) {
+          setDeviceType('mobile')
+        } else if (/tablet|ipad/.test(userAgent)) {
+          setDeviceType('tablet')
+        } else {
+          setDeviceType('desktop')
+        }
+
+        // Battery API
+        if ('getBattery' in navigator && navigator.getBattery) {
+          try {
+            const battery = await navigator.getBattery()
+
+            const updateBatteryInfo = () => {
+              setBatteryLevel(Math.round(battery.level * 100))
+              setIsCharging(battery.charging)
+            }
+
+            updateBatteryInfo()
+            battery.addEventListener('levelchange', updateBatteryInfo)
+            battery.addEventListener('chargingchange', updateBatteryInfo)
+
+            batteryCleanup = () => {
+              battery.removeEventListener('levelchange', updateBatteryInfo)
+              battery.removeEventListener('chargingchange', updateBatteryInfo)
+            }
+          } catch (error) {
+            console.log('Battery API access denied')
+          }
+        }
+
+        // Network API
+        const connection =
+          navigator.connection ||
+          navigator.mozConnection ||
+          navigator.webkitConnection
+        if (connection) {
+          const updateNetworkInfo = () => {
+            const effectiveType =
+              connection.effectiveType || connection.type || 'wifi'
+            setNetworkType(effectiveType as NetworkType)
+
+            if (connection.type === 'cellular' || /mobile/i.test(userAgent)) {
+              const locale = navigator.language || 'vi-VN'
+              if (locale.startsWith('vi')) {
+                const carriers = [
+                  'Viettel',
+                  'Vinaphone',
+                  'Mobifone',
+                  'Vietnamobile',
+                ]
+                setCarrierName(
+                  carriers[Math.floor(Math.random() * carriers.length)],
+                )
+              } else if (locale.startsWith('en-US')) {
+                const carriers = ['Verizon', 'AT&T', 'T-Mobile', 'Sprint']
+                setCarrierName(
+                  carriers[Math.floor(Math.random() * carriers.length)],
+                )
+              } else {
+                setCarrierName('Carrier')
+              }
+            } else {
+              setCarrierName('Wi-Fi')
+            }
+          }
+
+          updateNetworkInfo()
+          connection.addEventListener('change', updateNetworkInfo)
+
+          networkCleanup = () => {
+            connection.removeEventListener('change', updateNetworkInfo)
+          }
+        }
+      } catch (error) {
+        console.error('Error detecting device info:', error)
+      }
+    }
+
+    detectDeviceInfo()
+
+    return () => {
+      if (batteryCleanup) batteryCleanup()
+      if (networkCleanup) networkCleanup()
+    }
+  }, [])
+
+  // Time updates
+  useEffect(() => {
+    const updateTime = () => {
       const now = new Date()
       const hours = now.getHours()
       const minutes = now.getMinutes()
-
-      // Format time based on 24h format
       const timeString = `${hours.toString().padStart(2, '0')}:${minutes
         .toString()
         .padStart(2, '0')}`
       setCurrentTime(timeString)
 
-      // Simulate battery drain (optional - you can remove this)
-      setBatteryLevel((prev) => {
-        const newLevel = prev - 0.1 // Drain 0.1% every minute
-        return newLevel < 10 ? Math.random() * 20 + 80 : newLevel // Reset when too low
-      })
+      // Simulate battery drain if no real API
+      if (!('getBattery' in navigator)) {
+        setBatteryLevel((prev) => {
+          const newLevel = prev - 0.1
+          return newLevel < 10 ? Math.random() * 20 + 80 : newLevel
+        })
+      }
     }
 
-    updateTimeAndBattery() // Initial update
-    const intervalId = setInterval(updateTimeAndBattery, 60000) // Update every minute
-
+    updateTime()
+    const intervalId = setInterval(updateTime, 60000)
     return () => clearInterval(intervalId)
   }, [])
 
-  const selectedModel =
-    phoneModels.find((model) => model.id === selectedModelId) || phoneModels[0]
-
-  const handleModelChange = (modelId: string) => {
+  // Event handlers
+  const handleModelChange = useCallback((modelId: string) => {
     setSelectedModelId(modelId)
-  }
+  }, [])
 
-  const handlePhoneColorChange = (color: string) => {
+  const handlePhoneColorChange = useCallback((color: string) => {
     setPhoneColor(color)
-  }
+  }, [])
 
-  const handleShadowColorChange = (color: string) => {
+  const handleShadowColorChange = useCallback((color: string) => {
     setShadowColor(color)
-  }
+  }, [])
+
+  const handleOrientationToggle = useCallback(() => {
+    setOrientation((prev) => (prev === 'portrait' ? 'landscape' : 'portrait'))
+  }, [])
+
+  const handleScaleChange = useCallback((newScale: number) => {
+    setScale(newScale)
+  }, [])
 
   return {
     phoneModels,
@@ -181,8 +179,16 @@ export const usePhoneMockup = ({
     shadowColor,
     currentTime,
     batteryLevel,
+    isCharging,
+    networkType,
+    carrierName,
+    deviceType,
+    orientation,
+    scale,
     handleModelChange,
     handlePhoneColorChange,
     handleShadowColorChange,
+    handleOrientationToggle,
+    handleScaleChange,
   }
 }
