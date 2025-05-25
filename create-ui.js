@@ -102,7 +102,6 @@ const organismComponents = [
   'sidebar',
   'table',
   'combobox',
-  'date-picker',
   'resizable',
   'scroll-area',
   'sonner',

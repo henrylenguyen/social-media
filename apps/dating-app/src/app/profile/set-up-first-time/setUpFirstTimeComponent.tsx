@@ -1,6 +1,8 @@
 'use client'
+import { Progress } from '@social-media/atoms'
 import { PhoneMockupComponent } from '@social-media/molecules'
 import * as React from 'react'
+import Step1 from './step1'
 
 const SetUpFirstTimeComponent: React.FunctionComponent = (props) => {
   return (
@@ -18,14 +20,9 @@ const SetUpFirstTimeComponent: React.FunctionComponent = (props) => {
               <PhoneMockupComponent />
             </div>
 
-            {/* Cột phải: Form */}
             <div className='col-span-1 md:col-span-2 p-10 flex flex-col gap-6'>
-              <h1 className='text-2xl font-bold text-gray-900'>
-                Bước 1: Tạo Hồ Sơ Của Bạn
-              </h1>
-              <p className='text-md text-gray-600'>
-                Hãy cung cấp những thông tin cơ bản và hình ảnh để bắt đầu.
-              </p>
+              <Progress value={10} />
+              <Step1 />
               {/* Khu vực chứa các trường form */}
               <div className='bg-gray-50 p-6 rounded-lg min-h-[300px] border border-gray-100'>
                 <p className='text-gray-400'>

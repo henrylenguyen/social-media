@@ -17,7 +17,7 @@ const AppLayoutClient: React.FunctionComponent<IAppLayoutClientProps> = ({
     '/sign-in',
     '/sign-up',
     '/forgot-password',
-    '/profile/set-up-first-time', // Thêm trang setup vào đây
+    '/profile/set-up-first-time', 
   ]
 
   // Kiểm tra xem đường dẫn hiện tại có bắt đầu bằng một trong các noLayoutRoutes không
