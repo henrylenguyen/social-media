@@ -6,11 +6,18 @@ const config: StorybookConfig = {
     '../libs/**/*.stories.@(js|jsx|ts|tsx|mdx)',
     '../apps/**/*.stories.@(js|jsx|ts|tsx|mdx)',
   ],
-
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     '@storybook/addon-links',
+    {
+      name: '@storybook/addon-postcss',
+      options: {
+        postcssLoaderOptions: {
+          implementation: require('postcss'),
+        },
+      },
+    },
   ],
 
   framework: {
@@ -35,10 +42,7 @@ const config: StorybookConfig = {
     // Đảm bảo có `config.resolve.alias` trước khi thêm giá trị
     if (!config.resolve.alias) {
       config.resolve.alias = {}
-    }
-
-    // Cấu hình các alias cho đúng với cấu trúc dự án
-    // @ts-ignore
+    } // Cấu hình các alias cho đúng với cấu trúc dự án
     config.resolve.alias = {
       ...config.resolve.alias,
       // Library paths
@@ -46,15 +50,16 @@ const config: StorybookConfig = {
       '@social-media/molecules': join(__dirname, '../libs/molecules/src'),
       '@social-media/organisms': join(__dirname, '../libs/organisms/src'),
       '@social-media/templates': join(__dirname, '../libs/templates/src'),
-      '@social-media/assets': join(__dirname, '../assets'),
-
-      // App paths
+      '@social-media/assets': join(__dirname, '../assets'), // App paths
       '@': join(__dirname, '../apps/dating-app/src'),
 
       // Utils path cho các component trong libs
       src: join(__dirname, '../libs/atoms/src'),
       'src/utils': join(__dirname, '../libs/atoms/src/utils'),
       'src/utils/cn': join(__dirname, '../libs/atoms/src/utils/cn'),
+
+      // Mock next/navigation for Storybook
+      'next/navigation': join(__dirname, '__mocks__/next-navigation.js'),
     }
 
     // Thêm các rule cần thiết nếu có
