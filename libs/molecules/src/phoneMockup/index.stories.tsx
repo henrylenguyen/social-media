@@ -1,7 +1,7 @@
 // libs/molecules/src/phoneMockup/PhoneMockup.stories.tsx
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { PhoneMockupComponent } from './phoneMockup'
+import PhoneMockupComponent from './phoneMockup'
 import { phoneModels } from './phoneModels'
 
 const meta: Meta<typeof PhoneMockupComponent> = {
@@ -70,7 +70,7 @@ Component mockup điện thoại thực tế với kích thước CSS chính xá
       description: 'Hiển thị dropdown chọn model điện thoại',
       table: {
         type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
       },
     },
     showColorSelector: {
@@ -78,7 +78,7 @@ Component mockup điện thoại thực tế với kích thước CSS chính xá
       description: 'Hiển thị bộ chọn màu sắc',
       table: {
         type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
       },
     },
     showScaleSelector: {
@@ -86,7 +86,7 @@ Component mockup điện thoại thực tế với kích thước CSS chính xá
       description: 'Hiển thị dropdown điều chỉnh kích thước',
       table: {
         type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
       },
     },
     showOrientationToggle: {
@@ -94,7 +94,7 @@ Component mockup điện thoại thực tế với kích thước CSS chính xá
       description: 'Hiển thị nút xoay màn hình',
       table: {
         type: { summary: 'boolean' },
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
       },
     },
   },

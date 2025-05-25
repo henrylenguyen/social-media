@@ -14,17 +14,17 @@ const DEFAULT_CONTENT = (
   </div>
 )
 
-export const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
+const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
   children = DEFAULT_CONTENT,
   modelId = 'iphone-15',
   phoneColor = '#000000',
   shadowColor = 'rgba(0, 0, 0, 0.5)',
   className = '',
   phoneContainerClassName = '',
-  showModelSelector = true,
-  showColorSelector = true,
-  showScaleSelector = true,
-  showOrientationToggle = true,
+  showModelSelector = false,
+  showColorSelector = false,
+  showScaleSelector = false,
+  showOrientationToggle = false,
 }) => {
   const {
     phoneModels,
@@ -50,27 +50,21 @@ export const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
     initialShadowColor: shadowColor,
   })
 
-  // Calculate responsive dimensions với scale KHÔNG áp dụng cho outer container
-  // Để giống browser device mode: kích thước device cố định, scale content
   const baseWidth =
     orientation === 'landscape' ? selectedModel.height : selectedModel.width
   const baseHeight =
     orientation === 'landscape' ? selectedModel.width : selectedModel.height
 
-  // Outer container dimensions (KHÔNG scale - giữ nguyên kích thước)
   const outerWidth = baseWidth + selectedModel.bezelWidth * 2
   const outerHeight = baseHeight + selectedModel.bezelWidth * 2.5
 
-  // Inner dimensions (KHÔNG scale)
   const innerWidth = baseWidth
   const innerHeight = baseHeight
 
-  // Scaled values cho UI elements
   const scaledBezel = selectedModel.bezelWidth
   const scaledPadding = selectedModel.contentPadding
   const scaledCornerRadius = selectedModel.cornerRadius
 
-  // Device feature checks
   const isIOSDevice = deviceTypeHelpers.isIOSDevice(selectedModel.id)
   const hasNotch = deviceTypeHelpers.hasNotch(selectedModel.id)
   const hasTeardropNotch = deviceTypeHelpers.hasTeardropNotch(selectedModel.id)
@@ -85,7 +79,6 @@ export const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
   const isZFlipCover = deviceTypeHelpers.isZFlipCover(selectedModel.id)
   const hasAndroidNavBar = deviceTypeHelpers.hasAndroidNavBar(selectedModel.id)
 
-  // CSS classes
   const containerClass = `phone-mockup-container ${className}`
   const phoneClass = `phone-mockup-outer-container phone-model-${
     selectedModel.id
@@ -201,292 +194,303 @@ export const PhoneMockupComponent: React.FC<PhoneMockupProps> = ({
         )}
       </div>
 
-      {/* Phone Device - Outer container với kích thước cố định */}
+      {/* Phone Device - Wrapper with scaled dimensions */}
       <div
-        className={phoneClass}
+        className='phone-mockup-wrapper'
         style={{
-          width: `${outerWidth}px`,
-          height: `${outerHeight}px`,
-          backgroundColor: statePhoneColor,
-          boxShadow: `0 25px 50px -12px ${stateShadowColor}`,
-          borderRadius: `${scaledCornerRadius}px`,
-          // Scale toàn bộ phone container giống browser device mode
-          transform: `scale(${scale})`,
-          transformOrigin: 'center top',
+          width: `${outerWidth * scale}px`,
+          height: `${outerHeight * scale}px`,
         }}
       >
-        {/* Fold crease for foldables */}
-        {isFoldable && (
-          <div
-            className='phone-mockup-fold-crease'
-            style={{
-              height: `${innerHeight}px`,
-              top: `${scaledBezel}px`,
-            }}
-          />
-        )}
-
-        {/* Side buttons */}
+        {/* Outer container with original dimensions and scale transform */}
         <div
-          className='phone-mockup-side-button power-button'
+          className={phoneClass}
           style={{
-            top: `80px`,
-            height: `50px`,
-            width: `3px`,
-            right: `-2px`,
-            borderRadius: `2px`,
-          }}
-        />
-        <div
-          className='phone-mockup-side-button volume-up'
-          style={{
-            top: `80px`,
-            height: `30px`,
-            width: `3px`,
-            left: `-2px`,
-            borderRadius: `2px`,
-          }}
-        />
-        <div
-          className='phone-mockup-side-button volume-down'
-          style={{
-            top: `120px`,
-            height: `30px`,
-            width: `3px`,
-            left: `-2px`,
-            borderRadius: `2px`,
-          }}
-        />
-
-        {/* Inner screen container */}
-        <div
-          className='phone-mockup-inner-container'
-          style={{
-            top: `${scaledBezel}px`,
-            left: `${scaledBezel}px`,
-            width: `${innerWidth}px`,
-            height: `${innerHeight}px`,
-            borderRadius: `${scaledCornerRadius - 2}px`,
+            width: `${outerWidth}px`,
+            height: `${outerHeight}px`,
+            backgroundColor: statePhoneColor,
+            boxShadow: `0 25px 50px -12px ${stateShadowColor}`,
+            borderRadius: `${scaledCornerRadius}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: '0 0', // Changed to top-left for predictable layout
           }}
         >
-          {/* Camera/Speaker Elements */}
-          {hasNotch && (
+          {/* Fold crease for foldables */}
+          {isFoldable && (
             <div
-              className='phone-mockup-notch'
+              className='phone-mockup-fold-crease'
               style={{
-                height: `${selectedModel.notchHeight || 0}px`,
-                width: `100px`,
-                borderBottomLeftRadius: `12px`,
-                borderBottomRightRadius: `12px`,
+                height: `${innerHeight}px`,
+                top: `${scaledBezel}px`,
               }}
-            >
-              <div className='speaker' />
-              <div className='camera' />
-            </div>
+            />
           )}
 
-          {hasTeardropNotch && (
-            <div
-              className='phone-mockup-teardrop-notch'
-              style={{
-                width: `18px`,
-                height: `18px`,
-                top: `12px`,
-              }}
-            >
-              <div className='camera' />
-            </div>
-          )}
-
-          {hasCameraCutout && (
-            <div
-              className='phone-mockup-camera-cutout'
-              style={{
-                width: `50px`,
-                height: `12px`,
-              }}
-            >
-              <div className='camera' />
-              <div className='flash' />
-            </div>
-          )}
-
-          {/* Status Bar */}
+          {/* Side buttons */}
           <div
-            className='phone-mockup-status-bar'
+            className='phone-mockup-side-button power-button'
             style={{
-              height: `24px`,
-              padding: `4px 12px`,
-              paddingTop: hasCameraCutout || hasTeardropNotch ? `15px` : `4px`,
+              top: `80px`,
+              height: `50px`,
+              width: `3px`,
+              right: `-2px`,
+              borderRadius: `2px`,
+            }}
+          />
+          <div
+            className='phone-mockup-side-button volume-up'
+            style={{
+              top: `80px`,
+              height: `30px`,
+              width: `3px`,
+              left: `-2px`,
+              borderRadius: `2px`,
+            }}
+          />
+          <div
+            className='phone-mockup-side-button volume-down'
+            style={{
+              top: `120px`,
+              height: `30px`,
+              width: `3px`,
+              left: `-2px`,
+              borderRadius: `2px`,
+            }}
+          />
+
+          {/* Inner screen container */}
+          <div
+            className='phone-mockup-inner-container'
+            style={{
+              top: `${scaledBezel}px`,
+              left: `${scaledBezel}px`,
+              width: `${innerWidth}px`,
+              height: `${innerHeight}px`,
+              borderRadius: `${scaledCornerRadius - 2}px`,
             }}
           >
-            <div className='status-left'>
-              <div className='time' style={{ fontSize: `12px` }}>
-                {currentTime}
-              </div>
-            </div>
-
-            <div className='status-right' style={{ gap: `4px` }}>
-              {isIOSDevice ? (
-                <div className='carrier' style={{ fontSize: `11px` }}>
-                  {deviceType === 'desktop' ? 'Wi-Fi' : carrierName}
-                </div>
-              ) : (
-                <div className='signal-bars' style={{ gap: `1px` }}>
-                  {[1, 2, 3, 4].map((bar) => (
-                    <div
-                      key={bar}
-                      className={`bar bar-${bar} ${
-                        networkType === 'wifi' || bar <= 2 ? 'strong' : ''
-                      }`}
-                      style={{
-                        width: `2px`,
-                        height: `${bar * 2 + 1}px`,
-                        borderRadius: `0.5px`,
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-
+            {/* Camera/Speaker Elements */}
+            {hasNotch && (
               <div
-                className={`wifi-icon ${
-                  networkType === 'wifi' ? 'connected' : 'cellular'
-                }`}
+                className='phone-mockup-notch'
                 style={{
-                  width: `12px`,
-                  height: `8px`,
+                  height: `${selectedModel.notchHeight || 0}px`,
+                  width: `100px`,
+                  borderBottomLeftRadius: `12px`,
+                  borderBottomRightRadius: `12px`,
                 }}
               >
-                {networkType === 'wifi' ? (
-                  <svg viewBox='0 0 24 16' fill='currentColor'>
-                    <path d='M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3-3 3 3-3 3-3-3zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.86 9.14 5 13z' />
-                  </svg>
+                <div className='speaker' />
+                <div className='camera' />
+              </div>
+            )}
+
+            {hasTeardropNotch && (
+              <div
+                className='phone-mockup-teardrop-notch'
+                style={{
+                  width: `18px`,
+                  height: `18px`,
+                  top: `12px`,
+                }}
+              >
+                <div className='camera' />
+              </div>
+            )}
+
+            {hasCameraCutout && (
+              <div
+                className='phone-mockup-camera-cutout'
+                style={{
+                  width: `50px`,
+                  height: `12px`,
+                }}
+              >
+                <div className='camera' />
+                <div className='flash' />
+              </div>
+            )}
+
+            {/* Status Bar */}
+            <div
+              className='phone-mockup-status-bar'
+              style={{
+                height: `24px`,
+                padding: `4px 12px`,
+                paddingTop:
+                  hasCameraCutout || hasTeardropNotch ? `15px` : `4px`,
+              }}
+            >
+              <div className='status-left'>
+                <div className='time' style={{ fontSize: `12px` }}>
+                  {currentTime}
+                </div>
+              </div>
+
+              <div className='status-right' style={{ gap: `4px` }}>
+                {isIOSDevice ? (
+                  <div className='carrier' style={{ fontSize: `11px` }}>
+                    {deviceType === 'desktop' ? 'Wi-Fi' : carrierName}
+                  </div>
                 ) : (
-                  <div className='cellular-bars'>
+                  <div className='signal-bars' style={{ gap: `1px` }}>
                     {[1, 2, 3, 4].map((bar) => (
-                      <div key={bar} className='cellular-bar' />
+                      <div
+                        key={bar}
+                        className={`bar bar-${bar} ${
+                          networkType === 'wifi' || bar <= 2 ? 'strong' : ''
+                        }`}
+                        style={{
+                          width: `2px`,
+                          height: `${bar * 2 + 1}px`,
+                          borderRadius: `0.5px`,
+                        }}
+                      />
                     ))}
                   </div>
                 )}
-              </div>
 
-              {!isIOSDevice && (
                 <div
-                  className='battery-percentage'
-                  style={{ fontSize: `10px` }}
-                >
-                  {Math.round(batteryLevel)}%
-                </div>
-              )}
-
-              <div
-                className={`battery ${isCharging ? 'charging' : ''}`}
-                style={{
-                  width: `18px`,
-                  height: `9px`,
-                  borderRadius: `1px`,
-                  borderWidth: `0.5px`,
-                }}
-              >
-                <div
-                  className={`battery-level ${
-                    batteryLevel <= 20
-                      ? 'low'
-                      : batteryLevel <= 50
-                      ? 'medium'
-                      : batteryLevel <= 90
-                      ? 'high'
-                      : 'full'
+                  className={`wifi-icon ${
+                    networkType === 'wifi' ? 'connected' : 'cellular'
                   }`}
                   style={{
-                    width: `${Math.max(batteryLevel, 5)}%`,
-                    borderRadius: `0.5px`,
+                    width: `12px`,
+                    height: `8px`,
                   }}
-                />
-                {isCharging && (
+                >
+                  {networkType === 'wifi' ? (
+                    <svg viewBox='0 0 24 16' fill='currentColor'>
+                      <path d='M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.07 2.93 1 9zm8 8l3-3 3 3-3 3-3-3zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.86 9.14 5 13z' />
+                    </svg>
+                  ) : (
+                    <div className='cellular-bars'>
+                      {[1, 2, 3, 4].map((bar) => (
+                        <div key={bar} className='cellular-bar' />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {!isIOSDevice && (
                   <div
-                    className='charging-indicator'
-                    style={{ fontSize: `6px` }}
+                    className='battery-percentage'
+                    style={{ fontSize: `10px` }}
                   >
-                    ⚡
+                    {Math.round(batteryLevel)}%
                   </div>
                 )}
+
                 <div
-                  className='battery-tip'
+                  className={`battery ${isCharging ? 'charging' : ''}`}
                   style={{
-                    width: `1px`,
-                    height: `4px`,
-                    right: `-1.5px`,
-                    borderRadius: `0 0.5px 0.5px 0`,
+                    width: `18px`,
+                    height: `9px`,
+                    borderRadius: `1px`,
+                    borderWidth: `0.5px`,
                   }}
-                />
+                >
+                  <div
+                    className={`battery-level ${
+                      batteryLevel <= 20
+                        ? 'low'
+                        : batteryLevel <= 50
+                        ? 'medium'
+                        : batteryLevel <= 90
+                        ? 'high'
+                        : 'full'
+                    }`}
+                    style={{
+                      width: `${Math.max(batteryLevel, 5)}%`,
+                      borderRadius: `0.5px`,
+                    }}
+                  />
+                  {isCharging && (
+                    <div
+                      className='charging-indicator'
+                      style={{ fontSize: `6px` }}
+                    >
+                      ⚡
+                    </div>
+                  )}
+                  <div
+                    className='battery-tip'
+                    style={{
+                      width: `1px`,
+                      height: `4px`,
+                      right: `-1.5px`,
+                      borderRadius: `0 0.5px 0.5px 0`,
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Main Content Area */}
-          <div className='phone-mockup-content-outer-container'>
-            <div
-              className='phone-mockup-content-container'
-              style={{ width: `${innerWidth}px` }}
-            >
-              {isFoldable && <div className='phone-mockup-folded-area' />}
-
+            {/* Main Content Area */}
+            <div className='phone-mockup-content-outer-container'>
               <div
-                className='phone-mockup-content-width-limiter'
+                className='phone-mockup-content-container'
+                style={{ width: `${innerWidth}px` }}
+              >
+                {isFoldable && <div className='phone-mockup-folded-area' />}
+
+                <div
+                  className='phone-mockup-content-width-limiter'
+                  style={{
+                    width: `${innerWidth - scaledPadding * 2}px`,
+                    padding: `0 ${scaledPadding}px`,
+                  }}
+                >
+                  <div className='phone-mockup-content-wrapper'>{children}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom UI Elements */}
+            {hasiPhoneHomeButton && (
+              <div
+                className='phone-mockup-home-button'
                 style={{
-                  width: `${innerWidth - scaledPadding * 2}px`,
-                  padding: `0 ${scaledPadding}px`,
+                  width: `40px`,
+                  height: `40px`,
+                  bottom: `10px`,
+                  borderWidth: `2px`,
+                }}
+              />
+            )}
+
+            {hasiOSHomeIndicator && (
+              <div
+                className='phone-mockup-ios-home-indicator'
+                style={{
+                  width: `134px`,
+                  height: `5px`,
+                  bottom: `8px`,
+                  borderRadius: `3px`,
+                }}
+              />
+            )}
+
+            {hasAndroidNavBar && (
+              <div
+                className='phone-mockup-navigation-bar'
+                style={{
+                  height: `20px`,
+                  padding: `5px`,
                 }}
               >
-                <div className='phone-mockup-content-wrapper'>{children}</div>
+                <div className='nav-buttons'>
+                  <div className='back' />
+                  <div className='home' />
+                  <div className='recent' />
+                </div>
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Bottom UI Elements */}
-          {hasiPhoneHomeButton && (
-            <div
-              className='phone-mockup-home-button'
-              style={{
-                width: `40px`,
-                height: `40px`,
-                bottom: `10px`,
-                borderWidth: `2px`,
-              }}
-            />
-          )}
-
-          {hasiOSHomeIndicator && (
-            <div
-              className='phone-mockup-ios-home-indicator'
-              style={{
-                width: `134px`,
-                height: `5px`,
-                bottom: `8px`,
-                borderRadius: `3px`,
-              }}
-            />
-          )}
-
-          {hasAndroidNavBar && (
-            <div
-              className='phone-mockup-navigation-bar'
-              style={{
-                height: `20px`,
-                padding: `5px`,
-              }}
-            >
-              <div className='nav-buttons'>
-                <div className='back' />
-                <div className='home' />
-                <div className='recent' />
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
   )
 }
+
+export default PhoneMockupComponent

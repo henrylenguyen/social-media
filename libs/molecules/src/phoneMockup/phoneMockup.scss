@@ -119,15 +119,21 @@
     }
   }
 
+  &-wrapper {
+    position: relative;
+    margin: 20px auto;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
   &-outer-container {
     position: relative;
     transition: all 0.3s ease;
     overflow: visible;
-    margin: 20px; // Thêm margin để tránh bị cắt khi scale
-
-    &:hover {
-      transform: translateY(-2px) scale(var(--current-scale, 1));
-    }
+    // margin: 20px; // Removed margin, moved to wrapper
   }
 
   &-side-button {
@@ -470,7 +476,10 @@
     position: absolute;
     left: 50%;
     width: 1px;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
+    background: linear-gradient(to right,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.1));
     z-index: 15;
     transform: translateX(-50%);
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
