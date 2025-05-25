@@ -26,19 +26,23 @@ const preview: Preview = {
         },
       ],
     },
-  },  decorators: [
+  },
+  decorators: [
     (Story, context) => {
       // Update pathname mock based on story parameters
       const pathname = context.parameters?.nextRouter?.pathname || '/'
-      
+
       console.log('Storybook decorator - pathname:', pathname)
-      console.log('window.__setPathname available:', typeof window !== 'undefined' && !!window.__setPathname)
-      
+      console.log(
+        'window.__setPathname available:',
+        typeof window !== 'undefined' && !!window.__setPathname,
+      )
+
       // Update the mock pathname if available
       if (typeof window !== 'undefined' && window.__setPathname) {
         window.__setPathname(pathname)
       }
-      
+
       return (
         <div className='font-sans'>
           <Story />

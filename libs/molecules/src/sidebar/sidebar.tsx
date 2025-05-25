@@ -1,30 +1,37 @@
 'use client'
+import { LogoIcon } from '@social-media/assets'
+import {
+  Calendar,
+  Compass,
+  Heart,
+  HelpCircle,
+  MessageCircle,
+  Shield,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
-import { cn } from 'src/utils' // Đảm bảo đường dẫn này chính xác
+import { cn } from 'src/utils'
 
-// Placeholder cho icons
+// Icon components with consistent sizing and better design
 interface IconProps {
   className?: string
 }
 const IconDiscovery = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Discovery">🧭</span>
+  <Compass className={className} />
 )
 const IconChat = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Chat">💬</span>
+  <MessageCircle className={className} />
 )
 const IconEvents = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Events">🎉</span>
+  <Calendar className={className} />
 )
-const IconLikes = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Likes">💖</span>
-)
+const IconLikes = ({ className }: IconProps) => <Heart className={className} />
 const IconSafety = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Safety">🛡️</span>
+  <Shield className={className} />
 )
 const IconHelp = ({ className }: IconProps) => (
-  <span className={className} role="img" aria-label="Help">❓</span>
+  <HelpCircle className={className} />
 )
 
 interface NavItem {
@@ -32,23 +39,53 @@ interface NavItem {
   icon: React.ComponentType<IconProps>
   label: string
   badge?: string | null
+  color?: string
 }
 
 const navItems: NavItem[] = [
-  { href: '/discovery', icon: IconDiscovery, label: 'Khám phá', badge: null },
-  { href: '/chats', icon: IconChat, label: 'Trò chuyện', badge: '5' },
-  { href: '/events', icon: IconEvents, label: 'Sự kiện', badge: null },
+  {
+    href: '/discovery',
+    icon: IconDiscovery,
+    label: 'Khám phá',
+    badge: null,
+    color: 'text-blue-500',
+  },
+  {
+    href: '/chats',
+    icon: IconChat,
+    label: 'Trò chuyện',
+    badge: '5',
+    color: 'text-green-500',
+  },
+  {
+    href: '/events',
+    icon: IconEvents,
+    label: 'Sự kiện',
+    badge: null,
+    color: 'text-purple-500',
+  },
   {
     href: '/likes',
     icon: IconLikes,
     label: 'Lượt thích & Top Picks',
     badge: null,
+    color: 'text-red-500',
   },
 ]
 
 const footerItems: NavItem[] = [
-  { href: '/safety', icon: IconSafety, label: 'Trung tâm An toàn' },
-  { href: '/help', icon: IconHelp, label: 'Trung tâm Hỗ trợ' },
+  {
+    href: '/safety',
+    icon: IconSafety,
+    label: 'Trung tâm An toàn',
+    color: 'text-orange-500',
+  },
+  {
+    href: '/help',
+    icon: IconHelp,
+    label: 'Trung tâm Hỗ trợ',
+    color: 'text-indigo-500',
+  },
 ]
 
 interface ISidebarProps {
@@ -57,48 +94,83 @@ interface ISidebarProps {
 
 const Sidebar: React.FunctionComponent<ISidebarProps> = ({ className }) => {
   const pathname = usePathname()
-  // Sửa lại hàm renderNavItem
+
+  // Enhanced renderNavItem với thiết kế đẹp hơn
   const renderNavItem = (item: NavItem, isActive: boolean) => (
     <Link href={item.href} legacyBehavior>
-      <a // <-- Thêm thẻ <a> làm con duy nhất
+      <a
         href={item.href}
         className={cn(
-          'flex items-center gap-3 px-6 py-3 my-1 mx-4 rounded-md text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-primary',
-          isActive && 'bg-primary-light text-primary font-semibold',
+          'group flex items-center gap-3 px-4 py-3 my-1 mx-3 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out',
+          'hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary-light/10',
+          'hover:shadow-sm',
+          isActive
+            ? 'bg-gradient-to-r from-primary/15 to-primary-light/15 text-primary shadow-sm border-l-4 border-primary'
+            : 'text-gray-700 hover:text-primary',
         )}
       >
         <item.icon
           className={cn(
-            'text-xl w-6 text-center',
-            isActive ? 'text-primary' : 'text-gray-500',
+            'w-5 h-5 transition-all duration-200',
+            isActive
+              ? 'text-primary drop-shadow-sm'
+              : item.color || 'text-gray-500',
+            'group-hover:text-primary',
           )}
         />
-        <span>{item.label}</span>
+        <span
+          className={cn(
+            'flex-1 transition-all duration-200',
+            isActive ? 'font-semibold' : 'group-hover:font-medium',
+          )}
+        >
+          {item.label}
+        </span>
         {item.badge && (
-          <span className='ml-auto bg-error text-white text-xs font-bold rounded-full px-2 py-0.5'>
+          <span
+            className={cn(
+              'px-2 py-1 text-xs font-bold rounded-full transition-all duration-200',
+              'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm',
+            )}
+          >
             {item.badge}
           </span>
         )}
       </a>
     </Link>
   )
-  // Sửa lại hàm renderFooterItem (tương tự)
+
+  // Enhanced renderFooterItem với thiết kế đẹp hơn
   const renderFooterItem = (item: NavItem, isActive: boolean) => (
     <Link href={item.href} legacyBehavior>
-      <a // <-- Thêm thẻ <a> làm con duy nhất
+      <a
         href={item.href}
         className={cn(
-          'flex items-center gap-3 px-6 py-3 my-1 mx-4 rounded-md text-sm font-medium text-gray-500 transition-all duration-200 hover:bg-gray-100 hover:text-primary',
-          isActive && 'text-primary',
+          'group flex items-center gap-3 px-4 py-2 my-1 mx-3 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out',
+          'hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100',
+          'hover:shadow-sm',
+          isActive
+            ? 'bg-gradient-to-r from-primary/10 to-primary-light/10 text-primary shadow-sm'
+            : 'text-gray-600 hover:text-primary',
         )}
       >
         <item.icon
           className={cn(
-            'text-xl w-6 text-center text-gray-400',
-            isActive && 'text-primary',
+            'w-5 h-5 transition-all duration-200',
+            isActive
+              ? 'text-primary drop-shadow-sm'
+              : item.color || 'text-gray-400',
+            'group-hover:text-primary',
           )}
         />
-        <span>{item.label}</span>
+        <span
+          className={cn(
+            'transition-all duration-200',
+            isActive ? 'font-medium' : 'group-hover:font-medium',
+          )}
+        >
+          {item.label}
+        </span>
       </a>
     </Link>
   )
@@ -110,15 +182,9 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = ({ className }) => {
         className,
       )}
     >
-      {/* Logo */}
       <div className='px-6 py-6 text-left'>
-        <img
-          src='https://placehold.co/150x40/FF6B6B/FFFFFF?text=HearterLink&font=inter'
-          alt='Logo Ứng dụng'
-          className='max-h-10 w-auto'
-        />
+        <LogoIcon />
       </div>
-
       {/* Navigation */}
       <nav className='flex-grow overflow-y-auto'>
         <ul>
@@ -129,7 +195,6 @@ const Sidebar: React.FunctionComponent<ISidebarProps> = ({ className }) => {
           ))}
         </ul>
       </nav>
-
       {/* Footer Navigation */}
       <div className='py-4 mx-4 border-t border-gray-200'>
         <nav>

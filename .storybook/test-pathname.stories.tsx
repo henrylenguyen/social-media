@@ -6,9 +6,13 @@ const TestPathnameComponent = () => {
   const pathname = usePathname()
 
   return (
-    <div style={{ padding: '20px', background: '#f0f0f0', borderRadius: '8px' }}>
+    <div
+      style={{ padding: '20px', background: '#f0f0f0', borderRadius: '8px' }}
+    >
       <h2>Pathname Test</h2>
-      <p>Current pathname: <strong>{pathname}</strong></p>
+      <p>
+        Current pathname: <strong>{pathname}</strong>
+      </p>
       <p>This should change based on story parameters.</p>
     </div>
   )

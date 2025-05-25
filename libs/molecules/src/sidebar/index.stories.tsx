@@ -13,13 +13,60 @@ const meta: Meta<typeof Sidebar> = {
   },
   tags: ['autodocs'],
   decorators: [
-    // Chỉ giữ lại decorator layout (nếu cần), bỏ MemoryRouterProvider
+    // Layout để nội dung không chồng lên sidebar
     (Story) => (
       <div style={{ height: '100vh', display: 'flex' }}>
         <Story />
-        <div style={{ flex: 1, padding: '20px', background: '#f9fafb' }}>
-          <p>Nội dung trang. Kiểm tra sidebar bên trái để xem active state.</p>
-          <p>Active state sẽ được highlight bằng màu primary.</p>
+        <div
+          style={{
+            flex: 1,
+            marginLeft: '256px', // Width của sidebar (w-64 = 16rem = 256px)
+            padding: '20px',
+            background: '#f9fafb',
+            overflow: 'auto',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              marginBottom: '16px',
+              color: '#1f2937',
+            }}
+          >
+            Demo Content
+          </h1>
+          <p style={{ marginBottom: '12px', color: '#6b7280' }}>
+            Nội dung trang. Kiểm tra sidebar bên trái để xem active state.
+          </p>
+          <p style={{ marginBottom: '12px', color: '#6b7280' }}>
+            Active state sẽ được highlight bằng màu primary với border trái và
+            gradient background.
+          </p>
+          <div
+            style={{
+              background: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+              marginTop: '20px',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                marginBottom: '12px',
+                color: '#374151',
+              }}
+            >
+              Card Example
+            </h2>
+            <p style={{ color: '#6b7280' }}>
+              Đây là một ví dụ về nội dung trang. Sidebar được cố định bên trái
+              và nội dung này sẽ không bị che phủ bởi sidebar.
+            </p>
+          </div>
         </div>
       </div>
     ),
@@ -73,4 +120,3 @@ export const SafetyActive: Story = {
     },
   },
 }
-
