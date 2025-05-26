@@ -3,7 +3,9 @@ import { fn } from '@storybook/test'
 import { addDays, subDays } from 'date-fns'
 import React from 'react'
 import { DateRange } from 'react-day-picker'
-import { DateRangePicker, SupportedDateDisplayFormat } from './dateRangePicker'
+import { DateRangePicker } from './dateRangePicker'
+import { SupportedDateDisplayFormat } from 'src/type'
+
 
 const meta: Meta<typeof DateRangePicker> = {
   title: 'Organisms/DateRangePicker',

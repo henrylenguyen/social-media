@@ -15,7 +15,7 @@ import * as React from 'react'
 import { DateRange } from 'react-day-picker' // Import DayPickerProps
 import { cn } from 'src/utils'
 
-export type SupportedDateDisplayFormat =
+type SupportedDateDisplayFormat =
   | 'PPP'
   | 'dd/MM/yyyy'
   | 'MM/dd/yyyy'
@@ -53,7 +53,7 @@ export interface DateRangePickerProps {
   toYear?: number // Prop của DateRangePicker
 }
 
- function DateRangePicker({
+export function DateRangePicker({
   selectedRange,
   onRangeSelected,
   placeholder = 'Chọn khoảng ngày',
@@ -167,5 +167,3 @@ export interface DateRangePickerProps {
     </Popover>
   )
 }
-
-export default DateRangePicker
