@@ -1,14 +1,19 @@
 'use client'
 
 import { Button } from '@social-media/atoms'
-import { Calendar, CalendarProps, Popover, PopoverContent, PopoverTrigger } from '@social-media/molecules'
+import {
+  Calendar,
+  CalendarProps,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@social-media/molecules'
 import { format, isValid as isValidDate } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import * as React from 'react'
+import { DateRange } from 'react-day-picker' // Import DayPickerProps
 import { cn } from 'src/utils'
-
-
 
 export type SupportedDateDisplayFormat =
   | 'PPP'
@@ -18,55 +23,64 @@ export type SupportedDateDisplayFormat =
   | 'dd MMM yy'
   | 'd MMMM yyyy'
 
-export interface DatePickerProps {
-  selectedDate?: Date
-  onDateSelected: (date: Date | undefined) => void
+export interface DateRangePickerProps {
+  selectedRange?: DateRange
+  onRangeSelected: (range: DateRange | undefined) => void
   placeholder?: string
   className?: string
   popoverContentClassName?: string
   buttonProps?: React.ComponentProps<typeof Button>
   /**
    * Props để truyền vào component Calendar.
-   * Các props 'mode', 'selected', 'onSelect', 'initialFocus', 'locale' sẽ được DatePicker quản lý.
-   * Nếu 'useYearNavigation' là true, 'captionLayout', 'fromYear', 'toYear' cũng sẽ được DatePicker quản lý.
+   * Các props 'mode', 'selected', 'onSelect', 'initialFocus', 'locale', 'numberOfMonths' sẽ được DateRangePicker quản lý.
+   * Nếu 'useYearNavigation' là true, 'captionLayout', 'fromYear', 'toYear' cũng sẽ được DateRangePicker quản lý.
    */
   calendarProps?: Omit<
-    CalendarProps, // Sử dụng CalendarProps từ thư viện molecules của bạn
-    'mode' | 'selected' | 'onSelect' | 'initialFocus' | 'locale'
+    CalendarProps,
+    | 'mode'
+    | 'selected'
+    | 'onSelect'
+    | 'initialFocus'
+    | 'locale'
+    | 'numberOfMonths'
   >
+  numberOfMonths?: number
   allowClear?: boolean
   clearButtonLabel?: string
   displayFormat?: SupportedDateDisplayFormat
   useYearNavigation?: boolean
-  fromYear?: number
-  toYear?: number
+  fromYear?: number // Prop của DateRangePicker
+  toYear?: number // Prop của DateRangePicker
 }
 
-export function DatePicker({
-  selectedDate,
-  onDateSelected,
-  placeholder = 'Chọn ngày',
+export function DateRangePicker({
+  selectedRange,
+  onRangeSelected,
+  placeholder = 'Chọn khoảng ngày',
   className,
   popoverContentClassName,
   buttonProps,
-  calendarProps, // This will not have mode, selected, onSelect, initialFocus, locale
+  calendarProps,
+  numberOfMonths = 2,
   allowClear = false,
   clearButtonLabel = 'Xóa',
   displayFormat = 'PPP',
   useYearNavigation = false,
-  fromYear, // Prop của DatePicker
-  toYear, // Prop của DatePicker
-}: DatePickerProps) {
+  fromYear,
+  toYear,
+}: DateRangePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const handleDateSelect = (date: Date | undefined) => {
-    onDateSelected(date)
-    setIsOpen(false)
+  const handleRangeSelect = (range: DateRange | undefined) => {
+    onRangeSelected(range)
+    if (range?.from && range?.to) {
+      setIsOpen(false)
+    }
   }
 
-  const handleClearDate = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClearRange = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    onDateSelected(undefined)
+    onRangeSelected(undefined)
     setIsOpen(false)
   }
 
@@ -74,23 +88,24 @@ export function DatePicker({
     date: Date,
     formatString: SupportedDateDisplayFormat,
   ) => {
-    if (!isValidDate(date)) return placeholder
+    if (!isValidDate(date)) return ''
     try {
       return format(date, formatString, { locale: vi })
     } catch (error) {
       console.error('Error formatting date:', error)
-      return placeholder
+      return 'Invalid Date'
     }
   }
 
   // Build the final props for the Calendar component
   const effectiveCalendarProps: CalendarProps = {
     ...calendarProps, // Start with user-provided calendarProps
-    mode: 'single',
-    selected: selectedDate,
-    onSelect: handleDateSelect,
+    mode: 'range',
+    selected: selectedRange,
+    onSelect: handleRangeSelect,
     initialFocus: true,
     locale: vi,
+    numberOfMonths: numberOfMonths,
   }
 
   if (useYearNavigation) {
@@ -111,14 +126,21 @@ export function DatePicker({
           variant={'outline'}
           className={cn(
             'w-full justify-start text-left font-normal',
-            !selectedDate && 'text-muted-foreground',
+            !selectedRange?.from && 'text-muted-foreground',
             className,
           )}
           {...buttonProps}
         >
           <CalendarIcon className='mr-2 h-4 w-4' />
-          {selectedDate ? (
-            formatDateForDisplay(selectedDate, displayFormat)
+          {selectedRange?.from ? (
+            selectedRange.to ? (
+              <>
+                {formatDateForDisplay(selectedRange.from, displayFormat)} -{' '}
+                {formatDateForDisplay(selectedRange.to, displayFormat)}
+              </>
+            ) : (
+              formatDateForDisplay(selectedRange.from, displayFormat)
+            )
           ) : (
             <span>{placeholder}</span>
           )}
@@ -129,13 +151,13 @@ export function DatePicker({
         align='start'
       >
         <Calendar {...effectiveCalendarProps} />
-        {allowClear && selectedDate && (
+        {allowClear && selectedRange?.from && (
           <div className='p-2 border-t border-border'>
             <Button
               variant='ghost'
               size='sm'
               className='w-full'
-              onClick={handleClearDate}
+              onClick={handleClearRange}
             >
               {clearButtonLabel}
             </Button>
@@ -145,5 +167,3 @@ export function DatePicker({
     </Popover>
   )
 }
-
-export type { DatePickerProps as DatePickerElementProps }
