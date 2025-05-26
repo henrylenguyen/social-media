@@ -53,7 +53,7 @@ export interface DateRangePickerProps {
   toYear?: number // Prop của DateRangePicker
 }
 
-export function DateRangePicker({
+ function DateRangePicker({
   selectedRange,
   onRangeSelected,
   placeholder = 'Chọn khoảng ngày',
@@ -167,3 +167,5 @@ export function DateRangePicker({
     </Popover>
   )
 }
+
+export default DateRangePicker
