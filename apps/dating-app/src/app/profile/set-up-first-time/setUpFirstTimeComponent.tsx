@@ -1,6 +1,7 @@
 'use client'
 import { Progress } from '@social-media/atoms'
 import { PhoneMockupComponent } from '@social-media/molecules'
+import { DateRangePicker } from '@social-media/organisms'
 import * as React from 'react'
 import Step1 from './step1'
 
@@ -25,9 +26,13 @@ const SetUpFirstTimeComponent: React.FunctionComponent = (props) => {
               <Step1 />
               {/* Khu vực chứa các trường form */}
               <div className='bg-gray-50 p-6 rounded-lg min-h-[300px] border border-gray-100'>
-                <p className='text-gray-400'>
-                  [Các trường nhập liệu cho Bước 1 sẽ ở đây]
-                </p>
+                <DateRangePicker
+                  label='Chọn khoảng ngày'
+                  onChange={(value) => {
+                    console.log('Date range changed', value)
+                  }}
+                  placeholder='dd/MM/yyyy - dd/MM/yyyy'
+                />
               </div>
               {/* Nút điều hướng */}
               <div className='flex justify-end mt-6'>

@@ -1,8 +1,9 @@
 import { action } from '@storybook/addon-actions'
 import type { Meta, StoryObj } from '@storybook/react'
 import { vi } from 'date-fns/locale'
+import React from 'react'
 import { SupportedDateDisplayFormat } from '../date-picker-common/types'
-import { DateRangePicker } from './dateRangePicker'
+import { DateRangePicker, type DateRangePickerProps } from './dateRangePicker'
 
 /**
  * DateRangePicker là một component chọn khoảng ngày với giao diện lịch hiện đại.
@@ -91,8 +92,9 @@ DateRangePicker component cung cấp một giao diện trực quan để chọn 
       ] as SupportedDateDisplayFormat[],
     },
     numberOfMonths: {
-      description: 'Số tháng hiển thị cạnh nhau (mặc định là 2)',
-      control: { type: 'number', min: 1, max: 3 },
+      description: 'Số tháng hiển thị cạnh nhau (chỉ được phép 1 hoặc 2)',
+      control: { type: 'select' },
+      options: [1, 2],
     },
     disabled: {
       description: 'Vô hiệu hóa component',
@@ -381,3 +383,57 @@ export const ReportPeriod: Story = {
   },
 }
 
+// Component helper cho interactive test
+const InteractiveTestComponent = (args: Partial<DateRangePickerProps>) => {
+  const [value, setValue] = React.useState<
+    { from?: Date; to?: Date } | undefined
+  >({
+    from: new Date(2025, 3, 10), // 10/04/2025
+    to: new Date(2025, 4, 27), // 27/05/2025
+  })
+
+  return (
+    <div className='space-y-4'>
+      <DateRangePicker
+        {...args}
+        value={value}
+        onChange={(newValue) => {
+          setValue(newValue)
+          action('interactive-changed')(newValue)
+        }}
+      />
+      <div className='text-sm text-gray-600 bg-gray-50 p-3 rounded'>
+        <strong>Current value:</strong>{' '}
+        {value?.from && value?.to
+          ? `${value.from.toLocaleDateString(
+              'vi-VN',
+            )} - ${value.to.toLocaleDateString('vi-VN')}`
+          : value?.from
+          ? `${value.from.toLocaleDateString(
+              'vi-VN',
+            )} - (chưa chọn ngày kết thúc)`
+          : 'Chưa chọn'}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Test interactive với state management đúng
+ */
+export const InteractiveTest: Story = {
+  render: InteractiveTestComponent,
+  args: {
+    label: 'Test Interactive Range Selection',
+    dateFormat: 'dd/MM/yyyy',
+    numberOfMonths: 2,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Story test với state management đúng để kiểm tra việc chọn range có hoạt động đúng không.',
+      },
+    },
+  },
+}

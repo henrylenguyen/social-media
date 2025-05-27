@@ -55,13 +55,15 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       )}
 
       {useYearNavigation ? (
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-2 flex-1 justify-center'>
           <Select
             value={String(currentMonth)}
             onValueChange={(value) => setMonth(parseInt(value, 10))}
           >
-            <SelectTrigger className='h-9 text-sm px-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary bg-white'>
-              <SelectValue placeholder='Tháng' /> {/* Month */}
+            <SelectTrigger className='h-9 text-sm px-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary bg-white min-w-[100px]'>
+              <SelectValue>
+                {months.find((m) => m.value === currentMonth)?.label ?? 'Tháng'}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className='max-h-60 bg-white shadow-lg rounded-md border border-gray-200'>
               {months.map((m) => (
@@ -75,8 +77,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             value={String(currentYear)}
             onValueChange={(value) => setYear(parseInt(value, 10))}
           >
-            <SelectTrigger className='h-9 text-sm px-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary bg-white'>
-              <SelectValue placeholder='Năm' /> {/* Year */}
+            <SelectTrigger className='h-9 text-sm px-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary bg-white min-w-[80px]'>
+              <SelectValue>{currentYear}</SelectValue>
             </SelectTrigger>
             <SelectContent className='max-h-60 bg-white shadow-lg rounded-md border border-gray-200'>
               {years.map((y) => (

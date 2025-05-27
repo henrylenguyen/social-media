@@ -23,7 +23,7 @@ export interface UseDatePickerBaseLogicProps
     'value' | 'minDate' | 'maxDate' | 'locale' | 'useYearNavigation'
   > {
   initialVisibleDate?: Date
-  numberOfMonths?: number
+  numberOfMonths?: 1 | 2
   isRangePicker?: boolean
 }
 

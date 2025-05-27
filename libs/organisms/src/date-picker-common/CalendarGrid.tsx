@@ -38,10 +38,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
               !day.isDisabled && day.isCurrentMonth && onDateSelect(day.date)
             }
             onMouseEnter={() =>
-              onDateHover &&
-              !day.isDisabled &&
-              day.isCurrentMonth &&
-              onDateHover(day.date)
+              onDateHover && !day.isDisabled && onDateHover(day.date)
             }
             disabled={day.isDisabled || !day.isCurrentMonth}
             title={formatDate(day.date, dateFormat, locale)}

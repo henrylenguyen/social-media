@@ -26,13 +26,17 @@ export const useDateRangePicker = (props: DateRangePickerProps) => {
     placeholder,
   } = props
 
+  // Validate numberOfMonths to only allow 1 or 2
+  const validatedNumberOfMonths =
+    numberOfMonths === 1 || numberOfMonths === 2 ? numberOfMonths : 2
+
   const baseLogic = useDatePickerBaseLogic({
     value,
     minDate,
     maxDate,
     locale,
     useYearNavigation,
-    numberOfMonths,
+    numberOfMonths: validatedNumberOfMonths,
     isRangePicker: true,
   })
 
@@ -45,7 +49,7 @@ export const useDateRangePicker = (props: DateRangePickerProps) => {
         ? formatDate(range.from, dateFormat, locale)
         : '...'
       const toStr = range.to ? formatDate(range.to, dateFormat, locale) : '...'
-      if (range.from && !range.to) return fromStr
+      if (range.from && !range.to) return `${fromStr} - `
       return `${fromStr} - ${toStr}`
     },
     [dateFormat, locale],
@@ -94,15 +98,11 @@ export const useDateRangePicker = (props: DateRangePickerProps) => {
     return baseLogic.visibleMonthsData.map((monthData) => {
       const newDays = monthData.days.map((day) => {
         let isInHoverRange = false
+        let isHoveredEnd = false
 
         // Chỉ hiển thị hover effect khi đã chọn ngày đầu nhưng chưa chọn ngày cuối
-        if (
-          value?.from &&
-          !value.to &&
-          hoveredDate &&
-          day.isCurrentMonth &&
-          !day.isDisabled
-        ) {
+        // Cho phép hover trên tất cả các ngày, không chỉ ngày trong tháng hiện tại
+        if (value?.from && !value.to && hoveredDate && !day.isDisabled) {
           const startDate = value.from
           const endDate = hoveredDate
 
@@ -111,11 +111,16 @@ export const useDateRangePicker = (props: DateRangePickerProps) => {
           const startTime = startDate.getTime()
           const endTime = endDate.getTime()
 
-          if (endTime > startTime) {
-            // Hover ngày sau startDate
+          // Kiểm tra xem có phải ngày đang được hover không
+          if (isSameDayInternalRange(day.date, endDate)) {
+            isHoveredEnd = true
+          }
+
+          if (endTime >= startTime) {
+            // Hover ngày sau hoặc cùng ngày startDate
             isInHoverRange = dayTime > startTime && dayTime < endTime
           } else if (endTime < startTime) {
-            // Hover ngày trước startDate
+            // Hover ngày trước startDate (không được phép do đã disable)
             isInHoverRange = dayTime > endTime && dayTime < startTime
           }
         }
@@ -123,6 +128,7 @@ export const useDateRangePicker = (props: DateRangePickerProps) => {
         return {
           ...day,
           isInRange: day.isInRange || isInHoverRange,
+          isRangeEnd: day.isRangeEnd || isHoveredEnd,
         }
       })
       return { ...monthData, days: newDays }

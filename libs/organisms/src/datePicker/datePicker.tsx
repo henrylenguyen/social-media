@@ -90,7 +90,12 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
           </div>
         </PopoverTrigger>
         {isOpen && !disabled && (
-          <PopoverContent className='w-[320px] p-0 border rounded-lg shadow-xl bg-white z-50'>
+          <PopoverContent
+            className={cn(
+              'p-0 border rounded-lg shadow-xl bg-white z-50',
+              useYearNavigation ? 'w-[380px]' : 'w-[320px]',
+            )}
+          >
             <CalendarHeader
               monthName={monthData.monthName}
               year={monthData.year}
