@@ -1,53 +1,86 @@
+import { action } from '@storybook/addon-actions'
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
-import { addDays, subDays } from 'date-fns'
-import React from 'react'
-import { DateRange } from 'react-day-picker'
+import { vi } from 'date-fns/locale'
+import { SupportedDateDisplayFormat } from '../date-picker-common/types'
 import { DateRangePicker } from './dateRangePicker'
-import { SupportedDateDisplayFormat } from 'src/type'
 
-
+/**
+ * DateRangePicker là một component chọn khoảng ngày với giao diện lịch hiện đại.
+ *
+ * ## Tính năng chính:
+ * - **Chọn khoảng ngày**: Chọn ngày bắt đầu và ngày kết thúc
+ * - **Hiển thị 2 tháng**: Dễ dàng chọn khoảng ngày qua nhiều tháng
+ * - **Định dạng linh hoạt**: Hỗ trợ nhiều định dạng ngày khác nhau
+ * - **Validation**: Hỗ trợ minDate, maxDate để giới hạn ngày chọn
+ * - **Localization**: Hỗ trợ đa ngôn ngữ thông qua date-fns locale
+ * - **Read-only input**: Input chỉ đọc, tránh validation phức tạp
+ * - **Hover effect**: Hiển thị preview khoảng ngày khi hover
+ * - **Responsive**: Tương thích với mobile và desktop
+ *
+ * ## Cách sử dụng:
+ * ```tsx
+ * <DateRangePicker
+ *   label="Khoảng thời gian"
+ *   value={{ from: startDate, to: endDate }}
+ *   onChange={(range) => setDateRange(range)}
+ *   dateFormat="dd/MM/yyyy"
+ *   numberOfMonths={2}
+ * />
+ * ```
+ */
 const meta: Meta<typeof DateRangePicker> = {
   title: 'Organisms/DateRangePicker',
   component: DateRangePicker,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: `
+DateRangePicker component cung cấp một giao diện trực quan để chọn khoảng ngày tháng. Component hiển thị hai tháng cạnh nhau để dễ dàng chọn ngày bắt đầu và kết thúc.
+
+### Các định dạng ngày được hỗ trợ:
+- \`PPP\`: Định dạng đầy đủ (ví dụ: "April 29th, 2023")
+- \`dd/MM/yyyy\`: Định dạng Việt Nam (ví dụ: "29/04/2023")
+- \`MM/dd/yyyy\`: Định dạng Mỹ (ví dụ: "04/29/2023")
+- \`yyyy-MM-dd\`: Định dạng ISO (ví dụ: "2023-04-29")
+- \`dd MMM yy\`: Định dạng ngắn (ví dụ: "29 Apr 23")
+- \`d MMMM yyyy\`: Định dạng dài (ví dụ: "29 April 2023")
+
+### Cách chọn ngày:
+1. Click vào ngày đầu tiên để chọn ngày bắt đầu
+2. Click vào ngày thứ hai để chọn ngày kết thúc
+3. Hover trên các ngày để xem preview khoảng thời gian
+
+### Accessibility:
+- Hỗ trợ keyboard navigation
+- ARIA labels đầy đủ
+- Focus management tốt
+- Screen reader friendly
+        `,
+      },
+    },
+  },
   tags: ['autodocs'],
   argTypes: {
-    selectedRange: {
-      control: 'object',
-      description: 'Khoảng ngày được chọn.',
+    value: {
+      description: 'Giá trị khoảng ngày được chọn (object với from và to)',
+      control: { type: 'object' },
     },
-    onRangeSelected: {
-      action: 'onRangeSelected',
-      description: 'Callback được gọi khi một khoảng ngày được chọn.',
+    onChange: {
+      description: 'Callback được gọi khi khoảng ngày được chọn thay đổi',
+      action: 'onChange',
+    },
+    label: {
+      description: 'Label hiển thị phía trên input',
+      control: { type: 'text' },
     },
     placeholder: {
-      control: 'text',
-      description: 'Placeholder cho input.',
+      description: 'Placeholder text cho input',
+      control: { type: 'text' },
     },
-    className: {
-      control: 'text',
-      description: 'ClassName tùy chỉnh cho container (Button trigger).',
-    },
-    popoverContentClassName: {
-      control: 'text',
-      description: 'ClassName tùy chỉnh cho PopoverContent.',
-    },
-    numberOfMonths: {
-      control: { type: 'number', min: 1, max: 3 },
-      description: 'Số tháng hiển thị trong calendar.',
-    },
-    allowClear: {
-      control: 'boolean',
-      description: 'Hiển thị nút xóa khoảng ngày đã chọn.',
-    },
-    clearButtonLabel: {
-      control: 'text',
-      description: 'Nhãn cho nút xóa.',
-    },
-    displayFormat: {
-      control: {
-        type: 'select',
-      },
+    dateFormat: {
+      description: 'Định dạng hiển thị ngày',
+      control: { type: 'select' },
       options: [
         'PPP',
         'dd/MM/yyyy',
@@ -56,264 +89,295 @@ const meta: Meta<typeof DateRangePicker> = {
         'dd MMM yy',
         'd MMMM yyyy',
       ] as SupportedDateDisplayFormat[],
-      description: `Định dạng ngày hiển thị trên button.`,
+    },
+    numberOfMonths: {
+      description: 'Số tháng hiển thị cạnh nhau (mặc định là 2)',
+      control: { type: 'number', min: 1, max: 3 },
+    },
+    disabled: {
+      description: 'Vô hiệu hóa component',
+      control: { type: 'boolean' },
+    },
+    required: {
+      description: 'Đánh dấu trường bắt buộc',
+      control: { type: 'boolean' },
+    },
+    error: {
+      description: 'Thông báo lỗi',
+      control: { type: 'text' },
+    },
+    minDate: {
+      description: 'Ngày tối thiểu có thể chọn',
+      control: { type: 'date' },
+    },
+    maxDate: {
+      description: 'Ngày tối đa có thể chọn',
+      control: { type: 'date' },
     },
     useYearNavigation: {
-      control: 'boolean',
-      description:
-        'Sử dụng giao diện chọn năm và tháng bằng dropdown. Nếu true, fromYear và toYear của DateRangePicker nên được cung cấp.',
-    },
-    fromYear: {
-      control: 'number',
-      description:
-        'Năm bắt đầu cho dropdown (chỉ áp dụng khi useYearNavigation là true).',
-      if: { arg: 'useYearNavigation', eq: true },
-    },
-    toYear: {
-      control: 'number',
-      description:
-        'Năm kết thúc cho dropdown (chỉ áp dụng khi useYearNavigation là true).',
-      if: { arg: 'useYearNavigation', eq: true },
-    },
-    calendarProps: {
-      control: 'object',
-      description:
-        "Props tùy chỉnh cho Calendar. 'mode', 'selected', 'onSelect', 'locale', 'numberOfMonths', 'initialFocus' được DateRangePicker quản lý. Nếu 'useYearNavigation' là true, 'captionLayout', 'fromYear', 'toYear' cũng sẽ do DateRangePicker quản lý.",
-    },
-  },
-  args: {
-    onRangeSelected: fn(),
-    placeholder: 'Chọn khoảng thời gian',
-    numberOfMonths: 2,
-    displayFormat: 'PPP',
-    useYearNavigation: false,
-    allowClear: false,
-  },
-  parameters: {
-    layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Component DateRangePicker cho phép người dùng chọn một khoảng ngày. Tích hợp Popover và Calendar (thường là 2 tháng).',
-      },
+      description: 'Hiển thị dropdown chọn năm/tháng thay vì chỉ hiển thị tên',
+      control: { type: 'boolean' },
     },
   },
 }
 
 export default meta
+type Story = StoryObj<typeof meta>
 
-type Story = StoryObj<typeof DateRangePicker>
+/**
+ * Ví dụ cơ bản với tất cả các tính năng mặc định
+ */
+export const Default: Story = {
+  args: {
+    label: 'Chọn khoảng ngày',
+    placeholder: 'dd/MM/yyyy - dd/MM/yyyy',
+    onChange: action('date-range-changed'),
+  },
+}
 
-const RenderDateRangePickerWithState = (args: Story['args']) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [range, setRange] = React.useState<DateRange | undefined>(
-    args?.selectedRange,
-  )
+/**
+ * DateRangePicker với giá trị mặc định
+ */
+export const WithDefaultValue: Story = {
+  args: {
+    label: 'Kỳ nghỉ',
+    value: {
+      from: new Date('2023-04-15'),
+      to: new Date('2023-04-29'),
+    },
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('vacation-range-changed'),
+  },
+}
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  React.useEffect(() => {
-    // Allow Storybook control to update the state
-    setRange(args?.selectedRange)
-  }, [args?.selectedRange])
-
-  return (
-    <div style={{ width: '350px' }}>
+/**
+ * DateRangePicker với các định dạng ngày khác nhau
+ */
+export const DifferentFormats: Story = {
+  render: () => (
+    <div className='space-y-6 w-full max-w-4xl'>
       <DateRangePicker
-        {...args}
-        selectedRange={range}
-        onRangeSelected={(newRange) => {
-          setRange(newRange)
-          args?.onRangeSelected?.(newRange)
+        label='Định dạng PPP'
+        dateFormat='PPP'
+        value={{
+          from: new Date('2023-04-15'),
+          to: new Date('2023-04-29'),
         }}
+        onChange={action('ppp-changed')}
       />
-      <div className='mt-4 p-2 border rounded-md bg-gray-50 text-sm'>
-        <p>
-          Selected Range (State):{' '}
-          {range?.from
-            ? `${range.from.toLocaleDateString()} - ${
-                range.to ? range.to.toLocaleDateString() : '...'
-              }`
-            : 'Chưa chọn'}
-        </p>
-        <p>Display Format: {args?.displayFormat}</p>
-        <p>
-          Use Year Nav (Picker): {args?.useYearNavigation ? 'True' : 'False'}
-        </p>
-        {args?.useYearNavigation && <p>Picker From Year: {args?.fromYear}</p>}
-        {args?.useYearNavigation && <p>Picker To Year: {args?.toYear}</p>}
-        <p>CalendarProps: {JSON.stringify(args?.calendarProps)}</p>
-      </div>
+      <DateRangePicker
+        label='Định dạng dd/MM/yyyy'
+        dateFormat='dd/MM/yyyy'
+        value={{
+          from: new Date('2023-04-15'),
+          to: new Date('2023-04-29'),
+        }}
+        onChange={action('ddmmyyyy-changed')}
+      />
+      <DateRangePicker
+        label='Định dạng yyyy-MM-dd'
+        dateFormat='yyyy-MM-dd'
+        value={{
+          from: new Date('2023-04-15'),
+          to: new Date('2023-04-29'),
+        }}
+        onChange={action('iso-changed')}
+      />
+      <DateRangePicker
+        label='Định dạng dd MMM yy'
+        dateFormat='dd MMM yy'
+        value={{
+          from: new Date('2023-04-15'),
+          to: new Date('2023-04-29'),
+        }}
+        onChange={action('short-changed')}
+      />
     </div>
-  )
-}
-
-const today = new Date()
-const currentYear = today.getFullYear()
-
-export const DefaultRange: Story = {
-  name: '1. Mặc định (2 tháng)',
-  args: {},
-  render: RenderDateRangePickerWithState,
-}
-
-export const WithInitialRange: Story = {
-  name: '2. Có khoảng ngày chọn sẵn',
-  args: {
-    selectedRange: {
-      from: subDays(today, 10),
-      to: addDays(today, 5),
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const AllowClearRange: Story = {
-  name: '3. Cho phép xóa khoảng ngày',
-  args: {
-    selectedRange: {
-      from: subDays(today, 7),
-      to: today,
-    },
-    allowClear: true,
-    clearButtonLabel: 'Xóa tất cả',
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const SingleMonthDisplay: Story = {
-  name: '4. Hiển thị 1 tháng',
-  args: {
-    numberOfMonths: 1,
-    placeholder: 'Chọn khoảng ngày (1 tháng)',
-    selectedRange: {
-      from: new Date(currentYear, today.getMonth(), 5),
-      to: new Date(currentYear, today.getMonth(), 15),
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const RangePickerControlledYearNav: Story = {
-  name: '5.1. Chọn Năm/Tháng (RangePicker Controlled)',
-  args: {
-    placeholder: 'Chọn khoảng (RP Nav)',
-    useYearNavigation: true,
-    fromYear: currentYear - 2,
-    toYear: currentYear + 2,
-    selectedRange: {
-      from: new Date(currentYear, 0, 10), // 10 Jan
-      to: new Date(currentYear, 1, 20), // 20 Feb
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const RangeCalendarPropsYearNav: Story = {
-  name: '5.2. Chọn Năm/Tháng (CalendarProps Controlled)',
-  args: {
-    placeholder: 'Chọn khoảng (CP Nav)',
-    useYearNavigation: false,
-    calendarProps: {
-      captionLayout: 'dropdown-buttons',
-      fromYear: currentYear - 1,
-      toYear: currentYear + 1,
-    },
-    selectedRange: {
-      from: new Date(currentYear, 3, 1), // 1 Apr
-      to: new Date(currentYear, 3, 15), // 15 Apr
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const RangePickerOverridesCalendarPropsNav: Story = {
-  name: '5.3. RP Nav Ghi đè CP Nav',
-  args: {
-    placeholder: 'Chọn khoảng (RP overrides CP)',
-    useYearNavigation: true,
-    fromYear: currentYear - 4,
-    toYear: currentYear,
-    calendarProps: {
-      captionLayout: 'buttons', // Sẽ bị ghi đè
-      fromYear: currentYear - 1, // Sẽ bị ghi đè
-      toYear: currentYear + 1, // Sẽ bị ghi đè
-    },
-    selectedRange: {
-      from: new Date(currentYear - 1, 11, 20), // 20 Dec năm trước
-      to: new Date(currentYear, 0, 5), // 5 Jan năm nay
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const Format_dd_MM_yyyy_Range: Story = {
-  name: '6.1. Định dạng dd/MM/yyyy',
-  args: {
-    selectedRange: {
-      from: new Date(2024, 4, 10),
-      to: new Date(2024, 4, 25),
-    },
-    displayFormat: 'dd/MM/yyyy',
-    placeholder: 'Chọn khoảng (dd/MM/yyyy)',
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const Format_d_MMMM_yyyy_Range: Story = {
-  name: '6.2. Định dạng d MMMM yyyy',
-  args: {
-    selectedRange: {
-      from: new Date(2025, 0, 1),
-      to: new Date(2025, 0, 15),
-    },
-    displayFormat: 'd MMMM yyyy',
-    placeholder: 'Chọn khoảng (d MMMM yyyy)',
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const DisabledPastDatesInRange: Story = {
-  name: '7. Vô hiệu hóa ngày quá khứ',
-  args: {
-    placeholder: 'Chọn khoảng (không chọn quá khứ)',
-    calendarProps: {
-      disabled: (date) => date < new Date(new Date().setHours(0, 0, 0, 0)),
-    },
-    selectedRange: {
-      from: today,
-      to: addDays(today, 7),
-    },
-  },
-  render: RenderDateRangePickerWithState,
-}
-
-export const YearNavWithMaxRange: Story = {
-  name: '8. Chọn Năm/Tháng + Giới hạn khoảng (ví dụ: max 30 ngày)',
-  args: {
-    placeholder: 'Chọn khoảng (tối đa 30 ngày)',
-    useYearNavigation: true,
-    fromYear: currentYear - 1,
-    toYear: currentYear + 1,
-    // Logic giới hạn khoảng ngày sẽ cần xử lý trong onRangeSelected hoặc state của component cha
-    // Story này chỉ minh họa UI, không enforce logic giới hạn
-    calendarProps: {
-      // disabled: (date, { from }) => { // Ví dụ logic disable nếu chọn quá 30 ngày
-      //     if (from && date > addDays(from, 30)) return true;
-      //     return false;
-      // }
-    },
-    selectedRange: {
-      from: new Date(currentYear, today.getMonth(), 1),
-      to: new Date(currentYear, today.getMonth(), 15),
-    },
-  },
-  render: RenderDateRangePickerWithState,
+  ),
   parameters: {
     docs: {
       description: {
         story:
-          'Lưu ý: Logic giới hạn khoảng ngày (ví dụ: tối đa 30 ngày) cần được xử lý trong logic của ứng dụng (ví dụ: trong hàm `onRangeSelected` hoặc state của component cha). Story này chỉ minh họa cấu hình UI.',
+          'Hiển thị các định dạng ngày khác nhau được hỗ trợ bởi component.',
       },
     },
   },
 }
+
+/**
+ * DateRangePicker hiển thị 1 tháng
+ */
+export const SingleMonth: Story = {
+  args: {
+    label: 'Chọn khoảng ngày (1 tháng)',
+    numberOfMonths: 1,
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('single-month-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker hiển thị chỉ một tháng, phù hợp cho màn hình nhỏ hoặc không gian hạn chế.',
+      },
+    },
+  },
+}
+
+/**
+ * DateRangePicker với giới hạn ngày
+ */
+export const WithDateLimits: Story = {
+  args: {
+    label: 'Chọn khoảng ngày (3 tháng tới)',
+    minDate: new Date(),
+    maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('limited-range-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker với giới hạn ngày. Chỉ có thể chọn ngày trong vòng 3 tháng tới.',
+      },
+    },
+  },
+}
+
+/**
+ * DateRangePicker bắt buộc với validation
+ */
+export const Required: Story = {
+  args: {
+    label: 'Khoảng ngày bắt buộc',
+    required: true,
+    error: 'Vui lòng chọn khoảng ngày',
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('required-range-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker với trường bắt buộc và hiển thị lỗi validation.',
+      },
+    },
+  },
+}
+
+/**
+ * DateRangePicker bị vô hiệu hóa
+ */
+export const Disabled: Story = {
+  args: {
+    label: 'Khoảng ngày không thể chỉnh sửa',
+    value: {
+      from: new Date('2023-04-15'),
+      to: new Date('2023-04-29'),
+    },
+    disabled: true,
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('disabled-range-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker trong trạng thái disabled. Người dùng không thể tương tác.',
+      },
+    },
+  },
+}
+
+/**
+ * DateRangePicker với navigation năm/tháng
+ */
+export const WithYearNavigation: Story = {
+  args: {
+    label: 'Với dropdown năm/tháng',
+    useYearNavigation: true,
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('year-nav-range-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker với dropdown để chọn năm và tháng, hữu ích khi cần chọn ngày xa.',
+      },
+    },
+  },
+}
+
+/**
+ * DateRangePicker với locale tiếng Việt
+ */
+export const VietnameseLocale: Story = {
+  args: {
+    label: 'Lịch tiếng Việt',
+    locale: vi,
+    dateFormat: 'd MMMM yyyy',
+    value: {
+      from: new Date('2023-04-15'),
+      to: new Date('2023-04-29'),
+    },
+    onChange: action('vietnamese-range-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker sử dụng locale tiếng Việt với tên tháng và ngày trong tuần bằng tiếng Việt.',
+      },
+    },
+  },
+}
+
+/**
+ * Use case thực tế: Booking khách sạn
+ */
+export const HotelBooking: Story = {
+  args: {
+    label: 'Chọn ngày nhận phòng và trả phòng',
+    placeholder: 'Ngày nhận phòng - Ngày trả phòng',
+    minDate: new Date(),
+    dateFormat: 'dd/MM/yyyy',
+    onChange: action('hotel-booking-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Ví dụ sử dụng thực tế cho booking khách sạn với giới hạn không thể chọn ngày trong quá khứ.',
+      },
+    },
+  },
+}
+
+/**
+ * Use case thực tế: Báo cáo thống kê
+ */
+export const ReportPeriod: Story = {
+  args: {
+    label: 'Chọn kỳ báo cáo',
+    placeholder: 'Từ ngày - Đến ngày',
+    value: {
+      from: new Date(new Date().setDate(new Date().getDate() - 30)),
+      to: new Date(),
+    },
+    maxDate: new Date(),
+    dateFormat: 'dd/MM/yyyy',
+    useYearNavigation: true,
+    onChange: action('report-period-changed'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Ví dụ sử dụng cho chọn kỳ báo cáo thống kê với giá trị mặc định 30 ngày gần nhất.',
+      },
+    },
+  },
+}
+

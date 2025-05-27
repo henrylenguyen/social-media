@@ -1,169 +1,171 @@
-'use client'
-
-import { Button } from '@social-media/atoms'
+import { Button, Input } from '@social-media/atoms'
 import {
-  Calendar,
-  CalendarProps,
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@social-media/molecules'
-import { format, isValid as isValidDate } from 'date-fns'
-import { vi } from 'date-fns/locale'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import * as React from 'react'
-import { DateRange } from 'react-day-picker' // Import DayPickerProps
-import { cn } from 'src/utils'
+import { Locale } from 'date-fns'
+import { CalendarDays } from 'lucide-react' // Assuming lucide-react is available
+import React from 'react'
+import { cn } from 'src/utils' // Assuming cn is in @ui/utils or similar NX path
+import { CalendarGrid } from '../date-picker-common/CalendarGrid'
+import { CalendarHeader } from '../date-picker-common/CalendarHeader'
+import {
+  DateRangeType as DateRangePropType,
+  PickerProps,
+  SupportedDateDisplayFormat,
+} from '../date-picker-common/types'
+import { useDateRangePicker } from './useDateRangePicker'
 
-type SupportedDateDisplayFormat =
-  | 'PPP'
-  | 'dd/MM/yyyy'
-  | 'MM/dd/yyyy'
-  | 'yyyy-MM-dd'
-  | 'dd MMM yy'
-  | 'd MMMM yyyy'
-
-export interface DateRangePickerProps {
-  selectedRange?: DateRange
-  onRangeSelected: (range: DateRange | undefined) => void
-  placeholder?: string
-  className?: string
-  popoverContentClassName?: string
-  buttonProps?: React.ComponentProps<typeof Button>
-  /**
-   * Props để truyền vào component Calendar.
-   * Các props 'mode', 'selected', 'onSelect', 'initialFocus', 'locale', 'numberOfMonths' sẽ được DateRangePicker quản lý.
-   * Nếu 'useYearNavigation' là true, 'captionLayout', 'fromYear', 'toYear' cũng sẽ được DateRangePicker quản lý.
-   */
-  calendarProps?: Omit<
-    CalendarProps,
-    | 'mode'
-    | 'selected'
-    | 'onSelect'
-    | 'initialFocus'
-    | 'locale'
-    | 'numberOfMonths'
-  >
+export interface DateRangePickerProps extends Omit<PickerProps, 'onChange'> {
+  value?: DateRangePropType
+  onChange?: (range?: DateRangePropType) => void
   numberOfMonths?: number
-  allowClear?: boolean
-  clearButtonLabel?: string
-  displayFormat?: SupportedDateDisplayFormat
-  useYearNavigation?: boolean
-  fromYear?: number // Prop của DateRangePicker
-  toYear?: number // Prop của DateRangePicker
+  locale?: Locale
+  dateFormat?: SupportedDateDisplayFormat
 }
+export type DateRange = DateRangePropType
 
-export function DateRangePicker({
-  selectedRange,
-  onRangeSelected,
-  placeholder = 'Chọn khoảng ngày',
-  className,
-  popoverContentClassName,
-  buttonProps,
-  calendarProps,
-  numberOfMonths = 2,
-  allowClear = false,
-  clearButtonLabel = 'Xóa',
-  displayFormat = 'PPP',
-  useYearNavigation = false,
-  fromYear,
-  toYear,
-}: DateRangePickerProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  const handleRangeSelect = (range: DateRange | undefined) => {
-    onRangeSelected(range)
-    if (range?.from && range?.to) {
-      setIsOpen(false)
-    }
-  }
-
-  const handleClearRange = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    onRangeSelected(undefined)
-    setIsOpen(false)
-  }
-
-  const formatDateForDisplay = (
-    date: Date,
-    formatString: SupportedDateDisplayFormat,
-  ) => {
-    if (!isValidDate(date)) return ''
-    try {
-      return format(date, formatString, { locale: vi })
-    } catch (error) {
-      console.error('Error formatting date:', error)
-      return 'Invalid Date'
-    }
-  }
-
-  // Build the final props for the Calendar component
-  const effectiveCalendarProps: CalendarProps = {
-    ...calendarProps, // Start with user-provided calendarProps
-    mode: 'range',
-    selected: selectedRange,
-    onSelect: handleRangeSelect,
-    initialFocus: true,
-    locale: vi,
-    numberOfMonths: numberOfMonths,
-  }
-
-  if (useYearNavigation) {
-    effectiveCalendarProps.captionLayout = 'dropdown-buttons'
-    if (fromYear !== undefined) {
-      effectiveCalendarProps.fromYear = fromYear
-    }
-    if (toYear !== undefined) {
-      effectiveCalendarProps.toYear = toYear
-    }
-  }
-  // If useYearNavigation is false, captionLayout, fromYear, toYear from calendarProps (if provided) will be used.
+export const DateRangePicker: React.FC<DateRangePickerProps> = (props) => {
+  const {
+    label,
+    error,
+    required,
+    className,
+    inputClassName,
+    disabled,
+    numberOfMonths = 2,
+  } = props
+  const {
+    isOpen,
+    toggleOpen,
+    openPicker,
+    visibleMonthsData,
+    currentYear,
+    currentMonth,
+    years,
+    months,
+    prevMonth,
+    nextMonth,
+    setYear,
+    setMonth,
+    useYearNavigation,
+    locale,
+    formattedValue,
+    handleDateSelect,
+    inputPlaceholder,
+    setHoveredDate,
+  } = useDateRangePicker(props)
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant={'outline'}
-          className={cn(
-            'w-full justify-start text-left font-normal',
-            !selectedRange?.from && 'text-muted-foreground',
-            className,
-          )}
-          {...buttonProps}
+    <div className={cn('w-full space-y-1', className)}>
+      {label && (
+        <label
+          htmlFor={label}
+          className='block text-sm font-medium text-text-primary'
         >
-          <CalendarIcon className='mr-2 h-4 w-4' />
-          {selectedRange?.from ? (
-            selectedRange.to ? (
-              <>
-                {formatDateForDisplay(selectedRange.from, displayFormat)} -{' '}
-                {formatDateForDisplay(selectedRange.to, displayFormat)}
-              </>
-            ) : (
-              formatDateForDisplay(selectedRange.from, displayFormat)
-            )
-          ) : (
-            <span>{placeholder}</span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className={cn('w-auto p-0', popoverContentClassName)}
-        align='start'
-      >
-        <Calendar {...effectiveCalendarProps} />
-        {allowClear && selectedRange?.from && (
-          <div className='p-2 border-t border-border'>
+          {label} {required && <span className='text-error'>*</span>}
+        </label>
+      )}
+      <Popover>
+        <PopoverTrigger asChild>
+          <div className='relative'>
+            {' '}
+            <Input
+              id={label} // Use label as id for accessibility if label is present
+              type='text'
+              value={formattedValue}
+              readOnly
+              onFocus={openPicker}
+              placeholder={inputPlaceholder}
+              disabled={disabled}
+              className={cn(
+                'w-full pr-10 cursor-pointer',
+                inputClassName,
+                error && 'border-error focus:border-error focus:ring-error',
+              )}
+            />
             <Button
-              variant='ghost'
-              size='sm'
-              className='w-full'
-              onClick={handleClearRange}
+              type='button'
+              variant='outline'
+              size='icon'
+              className='absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-1 border-0 hover:bg-gray-100 text-text-tertiary'
+              onClick={toggleOpen}
+              disabled={disabled}
+              aria-label='Mở lịch' // Open calendar
             >
-              {clearButtonLabel}
-            </Button>
+              <CalendarDays className='h-5 w-5' />            </Button>
           </div>
+        </PopoverTrigger>
+        {isOpen && !disabled && (
+          <PopoverContent className='w-auto p-0 border rounded-lg shadow-xl bg-white z-50'>
+            {/* Header chung cho cả DateRangePicker */}
+            {numberOfMonths === 1 && (
+              <div className='bg-gray-50 border-b'>
+                <CalendarHeader
+                  monthName={visibleMonthsData[0].monthName}
+                  year={visibleMonthsData[0].year}
+                  currentMonth={currentMonth}
+                  currentYear={currentYear}
+                  years={years}
+                  months={months}
+                  prevMonth={prevMonth}
+                  nextMonth={nextMonth}
+                  setYear={setYear}
+                  setMonth={setMonth}
+                  useYearNavigation={useYearNavigation}
+                />
+              </div>
+            )}
+
+            <div
+              className={cn(
+                'flex flex-col md:flex-row',
+                numberOfMonths === 1 && 'max-w-xs',
+                numberOfMonths === 2 && 'md:min-w-[640px]',
+              )}
+              onMouseLeave={() => setHoveredDate(undefined)}
+            >
+              {visibleMonthsData.map((monthData, index) => (
+                <div
+                  key={`${monthData.year}-${monthData.monthName}-${index}`}
+                  className='flex-1 border-r last:border-r-0'
+                >
+                  {/* Header riêng cho từng tháng khi có nhiều tháng */}
+                  {numberOfMonths > 1 && (
+                    <div className='bg-gray-50 border-b'>
+                      <CalendarHeader
+                        monthName={monthData.monthName}
+                        year={monthData.year}
+                        currentMonth={currentMonth}
+                        currentYear={currentYear}
+                        years={years}
+                        months={months}
+                        prevMonth={index === 0 ? prevMonth : undefined}
+                        nextMonth={
+                          index === numberOfMonths - 1 ? nextMonth : undefined
+                        }
+                        setYear={setYear}
+                        setMonth={setMonth}
+                        useYearNavigation={useYearNavigation}
+                        hideNavigation={index > 0} // Ẩn navigation cho tháng thứ 2 trở đi
+                      />
+                    </div>
+                  )}
+                  <CalendarGrid
+                    days={monthData.days}
+                    onDateSelect={handleDateSelect}
+                    onDateHover={setHoveredDate}
+                    locale={locale}
+                    dateFormat={props.dateFormat}
+                  />
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
         )}
-      </PopoverContent>
-    </Popover>
+      </Popover>
+      {error && <p className='mt-1 text-xs text-error'>{error}</p>}
+    </div>
   )
 }

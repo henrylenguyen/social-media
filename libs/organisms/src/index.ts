@@ -8,5 +8,5 @@ export type {
   PasswordStrength,
 } from './passwordInput/passwordInput'
 
-export * from './datePicker/datePicker'
-export * from './dateRangePicker/dateRangePicker'
+export * from './datePicker'
+export * from './dateRangePicker'
