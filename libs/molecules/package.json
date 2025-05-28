@@ -12,10 +12,12 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",
     "date-fns": "^3.6.0",
     "input-otp": "^1.4.2",
-    "react-day-picker": "^8.10.1"
+    "react-day-picker": "^8.10.1",
+    "vaul": "^1.1.2"
   }
 }

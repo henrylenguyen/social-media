@@ -3,10 +3,10 @@ export { default as NumberStepWithText } from './numberStepWithText/numberStepWi
 
 export * from './calendar/calendar'
 export * from './card/card'
+export * from './drawer/drawer'
 export * from './floatingIcons'
 export { default as FloatingIcons } from './floatingIcons'
 export { default as Header } from './header/header'
 export { default as PhoneMockupComponent } from './phoneMockup/phoneMockup'
 export * from './popover/popover'
 export { default as Sidebar } from './sidebar/sidebar'
-export * from './calendar/calendar'
