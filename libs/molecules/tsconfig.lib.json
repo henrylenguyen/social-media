@@ -2,8 +2,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "../..",
     "baseUrl": ".",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "paths": {
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@assets/*": ["../../assets/*"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@hooks/*": ["../../hooks/*"],
+      "src/*": ["src/*"]
+    },
     "types": [
       "node",
       "@nx/react/typings/cssmodule.d.ts",
@@ -32,5 +41,14 @@
     "**/*.stories.jsx",
     "**/*.stories.tsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../assets/**/*.ts",
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx"
+  ]
 }

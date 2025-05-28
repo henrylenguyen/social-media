@@ -21,7 +21,9 @@
       "@social-media/styles": ["./styles/globals.css"],
       "@styles/*": ["./styles/*"],
       "@social-media/assets": ["./assets/index.ts"],
-      "@assets/*": ["./assets/*"]
+      "@assets/*": ["./assets/*"],
+      "@social-media/hooks": ["./hooks/index.ts"],
+      "@hooks/*": ["./hooks/*"]
     }
   }
 }

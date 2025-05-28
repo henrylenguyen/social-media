@@ -1,81 +1,374 @@
-# SocialMedia
+# 🚀 Social Media NX Monorepo
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Dự án Social Media được xây dựng trên NX Monorepo với kiến trúc Atomic Design, sử dụng React, TypeScript, Next.js và Tailwind CSS.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## 📁 Cấu trúc dự án
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/next?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+```
+social-media/
+├── 📱 apps/                          # Ứng dụng chính
+│   └── dating-app/                   # App hẹn hò
+│       ├── src/
+│       │   ├── app/                  # Pages và layouts
+│       │   │   ├── (auth)/           # Auth pages
+│       │   │   └── profile/          # Profile pages
+│       │   └── components/           # App-specific components
+│       ├── public/                   # Static assets
+│       └── tsconfig.json             # TypeScript config
+│
+├── 🧩 libs/                          # Thư viện UI components
+│   ├── atoms/                        # Components cơ bản
+│   │   ├── src/
+│   │   │   ├── button/               # Button component
+│   │   │   ├── input/                # Input component
+│   │   │   ├── progress/             # Progress component
+│   │   │   └── stepIndicator/        # Step indicator
+│   │   └── tsconfig.lib.json
+│   │
+│   ├── molecules/                    # Components phức tạp hơn
+│   │   ├── src/
+│   │   │   ├── sidebar/              # Sidebar navigation
+│   │   │   ├── floatingIcons/        # Floating icons
+│   │   │   └── phoneMockup/          # Phone mockup
+│   │   └── tsconfig.lib.json
+│   │
+│   ├── organisms/                    # Components phức tạp nhất
+│   │   ├── src/
+│   │   │   ├── datePicker/           # Date picker
+│   │   │   └── dateRangePicker/      # Date range picker
+│   │   └── tsconfig.lib.json
+│   │
+│   └── templates/                    # Page templates
+│       ├── src/
+│       └── tsconfig.lib.json
+│
+├── 🎨 assets/                        # Assets chia sẻ (ROOT LEVEL)
+│   ├── icons/                        # SVG icons
+│   │   ├── ChatBubbleIcon.tsx
+│   │   ├── DatingMessageIcon.tsx
+│   │   ├── HeartIcon.tsx
+│   │   ├── LocationPinIcon.tsx
+│   │   └── Logo.tsx
+│   ├── images/                       # Images
+│   ├── fonts/                        # Fonts
+│   ├── index.ts                      # Export file
+│   ├── package.json                  # Package config
+│   ├── project.json                  # NX project config
+│   └── tsconfig.json                 # TypeScript config
+│
+├── 🪝 hooks/                         # React hooks chia sẻ (ROOT LEVEL)
+│   ├── useDeviceDetection.ts         # Device detection hook
+│   ├── useMediaQuery.ts              # Media query hooks
+│   ├── index.ts                      # Export file
+│   ├── package.json                  # Package config
+│   ├── project.json                  # NX project config
+│   └── tsconfig.json                 # TypeScript config
+│
+├── 🎨 styles/                        # Global styles (ROOT LEVEL)
+│   └── globals.css                   # Tailwind CSS
+│
+├── 📋 Config files
+│   ├── nx.json                       # NX workspace config
+│   ├── package.json                  # Root package.json
+│   ├── tsconfig.base.json            # Base TypeScript config
+│   ├── tailwind.config.js            # Tailwind config
+│   └── prettier.config.js            # Prettier config
+│
+└── 📚 README.md                      # Documentation
+```
 
-## Finish your remote caching setup
+## 🔧 Cách tạo thư mục mới ở ROOT LEVEL
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/GUojGXMsqa)
+### **Bước 1: Tạo cấu trúc thư mục**
 
-## Run tasks
+```bash
+# Tạo thư mục mới (ví dụ: utils)
+mkdir utils
 
-To run the dev server for your app, use:
+# Tạo các file cần thiết
+touch utils/index.ts
+touch utils/package.json
+touch utils/project.json
+touch utils/tsconfig.json
+```
 
-```sh
+### **Bước 2: Cấu hình package.json**
+
+```json
+// utils/package.json
+{
+  "name": "@social-media/utils",
+  "version": "1.0.0",
+  "description": "Shared utility functions",
+  "main": "index.ts",
+  "types": "index.ts",
+  "private": true,
+  "keywords": ["utils", "helpers", "shared"],
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  }
+}
+```
+
+### **Bước 3: Cấu hình project.json (NX)**
+
+```json
+// utils/project.json
+{
+  "name": "utils",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "utils",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:util"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["utils/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "type-check": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/utils",
+        "main": "utils/index.ts",
+        "tsConfig": "utils/tsconfig.json"
+      }
+    }
+  }
+}
+```
+
+### **Bước 4: Cấu hình tsconfig.json**
+
+```json
+// utils/tsconfig.json
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "lib": ["DOM", "DOM.Iterable", "ES6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+```
+
+### **Bước 5: Cập nhật tsconfig.base.json**
+
+```json
+// tsconfig.base.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@social-media/styles": ["./styles/globals.css"],
+      "@styles/*": ["./styles/*"],
+      "@social-media/assets": ["./assets/index.ts"],
+      "@assets/*": ["./assets/*"],
+      "@social-media/hooks": ["./hooks/index.ts"],
+      "@hooks/*": ["./hooks/*"],
+      "@social-media/utils": ["./utils/index.ts"],  // ← Thêm dòng này
+      "@utils/*": ["./utils/*"]                     // ← Thêm dòng này
+    }
+  }
+}
+```
+
+### **Bước 6: Cập nhật package.json root**
+
+```json
+// package.json (root)
+{
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "hooks",
+    "styles",
+    "assets",
+    "utils"    // ← Thêm dòng này
+  ]
+}
+```
+
+### **Bước 7: Cấu hình TypeScript cho libs**
+
+**Cập nhật tất cả `libs/*/tsconfig.lib.json`:**
+
+```json
+// libs/atoms/tsconfig.lib.json, libs/molecules/tsconfig.lib.json, etc.
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "../..",           // ← Quan trọng: Set về project root
+    "baseUrl": ".",
+    "skipLibCheck": true,         // ← Quan trọng: Skip lib checking
+    "allowJs": true,              // ← Quan trọng: Allow JS files
+    "paths": {
+      "src/*": ["src/*"],
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@assets/*": ["../../assets/*"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@hooks/*": ["../../hooks/*"],
+      "@social-media/utils": ["../../utils/index.ts"],    // ← Thêm
+      "@utils/*": ["../../utils/*"]                        // ← Thêm
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../assets/**/*.ts",       // ← Quan trọng: Include external files
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx",
+    "../../utils/**/*.ts",        // ← Thêm
+    "../../utils/**/*.tsx"        // ← Thêm
+  ]
+}
+```
+
+### **Bước 8: Cấu hình TypeScript cho apps**
+
+**Cập nhật `apps/*/tsconfig.json`:**
+
+```json
+// apps/dating-app/tsconfig.json
+{
+  "compilerOptions": {
+    "rootDir": "../..",           // ← Quan trọng: Set về project root
+    "skipLibCheck": true,         // ← Quan trọng: Skip lib checking
+    "paths": {
+      "@/*": ["./src/*"],
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@social-media/utils": ["../../utils/index.ts"]     // ← Thêm
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../assets/**/*.ts",       // ← Include external files
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx",
+    "../../utils/**/*.ts",        // ← Thêm
+    "../../utils/**/*.tsx"        // ← Thêm
+  ]
+}
+```
+
+## 🎯 Sử dụng trong dự án
+
+### **Import từ thư mục ROOT LEVEL:**
+
+```tsx
+// ✅ Import assets
+import { LogoIcon, HeartIcon } from '@social-media/assets'
+
+// ✅ Import hooks
+import { useDeviceDetection, useIsMobile } from '@social-media/hooks'
+
+// ✅ Import utils (ví dụ)
+import { formatDate, validateEmail } from '@social-media/utils'
+
+// ✅ Import styles
+import '@social-media/styles'
+```
+
+### **Sử dụng trong component:**
+
+```tsx
+import React from 'react'
+import { LogoIcon } from '@social-media/assets'
+import { useDeviceDetection } from '@social-media/hooks'
+import { formatDate } from '@social-media/utils'
+
+const MyComponent = () => {
+  const { isMobile, deviceType } = useDeviceDetection()
+  const currentDate = formatDate(new Date())
+
+  return (
+    <div>
+      <LogoIcon />
+      <p>Device: {deviceType}</p>
+      <p>Date: {currentDate}</p>
+      {isMobile ? 'Mobile View' : 'Desktop View'}
+    </div>
+  )
+}
+
+export default MyComponent
+```
+
+## 🔑 Key Points để nhớ
+
+### **1. Cấu hình TypeScript quan trọng:**
+- ✅ `"rootDir": "../.."` - Set về project root
+- ✅ `"skipLibCheck": true` - Skip external lib checking
+- ✅ `"allowJs": true` - Allow JS files
+- ✅ Include external files trong `"include"` array
+
+### **2. Pattern đặt tên:**
+- ✅ Thư mục: `kebab-case` (utils, assets, hooks)
+- ✅ Package name: `@social-media/folder-name`
+- ✅ Import path: `@social-media/folder-name`
+
+### **3. Cấu trúc file bắt buộc:**
+- ✅ `index.ts` - Export file
+- ✅ `package.json` - Package metadata
+- ✅ `project.json` - NX project config
+- ✅ `tsconfig.json` - TypeScript config
+
+### **4. Workspaces:**
+- ✅ Thêm vào `package.json` root workspaces
+- ✅ Thêm paths vào `tsconfig.base.json`
+- ✅ Cập nhật tất cả libs và apps tsconfig
+
+## 🚀 Commands hữu ích
+
+```bash
+# Chạy dev server
 npx nx dev dating-app
-```
 
-To create a production bundle:
-
-```sh
+# Build production
 npx nx build dating-app
+
+# Lint code
+npx nx lint dating-app
+
+# Type check
+npx nx type-check hooks
+
+# Xem dependency graph
+npx nx graph
+
+# List tất cả projects
+npx nx show projects
 ```
 
-To see all available targets to run for a project, run:
+## 📚 Tài liệu tham khảo
 
-```sh
-npx nx show project dating-app
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/next:app demo
-```
-
-To generate a new library, use:
-
-```sh
-npx nx g @nx/react:lib mylib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/next?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [NX Documentation](https://nx.dev)
+- [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/)
+- [TypeScript Paths](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping)
+- [Tailwind CSS](https://tailwindcss.com/docs)

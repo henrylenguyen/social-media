@@ -3,7 +3,16 @@
   "compilerOptions": {
     "outDir": "dist",
     "baseUrl": ".",
-    "rootDir": "src",
+    "rootDir": "../..",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "paths": {
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@assets/*": ["../../assets/*"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@hooks/*": ["../../hooks/*"],
+      "src/*": ["src/*"]
+    },
     "types": [
       "node",
       "@nx/react/typings/cssmodule.d.ts",
@@ -36,6 +45,10 @@
     "src/**/*.js",
     "src/**/*.jsx",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "../../assets/**/*.ts",
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx"
   ]
 }

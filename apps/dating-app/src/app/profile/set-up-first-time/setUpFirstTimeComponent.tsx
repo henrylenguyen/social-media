@@ -1,5 +1,6 @@
 'use client'
 import { Progress } from '@social-media/atoms'
+
 import { PhoneMockupComponent } from '@social-media/molecules'
 import {
   DatePicker,
@@ -13,11 +14,11 @@ const SetUpFirstTimeComponent: React.FunctionComponent = () => {
   const [dateRange, setDateRange] = React.useState<DateRangeType | undefined>(
     undefined,
   )
-  console.log("dateRange:", dateRange)
+  console.log('dateRange:', dateRange)
   const [singleDate, setSingleDate] = React.useState<Date | undefined>(
     undefined,
   )
-  console.log("singleDate:", singleDate)
+  console.log('singleDate:', singleDate)
   return (
     <div className='min-h-screen bg-gray-100'>
       <main>

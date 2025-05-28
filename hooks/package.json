@@ -1,0 +1,19 @@
+{
+  "name": "@social-media/hooks",
+  "version": "1.0.0",
+  "description": "Shared React hooks for device detection and responsive design",
+  "main": "index.ts",
+  "types": "index.ts",
+  "keywords": [
+    "react",
+    "hooks",
+    "responsive",
+    "device-detection",
+    "mobile",
+    "tablet",
+    "desktop"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  }
+}

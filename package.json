@@ -101,7 +101,10 @@
   },
   "workspaces": [
     "apps/*",
-    "libs/*"
+    "libs/*",
+    "hooks",
+    "styles",
+    "assets"
   ],
   "importSort": {
     ".js": {

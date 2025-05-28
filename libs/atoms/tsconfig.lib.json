@@ -8,11 +8,17 @@
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts"
     ],
-    "rootDir": "src",
+    "rootDir": "../..",
+    "skipLibCheck": true,
+    "allowJs": true,
     "jsx": "react-jsx",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@assets/*": ["../../assets/*"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@hooks/*": ["../../hooks/*"]
     }
   },
   "exclude": [
@@ -35,5 +41,14 @@
     "**/*.stories.jsx",
     "**/*.stories.tsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../assets/**/*.ts",
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx"
+  ]
 }

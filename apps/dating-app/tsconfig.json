@@ -11,13 +11,19 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
+    "rootDir": "../..",
+    "skipLibCheck": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@social-media/assets": ["../../assets/index.ts"],
+      "@assets/*": ["../../assets/*"],
+      "@social-media/hooks": ["../../hooks/index.ts"],
+      "@hooks/*": ["../../hooks/*"]
     },
     "types": ["jest", "node"],
     "outDir": "dist",
@@ -26,6 +32,10 @@
   "include": [
     "../../apps/dating-app/.next/types/**/*.ts",
     "../../dist/apps/dating-app/.next/types/**/*.ts",
+    "../../assets/**/*.ts",
+    "../../assets/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx",
     "next-env.d.ts",
     "src/**/*.js",
     "src/**/*.jsx",
@@ -46,5 +56,5 @@
     "eslint.config.mjs",
     "**/*.stories.ts",
     "**/*.stories.js"
-  ],
+  ]
 }
