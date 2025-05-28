@@ -1,0 +1,59 @@
+{
+  "name": "molecules",
+  "sourceRoot": "libs/molecules/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/molecules",
+        "main": "libs/molecules/src/index.ts",
+        "tsConfig": "libs/molecules/tsconfig.lib.json",
+        "assets": [
+          "libs/molecules/*.md",
+          {
+            "input": "libs/molecules/src",
+            "glob": "**/*.css",
+            "output": "."
+          },
+          {
+            "input": "libs/molecules/src",
+            "glob": "**/*.scss",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/molecules/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/molecules/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "configDir": "libs/molecules/.storybook",
+        "browserTarget": "molecules:build-storybook"
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "configDir": "libs/molecules/.storybook",
+        "outputDir": "dist/storybook/molecules"
+      }
+    }
+  }
+}

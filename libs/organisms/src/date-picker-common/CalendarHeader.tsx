@@ -22,6 +22,8 @@ interface CalendarHeaderProps {
   monthName: string
   year: number
   hideNavigation?: boolean
+  minDate?: Date
+  maxDate?: Date
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -37,7 +39,19 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   setMonth,
   useYearNavigation,
   hideNavigation = false,
+  minDate,
+  maxDate,
 }) => {
+  // Check if navigation should be disabled
+  const isPrevDisabled =
+    minDate &&
+    new Date(currentYear, currentMonth - 1, 1) <
+      new Date(minDate.getFullYear(), minDate.getMonth(), 1)
+  const isNextDisabled =
+    maxDate &&
+    new Date(currentYear, currentMonth + 1, 1) >
+      new Date(maxDate.getFullYear(), maxDate.getMonth(), 1)
+
   return (
     <div className='flex items-center justify-between px-2 py-2 bg-gray-50 border-b'>
       {!hideNavigation && prevMonth ? (
@@ -46,6 +60,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           size='icon'
           className='h-8 w-8 rounded-full border-gray-300 hover:bg-gray-100'
           onClick={prevMonth}
+          disabled={isPrevDisabled}
           aria-label='Tháng trước' // Previous month
         >
           <ChevronLeft className='h-5 w-5 text-text-secondary' />
@@ -101,6 +116,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           size='icon'
           className='h-8 w-8 rounded-full border-gray-300 hover:bg-gray-100'
           onClick={nextMonth}
+          disabled={isNextDisabled}
           aria-label='Tháng sau' // Next month
         >
           <ChevronRight className='h-5 w-5 text-text-secondary' />

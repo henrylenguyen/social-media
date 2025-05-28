@@ -1,0 +1,54 @@
+{
+  "name": "atoms",
+  "sourceRoot": "libs/atoms/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/atoms",
+        "main": "libs/atoms/src/index.ts",
+        "tsConfig": "libs/atoms/tsconfig.lib.json",
+        "assets": [
+          "libs/atoms/*.md",
+          {
+            "input": "libs/atoms/src",
+            "glob": "**/*.css",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/atoms/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/atoms/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "configDir": "libs/atoms/.storybook",
+        "browserTarget": "atoms:build-storybook"
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "configDir": "libs/atoms/.storybook",
+        "outputDir": "dist/storybook/atoms"
+      }
+    }
+  }
+}

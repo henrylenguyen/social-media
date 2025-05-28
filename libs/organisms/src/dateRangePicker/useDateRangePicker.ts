@@ -1,145 +1,127 @@
-// libs/organisms/src/dateRangePicker/useDateRangePicker.ts
-import {
-  isBefore as isBeforeDateInternal,
-  isSameDay as isSameDayInternalRange,
-  startOfDay as startOfDayInternal,
-} from 'date-fns'
+// File: libs/organisms/src/dateRangePicker/useDateRangePicker.ts
+import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DateRangeType } from '../date-picker-common/types'
-import { useDatePickerBaseLogic } from '../date-picker-common/useDatePickerBaseLogic'
-import { formatDate } from '../date-picker-common/utils'
 import { DateRangePickerProps } from './dateRangePicker'
 
-const DEFAULT_LOCALE_INTERNAL = vi
-
 export const useDateRangePicker = (props: DateRangePickerProps) => {
-  const {
-    value,
-    onChange,
-    locale = DEFAULT_LOCALE_INTERNAL,
-    dateFormat = 'dd/MM/yyyy',
-    minDate,
-    maxDate,
-    useYearNavigation,
-    numberOfMonths = 2,
-    placeholder,
-  } = props
+  const { value, onChange, dateFormat = 'dd/MM/yyyy', placeholder } = props
 
-  // Validate numberOfMonths to only allow 1 or 2
-  const validatedNumberOfMonths =
-    numberOfMonths === 1 || numberOfMonths === 2 ? numberOfMonths : 2
+  const locale = vi
 
-  const baseLogic = useDatePickerBaseLogic({
-    value,
-    minDate,
-    maxDate,
-    locale,
-    useYearNavigation,
-    numberOfMonths: validatedNumberOfMonths,
-    isRangePicker: true,
-  })
+  const [isOpen, setIsOpen] = useState(false)
+  const [month, setMonth] = useState<Date>(value?.from || new Date())
+  const [hoveredDate, setHoveredDate] = useState<Date | undefined>()
 
-  const [hoveredDate, setHoveredDate] = useState<Date | undefined>(undefined)
+  // For year/month navigation
+  const currentYear = month.getFullYear()
+  const currentMonth = month.getMonth()
 
-  const formatRange = useCallback(
+  // Update month when value changes
+  useEffect(() => {
+    if (value?.from) {
+      setMonth(value.from)
+    }
+  }, [value?.from])
+
+  // Format the date range for display
+  const formatDateRange = useCallback(
     (range: DateRangeType | undefined): string => {
       if (!range || (!range.from && !range.to)) return ''
-      const fromStr = range.from
-        ? formatDate(range.from, dateFormat, locale)
-        : '...'
-      const toStr = range.to ? formatDate(range.to, dateFormat, locale) : '...'
-      if (range.from && !range.to) return `${fromStr} - `
-      return `${fromStr} - ${toStr}`
+
+      try {
+        if (range.from && !range.to) {
+          return format(range.from, dateFormat, { locale })
+        }
+        if (range.from && range.to) {
+          return `${format(range.from, dateFormat, { locale })} - ${format(
+            range.to,
+            dateFormat,
+            { locale },
+          )}`
+        }
+        return ''
+      } catch (error) {
+        console.error('Date formatting error:', error)
+        return ''
+      }
     },
     [dateFormat, locale],
   )
-  const [inputValue, setInputValue] = useState<string>(formatRange(value))
-  useEffect(() => {
-    setInputValue(formatRange(value))
-  }, [value, formatRange])
-  const handleDateSelect = useCallback(
-    (date: Date) => {
-      const sDate = startOfDayInternal(date)
-      let newRange: DateRangeType = value || {}
 
-      // Case 1: Chưa có ngày nào được chọn hoặc đã có đủ 2 ngày -> bắt đầu lại
-      if (!newRange.from || (newRange.from && newRange.to)) {
-        newRange = { from: sDate, to: undefined }
-      }
-      // Case 2: Đã có ngày từ, đang chọn ngày đến
-      else if (newRange.from && !newRange.to) {
-        // Nếu chọn cùng ngày với ngày từ -> reset
-        if (isSameDayInternalRange(sDate, newRange.from)) {
-          newRange = { from: sDate, to: undefined }
-        }
-        // Nếu chọn ngày trước ngày từ -> đổi chỗ
-        else if (isBeforeDateInternal(sDate, newRange.from)) {
-          newRange = { from: sDate, to: newRange.from }
-          baseLogic.closePicker()
-        }
-        // Nếu chọn ngày sau ngày từ -> hoàn thành range
-        else {
-          newRange = { from: newRange.from, to: sDate }
-          baseLogic.closePicker()
-        }
+  const formattedValue = formatDateRange(value)
+
+  // Handle date range selection
+  const handleSelect = useCallback(
+    (range: DateRangeType | undefined) => {
+      if (!range) {
+        onChange?.(undefined)
+        return
       }
 
-      // Cập nhật giá trị
-      onChange?.(newRange)
-      setInputValue(formatRange(newRange))
+      onChange?.(range)
 
-      // Reset hover state
-      setHoveredDate(undefined)
+      // Remove auto-close behavior - let user click outside to close
+      // User can continue selecting different ranges without popup closing
     },
-    [value, onChange, baseLogic, formatRange],
+    [onChange],
   )
-  const enhancedVisibleMonthsData = useMemo(() => {
-    return baseLogic.visibleMonthsData.map((monthData) => {
-      const newDays = monthData.days.map((day) => {
-        let isInHoverRange = false
-        let isHoveredEnd = false
 
-        // Chỉ hiển thị hover effect khi đã chọn ngày đầu nhưng chưa chọn ngày cuối
-        // Cho phép hover trên tất cả các ngày, không chỉ ngày trong tháng hiện tại
-        if (value?.from && !value.to && hoveredDate && !day.isDisabled) {
-          const startDate = value.from
-          const endDate = hoveredDate
+  // Handle month change from calendar navigation
+  const handleMonthChange = useCallback((newMonth: Date) => {
+    setMonth(newMonth)
+  }, [])
 
-          // Kiểm tra xem ngày hiện tại có nằm trong khoảng hover không
-          const dayTime = day.date.getTime()
-          const startTime = startDate.getTime()
-          const endTime = endDate.getTime()
+  // Handle year change from dropdown
+  const handleYearChange = useCallback(
+    (year: number) => {
+      const newDate = new Date(month)
+      newDate.setFullYear(year)
+      setMonth(newDate)
+    },
+    [month],
+  )
 
-          // Kiểm tra xem có phải ngày đang được hover không
-          if (isSameDayInternalRange(day.date, endDate)) {
-            isHoveredEnd = true
-          }
+  // Handle month change from dropdown
+  const handleMonthSelectChange = useCallback(
+    (monthIndex: number) => {
+      const newDate = new Date(month)
+      newDate.setMonth(monthIndex)
+      setMonth(newDate)
+    },
+    [month],
+  )
 
-          if (endTime >= startTime) {
-            // Hover ngày sau hoặc cùng ngày startDate
-            isInHoverRange = dayTime > startTime && dayTime < endTime
-          } else if (endTime < startTime) {
-            // Hover ngày trước startDate (không được phép do đã disable)
-            isInHoverRange = dayTime > endTime && dayTime < startTime
-          }
-        }
+  // Handle date hover for range preview
+  const handleDateHover = useCallback((date: Date | undefined) => {
+    setHoveredDate(date)
+  }, [])
 
-        return {
-          ...day,
-          isInRange: day.isInRange || isInHoverRange,
-          isRangeEnd: day.isRangeEnd || isHoveredEnd,
-        }
-      })
-      return { ...monthData, days: newDays }
-    })
-  }, [baseLogic.visibleMonthsData, value, hoveredDate])
+  // Get preview range when hovering
+  const getPreviewRange = useCallback(() => {
+    if (!value?.from || !hoveredDate || value.to) return undefined
+
+    const from = value.from
+    const to = hoveredDate
+
+    return from <= to ? { from, to } : { from: to, to: from }
+  }, [value?.from, value?.to, hoveredDate])
+
   return {
-    ...baseLogic,
-    formattedValue: inputValue,
-    handleDateSelect,
-    inputPlaceholder: placeholder ?? `${dateFormat} - ${dateFormat}`,
-    setHoveredDate,
-    visibleMonthsData: enhancedVisibleMonthsData,
+    isOpen,
+    setIsOpen,
+    formattedValue,
+    handleSelect,
+    month,
+    handleMonthChange,
+    currentYear,
+    currentMonth,
+    handleYearChange,
+    handleMonthSelectChange,
+    handleDateHover,
+    getPreviewRange,
+    locale,
+    inputPlaceholder: placeholder || `${dateFormat} - ${dateFormat}`,
   }
 }

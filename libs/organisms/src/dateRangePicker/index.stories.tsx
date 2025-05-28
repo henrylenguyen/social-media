@@ -1,34 +1,11 @@
+// File: libs/organisms/src/dateRangePicker/index.stories.tsx
 import { action } from '@storybook/addon-actions'
 import type { Meta, StoryObj } from '@storybook/react'
-import { vi } from 'date-fns/locale'
 import React from 'react'
+import type { DateRangeType } from '../date-picker-common/types'
 import { SupportedDateDisplayFormat } from '../date-picker-common/types'
-import { DateRangePicker, type DateRangePickerProps } from './dateRangePicker'
+import { DateRangePicker } from './dateRangePicker'
 
-/**
- * DateRangePicker là một component chọn khoảng ngày với giao diện lịch hiện đại.
- *
- * ## Tính năng chính:
- * - **Chọn khoảng ngày**: Chọn ngày bắt đầu và ngày kết thúc
- * - **Hiển thị 2 tháng**: Dễ dàng chọn khoảng ngày qua nhiều tháng
- * - **Định dạng linh hoạt**: Hỗ trợ nhiều định dạng ngày khác nhau
- * - **Validation**: Hỗ trợ minDate, maxDate để giới hạn ngày chọn
- * - **Localization**: Hỗ trợ đa ngôn ngữ thông qua date-fns locale
- * - **Read-only input**: Input chỉ đọc, tránh validation phức tạp
- * - **Hover effect**: Hiển thị preview khoảng ngày khi hover
- * - **Responsive**: Tương thích với mobile và desktop
- *
- * ## Cách sử dụng:
- * ```tsx
- * <DateRangePicker
- *   label="Khoảng thời gian"
- *   value={{ from: startDate, to: endDate }}
- *   onChange={(range) => setDateRange(range)}
- *   dateFormat="dd/MM/yyyy"
- *   numberOfMonths={2}
- * />
- * ```
- */
 const meta: Meta<typeof DateRangePicker> = {
   title: 'Organisms/DateRangePicker',
   component: DateRangePicker,
@@ -38,6 +15,11 @@ const meta: Meta<typeof DateRangePicker> = {
       description: {
         component: `
 DateRangePicker component cung cấp một giao diện trực quan để chọn khoảng ngày tháng. Component hiển thị hai tháng cạnh nhau để dễ dàng chọn ngày bắt đầu và kết thúc.
+
+### ✨ Tính năng mới - Tối ưu UI:
+- **Month/Year Navigation mặc định**: Dropdown chọn tháng/năm giúp navigate nhanh đến thời điểm mong muốn
+- **UX tốt cho range xa**: Dễ dàng chọn range từ 2025 đến 2030 mà không cần click nhiều lần
+- **Popup thông minh**: Không đóng sau khi chọn, cho phép user tiếp tục điều chỉnh
 
 ### Các định dạng ngày được hỗ trợ:
 - \`PPP\`: Định dạng đầy đủ (ví dụ: "April 29th, 2023")
@@ -116,192 +98,94 @@ DateRangePicker component cung cấp một giao diện trực quan để chọn 
       description: 'Ngày tối đa có thể chọn',
       control: { type: 'date' },
     },
-    useYearNavigation: {
-      description: 'Hiển thị dropdown chọn năm/tháng thay vì chỉ hiển thị tên',
-      control: { type: 'boolean' },
-    },
   },
 }
 
 export default meta
 type Story = StoryObj<typeof meta>
 
+// Default component with state management
+const DefaultComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <DateRangePicker
+      label='Chọn khoảng ngày'
+      placeholder='dd/MM/yyyy - dd/MM/yyyy'
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('date-range-changed')(newValue)
+      }}
+      dateFormat='dd/MM/yyyy'
+    />
+  )
+}
+
 /**
  * Ví dụ cơ bản với tất cả các tính năng mặc định
  */
 export const Default: Story = {
-  args: {
-    label: 'Chọn khoảng ngày',
-    placeholder: 'dd/MM/yyyy - dd/MM/yyyy',
-    onChange: action('date-range-changed'),
+  render: () => <DefaultComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateRangePicker với month/year navigation mặc định. Dễ dàng navigate đến tháng/năm xa mà không cần click nhiều lần.',
+      },
+    },
   },
+}
+
+// WithDefaultValue component with state management
+const WithDefaultValueComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>({
+    from: new Date('2025-05-15'),
+    to: new Date('2025-05-29'),
+  })
+
+  return (
+    <DateRangePicker
+      label='Kỳ nghỉ'
+      value={value}
+      dateFormat='dd/MM/yyyy'
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('vacation-range-changed')(newValue)
+      }}
+    />
+  )
 }
 
 /**
  * DateRangePicker với giá trị mặc định
  */
 export const WithDefaultValue: Story = {
-  args: {
-    label: 'Kỳ nghỉ',
-    value: {
-      from: new Date('2023-04-15'),
-      to: new Date('2023-04-29'),
-    },
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('vacation-range-changed'),
-  },
+  render: () => <WithDefaultValueComponent />,
+}
+
+// WithYearNavigation component with state management
+const WithYearNavigationComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <DateRangePicker
+      label='Với dropdown năm/tháng (mặc định)'
+      dateFormat='dd/MM/yyyy'
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('year-nav-range-changed')(newValue)
+      }}
+    />
+  )
 }
 
 /**
- * DateRangePicker với các định dạng ngày khác nhau
- */
-export const DifferentFormats: Story = {
-  render: () => (
-    <div className='space-y-6 w-full max-w-4xl'>
-      <DateRangePicker
-        label='Định dạng PPP'
-        dateFormat='PPP'
-        value={{
-          from: new Date('2023-04-15'),
-          to: new Date('2023-04-29'),
-        }}
-        onChange={action('ppp-changed')}
-      />
-      <DateRangePicker
-        label='Định dạng dd/MM/yyyy'
-        dateFormat='dd/MM/yyyy'
-        value={{
-          from: new Date('2023-04-15'),
-          to: new Date('2023-04-29'),
-        }}
-        onChange={action('ddmmyyyy-changed')}
-      />
-      <DateRangePicker
-        label='Định dạng yyyy-MM-dd'
-        dateFormat='yyyy-MM-dd'
-        value={{
-          from: new Date('2023-04-15'),
-          to: new Date('2023-04-29'),
-        }}
-        onChange={action('iso-changed')}
-      />
-      <DateRangePicker
-        label='Định dạng dd MMM yy'
-        dateFormat='dd MMM yy'
-        value={{
-          from: new Date('2023-04-15'),
-          to: new Date('2023-04-29'),
-        }}
-        onChange={action('short-changed')}
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Hiển thị các định dạng ngày khác nhau được hỗ trợ bởi component.',
-      },
-    },
-  },
-}
-
-/**
- * DateRangePicker hiển thị 1 tháng
- */
-export const SingleMonth: Story = {
-  args: {
-    label: 'Chọn khoảng ngày (1 tháng)',
-    numberOfMonths: 1,
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('single-month-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateRangePicker hiển thị chỉ một tháng, phù hợp cho màn hình nhỏ hoặc không gian hạn chế.',
-      },
-    },
-  },
-}
-
-/**
- * DateRangePicker với giới hạn ngày
- */
-export const WithDateLimits: Story = {
-  args: {
-    label: 'Chọn khoảng ngày (3 tháng tới)',
-    minDate: new Date(),
-    maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)),
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('limited-range-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateRangePicker với giới hạn ngày. Chỉ có thể chọn ngày trong vòng 3 tháng tới.',
-      },
-    },
-  },
-}
-
-/**
- * DateRangePicker bắt buộc với validation
- */
-export const Required: Story = {
-  args: {
-    label: 'Khoảng ngày bắt buộc',
-    required: true,
-    error: 'Vui lòng chọn khoảng ngày',
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('required-range-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateRangePicker với trường bắt buộc và hiển thị lỗi validation.',
-      },
-    },
-  },
-}
-
-/**
- * DateRangePicker bị vô hiệu hóa
- */
-export const Disabled: Story = {
-  args: {
-    label: 'Khoảng ngày không thể chỉnh sửa',
-    value: {
-      from: new Date('2023-04-15'),
-      to: new Date('2023-04-29'),
-    },
-    disabled: true,
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('disabled-range-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateRangePicker trong trạng thái disabled. Người dùng không thể tương tác.',
-      },
-    },
-  },
-}
-
-/**
- * DateRangePicker với navigation năm/tháng
+ * DateRangePicker với dropdown năm/tháng
  */
 export const WithYearNavigation: Story = {
-  args: {
-    label: 'Với dropdown năm/tháng',
-    useYearNavigation: true,
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('year-nav-range-changed'),
-  },
+  render: () => <WithYearNavigationComponent />,
   parameters: {
     docs: {
       description: {
@@ -312,127 +196,353 @@ export const WithYearNavigation: Story = {
   },
 }
 
-/**
- * DateRangePicker với locale tiếng Việt
- */
-export const VietnameseLocale: Story = {
-  args: {
-    label: 'Lịch tiếng Việt',
-    locale: vi,
-    dateFormat: 'd MMMM yyyy',
-    value: {
-      from: new Date('2023-04-15'),
-      to: new Date('2023-04-29'),
-    },
-    onChange: action('vietnamese-range-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DateRangePicker sử dụng locale tiếng Việt với tên tháng và ngày trong tuần bằng tiếng Việt.',
-      },
-    },
-  },
+// SingleMonth component with state management
+const SingleMonthComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <DateRangePicker
+      label='Chọn khoảng ngày (1 tháng)'
+      numberOfMonths={1}
+      dateFormat='dd/MM/yyyy'
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('single-month-changed')(newValue)
+      }}
+    />
+  )
 }
 
 /**
- * Use case thực tế: Booking khách sạn
+ * DateRangePicker hiển thị 1 tháng
  */
-export const HotelBooking: Story = {
-  args: {
-    label: 'Chọn ngày nhận phòng và trả phòng',
-    placeholder: 'Ngày nhận phòng - Ngày trả phòng',
-    minDate: new Date(),
-    dateFormat: 'dd/MM/yyyy',
-    onChange: action('hotel-booking-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Ví dụ sử dụng thực tế cho booking khách sạn với giới hạn không thể chọn ngày trong quá khứ.',
-      },
-    },
-  },
+export const SingleMonth: Story = {
+  render: () => <SingleMonthComponent />,
+}
+
+// WithDateLimits component with state management
+const WithDateLimitsComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <DateRangePicker
+      label='Chọn khoảng ngày (3 tháng tới)'
+      minDate={new Date()}
+      maxDate={new Date(new Date().setMonth(new Date().getMonth() + 3))}
+      dateFormat='dd/MM/yyyy'
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('limited-range-changed')(newValue)
+      }}
+    />
+  )
 }
 
 /**
- * Use case thực tế: Báo cáo thống kê
+ * DateRangePicker với giới hạn ngày
  */
-export const ReportPeriod: Story = {
-  args: {
-    label: 'Chọn kỳ báo cáo',
-    placeholder: 'Từ ngày - Đến ngày',
-    value: {
-      from: new Date(new Date().setDate(new Date().getDate() - 30)),
-      to: new Date(),
-    },
-    maxDate: new Date(),
-    dateFormat: 'dd/MM/yyyy',
-    useYearNavigation: true,
-    onChange: action('report-period-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Ví dụ sử dụng cho chọn kỳ báo cáo thống kê với giá trị mặc định 30 ngày gần nhất.',
-      },
-    },
-  },
+export const WithDateLimits: Story = {
+  render: () => <WithDateLimitsComponent />,
 }
 
-// Component helper cho interactive test
-const InteractiveTestComponent = (args: Partial<DateRangePickerProps>) => {
-  const [value, setValue] = React.useState<
-    { from?: Date; to?: Date } | undefined
-  >({
-    from: new Date(2025, 3, 10), // 10/04/2025
-    to: new Date(2025, 4, 27), // 27/05/2025
+// Required component with state management
+const RequiredComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <DateRangePicker
+      label='Khoảng ngày bắt buộc'
+      required={true}
+      error={!value ? 'Vui lòng chọn khoảng ngày' : undefined}
+      dateFormat='dd/MM/yyyy'
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue)
+        action('required-range-changed')(newValue)
+      }}
+    />
+  )
+}
+
+/**
+ * DateRangePicker bắt buộc với validation
+ */
+export const Required: Story = {
+  render: () => <RequiredComponent />,
+}
+
+// Disabled component with state management
+const DisabledComponent = () => {
+  const [value] = React.useState<DateRangeType | undefined>({
+    from: new Date('2025-05-15'),
+    to: new Date('2025-05-29'),
   })
 
   return (
-    <div className='space-y-4'>
+    <DateRangePicker
+      label='Khoảng ngày không thể chỉnh sửa'
+      value={value}
+      disabled={true}
+      dateFormat='dd/MM/yyyy'
+      onChange={action('disabled-range-changed')}
+    />
+  )
+}
+
+/**
+ * DateRangePicker bị vô hiệu hóa
+ */
+export const Disabled: Story = {
+  render: () => <DisabledComponent />,
+}
+
+// Interactive component for testing
+const InteractiveComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <div className='w-full max-w-xl space-y-4'>
       <DateRangePicker
-        {...args}
+        label='Test Interactive Selection'
         value={value}
         onChange={(newValue) => {
           setValue(newValue)
           action('interactive-changed')(newValue)
         }}
+        dateFormat='dd/MM/yyyy'
+        numberOfMonths={2}
       />
-      <div className='text-sm text-gray-600 bg-gray-50 p-3 rounded'>
-        <strong>Current value:</strong>{' '}
-        {value?.from && value?.to
-          ? `${value.from.toLocaleDateString(
-              'vi-VN',
-            )} - ${value.to.toLocaleDateString('vi-VN')}`
-          : value?.from
-          ? `${value.from.toLocaleDateString(
-              'vi-VN',
-            )} - (chưa chọn ngày kết thúc)`
-          : 'Chưa chọn'}
+
+      <div className='p-4 bg-gray-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm'>Current Value:</h3>
+        <p className='text-sm'>
+          <strong>From:</strong>{' '}
+          {value?.from
+            ? value.from.toLocaleDateString('vi-VN')
+            : 'Not selected'}
+        </p>
+        <p className='text-sm'>
+          <strong>To:</strong>{' '}
+          {value?.to ? value.to.toLocaleDateString('vi-VN') : 'Not selected'}
+        </p>
+      </div>
+
+      <div className='flex gap-2'>
+        <button
+          onClick={() => setValue(undefined)}
+          className='px-3 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600'
+        >
+          Clear
+        </button>
+        <button
+          onClick={() => {
+            const today = new Date()
+            const nextWeek = new Date()
+            nextWeek.setDate(today.getDate() + 7)
+            setValue({ from: today, to: nextWeek })
+          }}
+          className='px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600'
+        >
+          Next 7 Days
+        </button>
       </div>
     </div>
   )
 }
 
 /**
- * Test interactive với state management đúng
+ * Interactive test với state management
  */
-export const InteractiveTest: Story = {
-  render: InteractiveTestComponent,
-  args: {
-    label: 'Test Interactive Range Selection',
-    dateFormat: 'dd/MM/yyyy',
-    numberOfMonths: 2,
-  },
+export const Interactive: Story = {
+  render: () => <InteractiveComponent />,
   parameters: {
     docs: {
       description: {
         story:
-          'Story test với state management đúng để kiểm tra việc chọn range có hoạt động đúng không.',
+          'Interactive example với state management để test chức năng chọn range.',
+      },
+    },
+  },
+}
+
+// Clean test component without initial value
+const CleanTestComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <div className='w-full max-w-xl space-y-4'>
+      <DateRangePicker
+        label='Clean Test (No Initial Value)'
+        value={value}
+        onChange={(newValue) => {
+          setValue(newValue)
+          action('clean-test-changed')(newValue)
+        }}
+        dateFormat='dd/MM/yyyy'
+        numberOfMonths={2}
+      />
+
+      <div className='p-4 bg-gray-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm'>Current Value:</h3>
+        <p className='text-sm'>
+          <strong>From:</strong>{' '}
+          {value?.from
+            ? value.from.toLocaleDateString('vi-VN')
+            : 'Not selected'}
+        </p>
+        <p className='text-sm'>
+          <strong>To:</strong>{' '}
+          {value?.to ? value.to.toLocaleDateString('vi-VN') : 'Not selected'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Clean test without initial value
+ */
+export const CleanTest: Story = {
+  render: () => <CleanTestComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Clean test component starting with no initial value.',
+      },
+    },
+  },
+}
+
+// Test component for range selection behavior
+const RangeSelectionTestComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>(undefined)
+
+  return (
+    <div className='w-full max-w-xl space-y-4'>
+      <DateRangePicker
+        label='Test Range Selection Behavior'
+        value={value}
+        onChange={(newValue) => {
+          setValue(newValue)
+          action('range-selection-test')(newValue)
+        }}
+        dateFormat='dd/MM/yyyy'
+        numberOfMonths={2}
+      />
+
+      <div className='p-4 bg-blue-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm text-blue-800'>Instructions:</h3>
+        <ol className='text-sm text-blue-700 space-y-1'>
+          <li>1. Click on a start date</li>
+          <li>2. Notice that dates before the start date are now disabled</li>
+          <li>3. Hover over future dates to see range preview</li>
+          <li>4. Click on an end date to complete the selection</li>
+        </ol>
+      </div>
+
+      <div className='p-4 bg-gray-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm'>Current Value:</h3>
+        <p className='text-sm'>
+          <strong>From:</strong>{' '}
+          {value?.from
+            ? value.from.toLocaleDateString('vi-VN')
+            : 'Not selected'}
+        </p>
+        <p className='text-sm'>
+          <strong>To:</strong>{' '}
+          {value?.to ? value.to.toLocaleDateString('vi-VN') : 'Not selected'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Test range selection behavior
+ */
+export const RangeSelectionTest: Story = {
+  render: () => <RangeSelectionTestComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Test component để kiểm tra behavior của range selection với disabled dates.',
+      },
+    },
+  },
+}
+
+// Long Range Selection component
+const LongRangeSelectionComponent = () => {
+  const [value, setValue] = React.useState<DateRangeType | undefined>({
+    from: new Date('2025-05-01'),
+    to: new Date('2030-12-31'),
+  })
+
+  return (
+    <div className='w-full max-w-xl space-y-4'>
+      <DateRangePicker
+        label='Long Range Selection (2025-2030)'
+        value={value}
+        onChange={(newValue) => {
+          setValue(newValue)
+          action('long-range-changed')(newValue)
+        }}
+        dateFormat='dd/MM/yyyy'
+        numberOfMonths={2}
+        placeholder='dd/MM/yyyy - dd/MM/yyyy'
+      />
+
+      <div className='p-4 bg-green-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm text-green-800'>
+          Tối ưu cho Range xa:
+        </h3>
+        <ul className='text-sm text-green-700 space-y-1'>
+          <li>✅ Dropdown tháng/năm giúp navigate nhanh</li>
+          <li>✅ Không cần click nhiều lần để đến năm xa</li>
+          <li>✅ UX tốt hơn cho việc chọn range dài hạn</li>
+          <li>✅ Popup không đóng sau khi chọn - tiếp tục chọn được</li>
+        </ul>
+      </div>
+
+      <div className='p-4 bg-gray-50 rounded-lg space-y-2'>
+        <h3 className='font-semibold text-sm'>Current Value:</h3>
+        <p className='text-sm'>
+          <strong>From:</strong>{' '}
+          {value?.from
+            ? value.from.toLocaleDateString('vi-VN')
+            : 'Not selected'}
+        </p>
+        <p className='text-sm'>
+          <strong>To:</strong>{' '}
+          {value?.to ? value.to.toLocaleDateString('vi-VN') : 'Not selected'}
+        </p>
+        <p className='text-sm text-gray-600'>
+          <strong>Duration:</strong>{' '}
+          {value?.from && value?.to
+            ? `${Math.ceil(
+                (value.to.getTime() - value.from.getTime()) /
+                  (1000 * 60 * 60 * 24),
+              )} ngày`
+            : 'N/A'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Long Range Selection - Tối ưu cho việc chọn range xa
+ */
+export const LongRangeSelection: Story = {
+  render: () => <LongRangeSelectionComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demo việc chọn range xa (2025-2030) với month/year navigation để UX tốt hơn.',
       },
     },
   },

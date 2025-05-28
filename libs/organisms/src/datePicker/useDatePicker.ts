@@ -11,13 +11,14 @@ export const useDatePicker = (props: DatePickerProps) => {
   const {
     value,
     onChange,
-    locale = DEFAULT_LOCALE_INTERNAL,
     dateFormat = 'dd/MM/yyyy',
     minDate,
     maxDate,
-    useYearNavigation,
+    useYearNavigation = true,
     placeholder,
   } = props
+
+  const locale = DEFAULT_LOCALE_INTERNAL
 
   const baseLogic = useDatePickerBaseLogic({
     value,
@@ -42,9 +43,9 @@ export const useDatePicker = (props: DatePickerProps) => {
         onChange(date)
       }
       setInputValue(formatDate(date, dateFormat, locale))
-      baseLogic.closePicker()
+      // Remove auto-close behavior - let user click outside to close
     },
-    [onChange, dateFormat, locale, baseLogic],
+    [onChange, dateFormat, locale],
   )
 
   return {

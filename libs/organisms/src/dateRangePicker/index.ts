@@ -1,4 +1,3 @@
-// libs/organisms/src/dateRangePicker/index.ts
-export * from './dateRangePicker'
-// Re-export useDateRangePicker if it's intended to be used externally
-// export * from './useDateRangePicker';
+export type { DateRangeType } from '../date-picker-common/types'
+export { DateRangePicker } from './dateRangePicker'
+export type { DateRangePickerProps } from './dateRangePicker'

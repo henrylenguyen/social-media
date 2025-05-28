@@ -1,11 +1,23 @@
 'use client'
 import { Progress } from '@social-media/atoms'
 import { PhoneMockupComponent } from '@social-media/molecules'
-import { DateRangePicker } from '@social-media/organisms'
+import {
+  DatePicker,
+  DateRangePicker,
+  type DateRangeType,
+} from '@social-media/organisms'
 import * as React from 'react'
 import Step1 from './step1'
 
-const SetUpFirstTimeComponent: React.FunctionComponent = (props) => {
+const SetUpFirstTimeComponent: React.FunctionComponent = () => {
+  const [dateRange, setDateRange] = React.useState<DateRangeType | undefined>(
+    undefined,
+  )
+  console.log("dateRange:", dateRange)
+  const [singleDate, setSingleDate] = React.useState<Date | undefined>(
+    undefined,
+  )
+  console.log("singleDate:", singleDate)
   return (
     <div className='min-h-screen bg-gray-100'>
       <main>
@@ -26,13 +38,62 @@ const SetUpFirstTimeComponent: React.FunctionComponent = (props) => {
               <Step1 />
               {/* Khu vực chứa các trường form */}
               <div className='bg-gray-50 p-6 rounded-lg min-h-[300px] border border-gray-100'>
-                <DateRangePicker
-                  label='Chọn khoảng ngày'
-                  onChange={(value) => {
-                    console.log('Date range changed', value)
-                  }}
-                  placeholder='dd/MM/yyyy - dd/MM/yyyy'
-                />
+                <div className='space-y-4'>
+                  <DatePicker
+                    label='Chọn ngày đơn (Test Fix)'
+                    value={singleDate}
+                    onChange={(value) => {
+                      console.log('Single date changed in app:', value)
+                      setSingleDate(value as Date)
+                    }}
+                    placeholder='dd/MM/yyyy'
+                    dateFormat='dd/MM/yyyy'
+                  />
+
+                  <DateRangePicker
+                    label='Chọn khoảng ngày'
+                    value={dateRange}
+                    onChange={(value) => {
+                      console.log('Date range changed in app:', value)
+                      setDateRange(value)
+                    }}
+                    placeholder='dd/MM/yyyy - dd/MM/yyyy'
+                    numberOfMonths={2}
+                    dateFormat='dd/MM/yyyy'
+                  />
+                </div>
+
+                {/* Debug info */}
+                <div className='mt-4 p-4 bg-white rounded border'>
+                  <h3 className='font-semibold text-sm mb-2'>Debug Info:</h3>
+                  <div className='space-y-2'>
+                    <div>
+                      <p className='text-sm'>
+                        <strong>Single Date:</strong>{' '}
+                        {singleDate
+                          ? singleDate.toLocaleDateString('vi-VN')
+                          : 'Not selected'}
+                      </p>
+                      <p className='text-xs text-gray-500'>
+                        ISO: {singleDate ? singleDate.toISOString() : 'None'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className='text-sm'>
+                        <strong>Range From:</strong>{' '}
+                        {dateRange?.from
+                          ? dateRange.from.toLocaleDateString('vi-VN')
+                          : 'Not selected'}
+                      </p>
+                      <p className='text-sm'>
+                        <strong>Range To:</strong>{' '}
+                        {dateRange?.to
+                          ? dateRange.to.toLocaleDateString('vi-VN')
+                          : 'Not selected'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
               {/* Nút điều hướng */}
               <div className='flex justify-end mt-6'>

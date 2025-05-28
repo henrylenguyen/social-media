@@ -4,7 +4,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@social-media/molecules'
-import { Locale } from 'date-fns'
 import { CalendarDays } from 'lucide-react' // Assuming lucide-react is available
 import React from 'react'
 import { cn } from 'src/utils' // Assuming cn is in @ui/utils or similar NX path
@@ -20,7 +19,6 @@ import { useDatePicker } from './useDatePicker'
 export interface DatePickerProps extends PickerProps {
   value?: Date
   onChange?: (date?: Date | DateRangeType) => void
-  locale?: Locale
   dateFormat?: SupportedDateDisplayFormat
 }
 

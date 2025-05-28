@@ -2,6 +2,7 @@
 import {
   addMonths,
   eachDayOfInterval,
+  endOfDay,
   endOfMonth,
   format as formatDateFnsInternal,
   getDay,
@@ -14,6 +15,7 @@ import {
   isValid as isValidDateFns,
   Locale,
   parse as parseDateFnsInternal,
+  startOfDay,
   startOfMonth,
   subMonths,
 } from 'date-fns'
@@ -54,35 +56,18 @@ const calculateDisabledState = (
   selectedValue?: Date | DateRangeType,
 ): boolean => {
   // Kiểm tra minDate và maxDate
-  let isDisabled =
-    ((minDate &&
-      isBefore(date, minDate) &&
-      !isSameDayFnsInternal(date, minDate)) ||
-      (maxDate &&
-        isAfter(date, maxDate) &&
-        !isSameDayFnsInternal(date, maxDate))) ??
-    false
-
-  // Đối với range picker, disable các ngày trước ngày đã chọn
-  if (
-    isRangePicker &&
-    selectedValue &&
-    typeof selectedValue === 'object' &&
-    'from' in selectedValue &&
-    selectedValue.from &&
-    !selectedValue.to
-  ) {
-    const range = selectedValue as DateRangeType
-    if (
-      range.from &&
-      isBefore(date, range.from) &&
-      !isSameDayFnsInternal(date, range.from)
-    ) {
-      isDisabled = true
-    }
+  if (minDate && isBefore(date, startOfDay(minDate))) {
+    return true
+  }
+  if (maxDate && isAfter(date, endOfDay(maxDate))) {
+    return true
   }
 
-  return isDisabled
+  // Đối với range picker, không disable các ngày khi đã có ngày bắt đầu
+  // Để người dùng có thể chọn ngày kết thúc bất kỳ
+  // Logic swap date sẽ được xử lý trong handleDateSelect
+
+  return false
 }
 
 export const generateMonthDays = (
@@ -154,14 +139,13 @@ export const generateMonthDays = (
           range.from &&
           range.to &&
           isAfter(date, range.from) &&
-          isBefore(date, range.to)
+          isBefore(date, range.to) &&
+          !isSameDayFnsInternal(date, range.from) &&
+          !isSameDayFnsInternal(date, range.to)
         ) {
           isInRange = true
         }
-        if (range.from && !range.to && isSameDayFnsInternal(date, range.from)) {
-          isSelected = true
-          isRangeStart = true
-        }
+        // Remove duplicate logic - already handled above
       } else if (!isRangePicker && selectedValue instanceof Date) {
         isSelected = isSameDayFnsInternal(date, selectedValue as Date)
       }

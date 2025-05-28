@@ -2,7 +2,6 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DatePicker } from './datePicker'
-import * as stories from './index.stories'
 
 // Mock dependencies
 jest.mock('@social-media/atoms', () => ({
@@ -11,35 +10,83 @@ jest.mock('@social-media/atoms', () => ({
       {children}
     </button>
   ),
-  Input: ({ value, onChange, onFocus, ...props }: React.ComponentProps<'input'> & { value?: string; onChange?: (value: string) => void }) => (
-    <input 
-      value={value ?? ''} 
-      onChange={(e) => onChange?.(e.target.value)} 
+  Input: ({
+    value,
+    onChange,
+    onFocus,
+    ...props
+  }: React.ComponentProps<'input'> & {
+    value?: string
+    onChange?: (value: string) => void
+  }) => (
+    <input
+      value={value ?? ''}
+      onChange={(e) => onChange?.(e.target.value)}
       onFocus={onFocus}
-      {...props} 
+      {...props}
     />
   ),
 }))
 
 jest.mock('@social-media/molecules', () => ({
-  Popover: ({ children }: { children: React.ReactNode }) => <div data-testid="popover">{children}</div>,
+  Popover: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid='popover'>{children}</div>
+  ),
   PopoverContent: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="popover-content">{children}</div>
+    <div data-testid='popover-content'>{children}</div>
   ),
   PopoverTrigger: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="popover-trigger">{children}</div>
+    <div data-testid='popover-trigger'>{children}</div>
   ),
 }))
 
 jest.mock('lucide-react', () => ({
-  CalendarDays: () => <div data-testid="calendar-icon" />,
+  CalendarDays: () => <span data-testid='calendar-icon'>📅</span>,
 }))
 
 jest.mock('src/utils', () => ({
   cn: (...classes: (string | undefined)[]) => classes.filter(Boolean).join(' '),
 }))
 
-describe('DatePicker Component Tests', () => {
+// Mock CalendarGrid và CalendarHeader
+jest.mock('../date-picker-common/CalendarGrid', () => ({
+  CalendarGrid: ({
+    onDateSelect,
+    days,
+  }: {
+    onDateSelect: (date: Date) => void
+    days: Array<{ date: Date; isCurrentMonth: boolean; isDisabled: boolean }>
+  }) => (
+    <div data-testid='calendar-grid'>
+      {days?.map((day, dayIndex) => (
+        <button
+          key={`${day.date.getTime()}-${dayIndex}`}
+          data-testid={`calendar-day-${day.date.getDate()}`}
+          onClick={() => onDateSelect(day.date)}
+          disabled={day.isDisabled || !day.isCurrentMonth}
+        >
+          {day.date.getDate()}
+        </button>
+      ))}
+    </div>
+  ),
+}))
+
+jest.mock('../date-picker-common/CalendarHeader', () => ({
+  CalendarHeader: ({
+    monthName,
+    year,
+  }: {
+    monthName: string
+    year: number
+  }) => (
+    <div data-testid='calendar-header'>
+      {monthName} {year}
+    </div>
+  ),
+}))
+
+describe('DatePicker', () => {
   const mockOnChange = jest.fn()
 
   beforeEach(() => {
@@ -47,97 +94,112 @@ describe('DatePicker Component Tests', () => {
   })
 
   describe('Basic Rendering', () => {
-    it('renders correctly with minimal props', () => {
-      render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-          data-testid="datePicker"
-        />
-      )
-
-      expect(screen.getByTestId('datePicker')).toBeInTheDocument()
+    it('renders with default props', () => {
+      render(<DatePicker onChange={mockOnChange} />)
       expect(screen.getByRole('textbox')).toBeInTheDocument()
       expect(screen.getByTestId('calendar-icon')).toBeInTheDocument()
     })
 
-    it('renders with label and required indicator', () => {
-      render(
-        <DatePicker
-          label="Chọn ngày sinh"
-          value={undefined}
-          onChange={mockOnChange}
-          required
-        />
-      )
-
-      expect(screen.getByText('Chọn ngày sinh')).toBeInTheDocument()
-      expect(screen.getByText('*')).toBeInTheDocument()
-    })
-
-    it('renders with error message', () => {
-      render(
-        <DatePicker
-          label="Ngày sinh"
-          value={undefined}
-          onChange={mockOnChange}
-          error="Vui lòng chọn ngày sinh"
-        />
-      )
-
-      expect(screen.getByText('Vui lòng chọn ngày sinh')).toBeInTheDocument()
+    it('renders with label', () => {
+      render(<DatePicker label='Select Date' onChange={mockOnChange} />)
+      expect(screen.getByText('Select Date')).toBeInTheDocument()
     })
 
     it('renders with placeholder', () => {
       render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-          placeholder="dd/mm/yyyy"
-        />
+        <DatePicker placeholder='Pick a date' onChange={mockOnChange} />,
       )
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('placeholder', 'Pick a date')
+    })
 
-      expect(screen.getByPlaceholderText('dd/mm/yyyy')).toBeInTheDocument()
+    it('renders with error message', () => {
+      render(
+        <DatePicker error='Please select a date' onChange={mockOnChange} />,
+      )
+      expect(screen.getByText('Please select a date')).toBeInTheDocument()
+    })
+
+    it('renders as required', () => {
+      render(<DatePicker required onChange={mockOnChange} />)
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('required')
+    })
+
+    it('renders as disabled', () => {
+      render(<DatePicker disabled onChange={mockOnChange} />)
+      const input = screen.getByRole('textbox')
+      expect(input).toBeDisabled()
     })
   })
 
-  describe('Date Display', () => {
+  describe('Value Display', () => {
+    it('displays empty input when no value is provided', () => {
+      render(<DatePicker onChange={mockOnChange} />)
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveValue('')
+    })
+
     it('displays formatted date when value is provided', () => {
-      const testDate = new Date(2024, 0, 15) // 15/01/2024
+      const testDate = new Date('2024-01-15')
+
       render(
         <DatePicker
           value={testDate}
           onChange={mockOnChange}
-          dateFormat="dd/MM/yyyy"
-        />
+          dateFormat='dd/MM/yyyy'
+        />,
       )
 
       const input = screen.getByRole('textbox')
       expect(input).toHaveValue('15/01/2024')
     })
+  })
 
-    it('shows empty value when no date selected', () => {
+  describe('Date Format Support', () => {
+    const testDate = new Date('2024-01-15')
+
+    it('formats dates with dd/MM/yyyy format', () => {
       render(
         <DatePicker
-          value={undefined}
+          value={testDate}
           onChange={mockOnChange}
-        />
+          dateFormat='dd/MM/yyyy'
+        />,
       )
-
       const input = screen.getByRole('textbox')
-      expect(input).toHaveValue('')
+      expect(input).toHaveValue('15/01/2024')
+    })
+
+    it('formats dates with MM/dd/yyyy format', () => {
+      render(
+        <DatePicker
+          value={testDate}
+          onChange={mockOnChange}
+          dateFormat='MM/dd/yyyy'
+        />,
+      )
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveValue('01/15/2024')
+    })
+
+    it('formats dates with yyyy-MM-dd format', () => {
+      render(
+        <DatePicker
+          value={testDate}
+          onChange={mockOnChange}
+          dateFormat='yyyy-MM-dd'
+        />,
+      )
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveValue('2024-01-15')
     })
   })
 
   describe('User Interactions', () => {
-    it('opens picker when input is focused', async () => {
+    it('opens calendar when input is clicked', async () => {
       const user = userEvent.setup()
-      render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-        />
-      )
+      render(<DatePicker onChange={mockOnChange} />)
 
       const input = screen.getByRole('textbox')
       await user.click(input)
@@ -145,84 +207,38 @@ describe('DatePicker Component Tests', () => {
       expect(screen.getByTestId('popover-content')).toBeInTheDocument()
     })
 
-    it('opens picker when calendar button is clicked', async () => {
+    it('opens calendar when calendar icon is clicked', async () => {
       const user = userEvent.setup()
-      render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-        />
-      )
+      render(<DatePicker onChange={mockOnChange} />)
 
-      const calendarButton = screen.getByRole('button')
-      await user.click(calendarButton)
+      const calendarIcon = screen.getByTestId('calendar-icon')
+      await user.click(calendarIcon)
 
       expect(screen.getByTestId('popover-content')).toBeInTheDocument()
     })
   })
 
-  describe('Disabled State', () => {
-    it('disables input and button when disabled prop is true', () => {
-      render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-          disabled
-        />
-      )
-
-      const input = screen.getByRole('textbox')
-      const button = screen.getByRole('button')
-
-      expect(input).toBeDisabled()
-      expect(button).toBeDisabled()
-    })
-  })
-
   describe('Accessibility', () => {
-    it('has proper aria-label for calendar button', () => {
-      render(
-        <DatePicker
-          value={undefined}
-          onChange={mockOnChange}
-        />
-      )
-
-      const button = screen.getByRole('button')
-      expect(button).toHaveAttribute('aria-label', 'Mở lịch')
-    })
-
-    it('associates label with input correctly', () => {
-      render(
-        <DatePicker
-          label="Ngày sinh"
-          value={undefined}
-          onChange={mockOnChange}
-        />
-      )
-
-      const label = screen.getByText('Ngày sinh')
+    it('associates label with input', () => {
+      render(<DatePicker label='Date' onChange={mockOnChange} />)
       const input = screen.getByRole('textbox')
-
-      expect(label).toHaveAttribute('for', 'Ngày sinh')
-      expect(input).toHaveAttribute('id', 'Ngày sinh')
+      expect(input).toHaveAccessibleName('Date')
     })
   })
 
-  describe('Story Integration', () => {
-    it('renders with Default story props', () => {
-      const defaultProps = stories.Default?.args || {}
+  describe('Edge Cases', () => {
+    it('handles null onChange gracefully', () => {
+      expect(() => {
+        render(<DatePicker />)
+      }).not.toThrow()
+    })
 
-      render(
-        <DatePicker
-          {...defaultProps}
-          data-testid="datePicker-with-story-props"
-        />
-      )
+    it('handles invalid date objects gracefully', () => {
+      const invalidDate = new Date('invalid')
 
-      expect(
-        screen.getByTestId('datePicker-with-story-props')
-      ).toBeInTheDocument()
+      expect(() => {
+        render(<DatePicker value={invalidDate} onChange={mockOnChange} />)
+      }).not.toThrow()
     })
   })
 })

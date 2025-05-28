@@ -1,6 +1,5 @@
 import { action } from '@storybook/addon-actions'
 import type { Meta, StoryObj } from '@storybook/react'
-import { vi } from 'date-fns/locale'
 import { SupportedDateDisplayFormat } from '../date-picker-common/types'
 import { DatePicker } from './datePicker'
 
@@ -101,10 +100,6 @@ DatePicker component cung cấp một giao diện trực quan để chọn ngày
     maxDate: {
       description: 'Ngày tối đa có thể chọn',
       control: { type: 'date' },
-    },
-    useYearNavigation: {
-      description: 'Hiển thị dropdown chọn năm/tháng thay vì chỉ hiển thị tên',
-      control: { type: 'boolean' },
     },
   },
 }
@@ -252,12 +247,11 @@ export const Disabled: Story = {
 }
 
 /**
- * DatePicker với navigation năm/tháng
+ * DatePicker với navigation năm/tháng (mặc định)
  */
 export const WithYearNavigation: Story = {
   args: {
-    label: 'Với dropdown năm/tháng',
-    useYearNavigation: true,
+    label: 'Với dropdown năm/tháng (mặc định)',
     dateFormat: 'dd/MM/yyyy',
     onChange: action('year-nav-changed'),
   },
@@ -265,28 +259,7 @@ export const WithYearNavigation: Story = {
     docs: {
       description: {
         story:
-          'DatePicker với dropdown để chọn năm và tháng, hữu ích khi cần chọn ngày xa.',
-      },
-    },
-  },
-}
-
-/**
- * DatePicker với locale tiếng Việt
- */
-export const VietnameseLocale: Story = {
-  args: {
-    label: 'Lịch tiếng Việt',
-    locale: vi,
-    dateFormat: 'd MMMM yyyy',
-    value: new Date('2023-04-29'),
-    onChange: action('vietnamese-date-changed'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'DatePicker sử dụng locale tiếng Việt với tên tháng và ngày trong tuần bằng tiếng Việt.',
+          'DatePicker với dropdown để chọn năm và tháng mặc định, hữu ích khi cần chọn ngày xa.',
       },
     },
   },

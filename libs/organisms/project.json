@@ -1,0 +1,54 @@
+{
+  "name": "organisms",
+  "sourceRoot": "libs/organisms/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/organisms",
+        "main": "libs/organisms/src/index.ts",
+        "tsConfig": "libs/organisms/tsconfig.lib.json",
+        "assets": [
+          "libs/organisms/*.md",
+          {
+            "input": "libs/organisms/src",
+            "glob": "**/*.css",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/organisms/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/organisms/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "configDir": "libs/organisms/.storybook",
+        "browserTarget": "organisms:build-storybook"
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "configDir": "libs/organisms/.storybook",
+        "outputDir": "dist/storybook/organisms"
+      }
+    }
+  }
+}

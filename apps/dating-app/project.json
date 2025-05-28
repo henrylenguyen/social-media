@@ -1,0 +1,60 @@
+{
+  "name": "dating-app",
+  "sourceRoot": "apps/dating-app/src",
+  "projectType": "application",
+  "tags": ["scope:dating", "type:app"],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/dating-app"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "apps/dating-app"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "dating-app:build",
+        "dev": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "dating-app:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "dating-app:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nx/next:export",
+      "options": {
+        "buildTarget": "dating-app:build:production"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/dating-app/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/dating-app/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  }
+}
